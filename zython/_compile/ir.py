@@ -1,6 +1,6 @@
 class IR:
     def __init__(self, model, how_to_solve):
-        if not hasattr(model, "_constaints"):
+        if not hasattr(model, "_constraints"):
             model._constraints = []
         self._model = model
         self._vars = self._get_vars()
