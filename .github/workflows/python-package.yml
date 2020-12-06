@@ -23,11 +23,18 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependacies
+    - name: Install dependencies
       run: |
         sudo apt-get install minizinc
-        minizinc --version
+        which minizinc || echo "NOOOOOOOOO"
+        echo $PATH
+        file /usr/bin/minizinc|| echo "2NOOOOOOOOO"
+        ls -l /usr/bin/minizinc
         pip install flake8 tox
+    - name: Check minizinc version
+      run: |
+        minizinc --version
+        which minizinc || echo "NOOOOOOOOO"
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
