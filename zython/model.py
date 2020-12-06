@@ -29,7 +29,7 @@ class Model(ABC):
     def constraints(self, value):
         self._constraints = value
 
-    def compile(self, how_to_solve):
+    def compile(self, how_to_solve="satisfy"):
         if not hasattr(self, "_ir"):
             self._ir = IR(self, how_to_solve)
             result = to_zinc(self._ir)
