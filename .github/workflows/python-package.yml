@@ -25,6 +25,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependacies
       run: |
+        apt-get install minizinc
         pip install flake8 tox
     - name: Lint with flake8
       run: |
