@@ -6,6 +6,6 @@ def test_range_one_arg():
         def __init__(self):
             self.a = zn.var(range(100))
 
-    model = MyModel()
+    model = MyModel() #
     src = model.compile()
     assert "var 0..99: a;" in src
