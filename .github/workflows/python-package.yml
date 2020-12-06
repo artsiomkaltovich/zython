@@ -26,6 +26,7 @@ jobs:
     - name: Install dependacies
       run: |
         sudo apt-get install minizinc
+        minizinc --version
         pip install flake8 tox
     - name: Lint with flake8
       run: |
