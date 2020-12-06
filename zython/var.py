@@ -7,8 +7,8 @@ class var(_Operation):
     def __init__(self, type_or_value, /):
         self._name = None
         if isinstance(type_or_value, range):
-            # TODO: check for type in range
-            # TODO: assert step
+            if type_or_value.step != 1:
+                raise ValueError("Step values other than 1 are not supported")
             self._type = type_or_value
             self._value = None
         elif isinstance(type_or_value, int):
