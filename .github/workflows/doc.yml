@@ -41,4 +41,4 @@ jobs:
         minizinc --version
     - name: Doc tests
       run: |
-        pytest --doctest-glob=*.rst --doctest-modules'
+        pytest doc --doctest-glob=*.rst --doctest-modules

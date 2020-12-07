@@ -11,9 +11,9 @@ The very common example of such problem is the following:
 
 ::
 
-    S E N D
-+   M O R E
-= M O N E Y
+        S E N D
+    +   M O R E
+    = M O N E Y
 
 Let's express it with zython.
 
@@ -26,23 +26,28 @@ Python Model
 
     class MoneyModel(zn.Model):
         def __init__(self):
-            self.S = zn.var(int)
-            self.E = zn.var(int)
-            self.N = zn.var(int)
-            self.D = zn.var(int)
-            self.M = zn.var(int)
-            self.O = zn.var(int)
-            self.R = zn.var(int)
-            self.Y = zn.var(int)
+            self.S = zn.var(range(1, 10))
+            self.E = zn.var(range(0, 10))
+            self.N = zn.var(range(0, 10))
+            self.D = zn.var(range(0, 10))
+            self.M = zn.var(range(1, 10))
+            self.O = zn.var(range(0, 10))
+            self.R = zn.var(range(0, 10))
+            self.Y = zn.var(range(0, 10))
 
-The result is:
+            self.constraints = [(self.S * 1000 + self.E * 100 + self.N * 10 + self.D +
+                                 self.M * 1000 + self.O * 100 + self.R * 10 + self.E ==
+                                 self.M * 10000 + self.O * 1000 + self.N * 100 + self.E * 10 + self.Y),
+                                 zn.all_different(self.S, self.E, self.N, self.D, self.M, self.O, self.R, self.Y)]
+
+    model = MoneyModel()
+    result = model.solve_satisfy()
+    print(" ", result["S"], result["E"], result["N"], result["D"])
+    print(" ", result["M"], result["O"], result["R"], result["E"])
+    print(result["M"], result["O"], result["N"], result["E"], result["Y"])
 
 .. testoutput::
 
-                     Time  PRICE   AVERAGE   STDDEV  LOWER_BAND  UPPER_BAND
-    0 2003-12-01 00:00:00  1.45   1.450000  0.00000  1.450000    1.450000
-    1 2003-12-01 00:00:01  1.55   1.500000  0.05000  1.450000    1.550000
-    2 2003-12-01 00:00:02  1.45   1.483333  0.04714  1.436193    1.530474
-    3 2003-12-01 00:00:04  1.30   1.375000  0.07500  1.300000    1.450000
-    4 2003-12-01 00:00:10  1.40   1.400000  0.00000  1.400000    1.400000
-
+      9 5 6 7
+      1 0 8 5
+    1 0 6 5 2

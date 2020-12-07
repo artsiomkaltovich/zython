@@ -1,7 +1,16 @@
+from zython._compile.flags import Flag
+from zython.operations import constraint
+
+
 class IR:
     def __init__(self, model, how_to_solve):
+        self.flags = set()
         if not hasattr(model, "_constraints"):
             model._constraints = []
+        else:
+            for c in model.constraints:
+                if isinstance(c, constraint.all_different):
+                    self.flags.add(Flag.all_different)
         self._model = model
         self._vars = self._get_vars()
         self._src = None

@@ -1,8 +1,9 @@
-class _Operation:
+from zython.operations.constraint import Constrain
+
+
+class _Operation(Constrain):
     def __init__(self, op, *params):
-        self._op = op
-        self._params = params
-        self._str = None
+        super(_Operation, self).__init__(op, *params)
 
     def __pow__(self, power, modulo=None):
         if modulo is not None:
@@ -53,11 +54,6 @@ class _Operation:
 
     def __and__(self, other):
         return _Operation(_and, self, other)
-
-    def __str__(self):
-        if self._str is None:
-            self._str = self._op(*self._params)
-        return self._str
 
 
 def _pow(a, b, /):
