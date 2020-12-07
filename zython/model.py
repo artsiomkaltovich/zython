@@ -1,12 +1,10 @@
-from abc import ABC, abstractmethod
-from typing import Optional, List
+from abc import ABC
 
 import minizinc
 
-from zython.var import var
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
-from zython.operations import _Operation
+from zython.var import var
 
 
 class Model(ABC):
