@@ -1,6 +1,7 @@
 import inspect
 
 from zython.operations._operation import _Operation
+from zython.operations.constraint import Constraint
 
 
 class var(_Operation):
@@ -15,6 +16,9 @@ class var(_Operation):
         elif isinstance(type_or_value, int):
             self._type = int
             self._value = type_or_value
+        elif isinstance(type_or_value, Constraint):
+            self._type = type_or_value.type
+            self._value = type_or_value
         elif inspect.isclass(type_or_value):
             if issubclass(type_or_value, int):
                 self._type = int
@@ -25,10 +29,6 @@ class var(_Operation):
     def name(self):
         assert self._name, "name wasn't specified"
         return self._name
-
-    @property
-    def type(self):
-        return self._type
 
     @property
     def value(self):

@@ -1,6 +1,6 @@
 import pytest
 
-from zython import var
+from zython.var_par.var import var
 
 
 def test_simple():
