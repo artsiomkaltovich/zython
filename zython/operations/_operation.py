@@ -1,7 +1,7 @@
-from zython.operations.constraint import Constraint
+from zython.operations.constraint import Constrain
 
 
-class _Operation(Constraint):
+class _Operation(Constrain):
     def __init__(self, op, *params):
         super(_Operation, self).__init__(op, *params)
 
