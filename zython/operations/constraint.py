@@ -32,5 +32,5 @@ class sum(Constraint):
 
 
 def _sum(arg, /):
-    #return f"sum(i__ in 0..{len(arg)})({arg.name}[i__])"
+    # return f"sum(i__ in 0..{len(arg)})({arg.name}[i__])"
     return f"sum({arg.name})"

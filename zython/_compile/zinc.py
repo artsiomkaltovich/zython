@@ -2,7 +2,6 @@ import zython as zn
 from zython._compile.flags import Flag
 from zython._compile.ir import IR
 from zython.operations._operation import _eq
-from zython.operations.constraint import Constraint
 
 
 def to_zinc(ir: IR):
