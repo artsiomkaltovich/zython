@@ -1,5 +1,5 @@
-CryptArithmetic Problem
-=======================
+CryptArithmetic Problem (all_different Constraint)
+==================================================
 
 In such kind of problem all letters should be replaced with digits with two
 main restriction:
@@ -18,7 +18,7 @@ The very common example of such problem is the following:
 Let's express it with zython.
 
 Python Model
-============
+------------
 
 .. testcode::
 
