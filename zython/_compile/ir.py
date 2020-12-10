@@ -5,14 +5,9 @@ from zython.operations import constraint
 class IR:
     def __init__(self, model, how_to_solve):
         self.flags = set()
-        if not hasattr(model, "_constraints"):
-            model._constraints = []
-        else:
-            for c in model.constraints:
-                if isinstance(c, constraint.all_different):
-                    self.flags.add(Flag.all_different)
         self._model = model
         self._vars = self._get_vars()
+        self._process_constraints(model)
         self._src = None
         self._how_to_solve = how_to_solve
 
@@ -36,3 +31,11 @@ class IR:
                 attr._name = name
                 result[name] = attr
         return result
+
+    def _process_constraints(self, model):
+        if not hasattr(model, "_constraints"):
+            model._constraints = []
+        else:
+            for c in model.constraints:
+                if isinstance(c, constraint.all_different):
+                    self.flags.add(Flag.all_different)

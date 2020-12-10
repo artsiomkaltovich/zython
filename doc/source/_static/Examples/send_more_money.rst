@@ -18,7 +18,7 @@ The very common example of such problem is the following:
 Let's express it with zython.
 
 Python Model
-============
+------------
 
 .. testcode::
 

@@ -67,7 +67,7 @@ as
     for i in range(len(result)):
         print("x = {}".format(result[i, "x"]))
 
-While zython make it possible to describe this library using python only:
+While zython makes it possible to describe this model using python only:
 
     class MyModel(zython.Model):
     def __init__(self, a: int, b: int, c: int):

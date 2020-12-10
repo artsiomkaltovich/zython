@@ -4,7 +4,8 @@ import minizinc
 
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
-from zython.var import var
+from zython.operations.constraint import Constraint
+from zython.var_par.var import var
 
 
 class Model(ABC):
@@ -13,9 +14,9 @@ class Model(ABC):
         model = minizinc.Model()
         model.add_string(self.compile("satisfy"))
         inst = minizinc.Instance(solver, model)
-        for name, value in self._ir.vars.items():
-            if value.value is not None:
-                inst[name] = value.value
+        #for name, value in self._ir.vars.items():
+        #    if value.value is not None:
+        #        inst[name] = value.value
         result = inst.solve(all_solutions=all_solutions)
         return result
 
@@ -44,3 +45,5 @@ class Model(ABC):
         if not attr_name.startswith("_"):
             if isinstance(attr, var):
                 return attr
+            if isinstance(attr, Constraint):
+                return var(attr)

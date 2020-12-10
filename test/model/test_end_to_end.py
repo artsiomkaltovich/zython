@@ -1,25 +1,23 @@
-import pytest
-
 import minizinc
 import zython
-from zython import var
+from zython.var_par.var import var
 
 
 def test_minizinc_example():
     def minizinc_model():
-        src = "int: a;\n" \
-              "int: b;\n" \
-              "int: c;\n" \
+        src = "var int: a;\n" \
+              "var int: b;\n" \
+              "var int: c;\n" \
               "var -100..100: x;\n" \
+              "constraint a == 1;\n" \
+              "constraint b == 4;\n" \
+              "constraint c == 0;\n" \
               "constraint ((((a * pow(x, 2)) + (b * x)) + c) = 0);\n" \
               "solve satisfy"
         model = minizinc.Model()
         model.add_string(src)
         gecode = minizinc.Solver.lookup("gecode")
         inst = minizinc.Instance(gecode, model)
-        inst["a"] = 1
-        inst["b"] = 4
-        inst["c"] = 0
         result = inst.solve(all_solutions=True)
         return result
 
@@ -46,20 +44,20 @@ def test_minizinc_example():
 
 def test_range_cmp():
     def minizinc_model(limits):
-        src = "int: a;\n" \
-              "int: b;\n" \
-              "var -100..100: x;\n" \
-              "constraint a < x;\n" \
-              "constraint x < b;\n" \
-              "solve satisfy"
-        model = minizinc.Model()
-        model.add_string(src)
-        gecode = minizinc.Solver.lookup("gecode")
         result = []
         for a, b in limits:
+            src = "var int: a;\n" \
+                  "var int: b;\n" \
+                  "var -100..100: x;\n" \
+                  f"constraint a == {a};\n" \
+                  f"constraint b == {b};\n" \
+                  "constraint a < x;\n" \
+                  "constraint x < b;\n" \
+                  "solve satisfy"
+            model = minizinc.Model()
+            model.add_string(src)
+            gecode = minizinc.Solver.lookup("gecode")
             inst = minizinc.Instance(gecode, model)
-            inst["a"] = a
-            inst["b"] = b
             result.append(inst.solve(all_solutions=True))
         return result
 
