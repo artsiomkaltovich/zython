@@ -1,7 +1,7 @@
 import inspect
 
 from zython.operations._operation import _Operation
-from zython.operations.constraint import Constraint
+from zython.operations.constraint.constraint import Constraint
 
 
 class var(_Operation):

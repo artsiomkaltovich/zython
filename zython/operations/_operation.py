@@ -1,4 +1,4 @@
-from zython.operations.constraint import Constraint
+from zython.operations.constraint.constraint import Constraint
 
 
 class _Operation(Constraint):
