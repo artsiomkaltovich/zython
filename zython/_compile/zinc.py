@@ -53,5 +53,5 @@ def _set_value_as_constraint(ir, variable):
 def _get_value_decl(variable):
     if isinstance(variable.value, tuple):
         # TODO: support 2 and more d
-        return f"array1d({_get_array_shape_decl(variable.shape)}, [{', '.join(str(v) for v in variable.value)}])"
+        return f"array{len(variable.shape)}d({_get_array_shape_decl(variable.shape)}, [{', '.join(str(v) for v in variable.value)}])"
     return str(variable.value)

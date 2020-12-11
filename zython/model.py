@@ -4,7 +4,7 @@ import minizinc
 
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
-from zython.operations.constraint import Constraint
+from zython.operations.constraint.constraint import Constraint
 from zython.var_par.var import var
 
 
@@ -13,6 +13,7 @@ class Model(ABC):
         solver = minizinc.Solver.lookup("gecode")
         model = minizinc.Model()
         model.add_string(self.compile("satisfy"))
+        print(self.src)
         inst = minizinc.Instance(solver, model)
         result = inst.solve(all_solutions=all_solutions)
         return result
