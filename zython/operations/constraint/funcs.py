@@ -29,7 +29,7 @@ def _sum(arg, /):
                 if pos.step is not None and pos.step != 1:
                     raise ValueError("step isn't suported for now")
                 var_name = f"i{i}__"
-                stop = pos.stop if pos.stop else arg.array.shape[level] - 1
+                stop = pos.stop - 1 if pos.stop else arg.array.shape[level] - 1
                 start = pos.start if pos.start else 0
                 if start > stop:
                     raise ValueError("start should be smaller then stop")

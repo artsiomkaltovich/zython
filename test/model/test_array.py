@@ -13,7 +13,7 @@ def test_2d():
     model = MyModel(((j for j in i) for i in r))
     result = model.solve_satisfy()
     assert result["a"] == [[0, 1, 2], [1, 2, 3], [2, 3, 4]]
-    assert result["s1"] == 3
+    assert result["s1"] == 1
     assert result["s2"] == 7
     assert result["s3"] == 4
 
