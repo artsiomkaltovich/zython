@@ -1,5 +1,5 @@
 from zython._compile.flags import Flag
-from zython.operations import constraint
+from zython.operations.constraint import funcs
 
 
 class IR:
@@ -37,5 +37,5 @@ class IR:
             model._constraints = []
         else:
             for c in model.constraints:
-                if isinstance(c, constraint.all_different):
+                if isinstance(c, funcs.all_different):
                     self.flags.add(Flag.all_different)
