@@ -75,4 +75,3 @@ class ArrayView(Array):
         self.array = array
         self.pos = pos
         self._type = array.type
-        #self._name = array.name

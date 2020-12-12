@@ -170,7 +170,7 @@ def _forall(seq, func):
             func_str = _to_str(func(v))
         else:
             func_str = _to_str(func())
-        return f"forall({v.name} in {seq.start}..{seq.stop - 1}){_to_str(func(v))}"
+        return f"forall({v.name} in {seq.start}..{seq.stop - 1}){func_str}"
     else:
         raise ValueError(f"seq should be range, but {type(seq)} was specified")
 
