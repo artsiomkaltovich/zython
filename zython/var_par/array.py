@@ -70,8 +70,8 @@ class Array(var):
         return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__") and (not isinstance(arg, str))
 
 
-class ArrayView:
+class ArrayView(Array):
     def __init__(self, array, pos):
         self.array = array
         self.pos = pos
-        self.type = array.type
+        self._type = array.type

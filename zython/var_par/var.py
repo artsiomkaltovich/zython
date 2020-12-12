@@ -34,8 +34,5 @@ class var(_Operation):
     def value(self):
         return self._value
 
-    def __str__(self):
-        return self.name
-
     def __repr__(self):
         return f"var({self._type}: {self._name})"
