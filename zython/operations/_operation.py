@@ -1,3 +1,4 @@
+from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
 
 
@@ -8,113 +9,49 @@ class _Operation(Constraint):
     def __pow__(self, power, modulo=None):
         if modulo is not None:
             raise ValueError("modulo is not supported")
-        return _Operation(_pow, self, power)
+        return _Operation(Op.pow, self, power)
 
     def __mul__(self, other):
-        return _Operation(_mul, self, other)
+        return _Operation(Op.mul, self, other)
 
     def __truediv__(self, other):
-        return _Operation(_truediv, self, other)
+        return _Operation(Op.truediv, self, other)
 
     def __floordiv__(self, other):
-        return _Operation(_floordiv, self, other)
+        return _Operation(Op.floatdiv, self, other)
 
     def __mod__(self, other):
-        return _Operation(_mod, self, other)
+        return _Operation(Op.mod, self, other)
 
     def __add__(self, other):
-        return _Operation(_add, self, other)
+        return _Operation(Op.add, self, other)
 
     def __sub__(self, other):
-        return _Operation(_sub, self, other)
+        return _Operation(Op.sub, self, other)
 
     def __eq__(self, other):
-        return _Operation(_eq, self, other)
+        return _Operation(Op.eq, self, other)
 
     def __ne__(self, other):
-        return _Operation(_ne, self, other)
+        return _Operation(Op.ne, self, other)
 
     def __lt__(self, other):
-        return _Operation(_lt, self, other)
+        return _Operation(Op.lt, self, other)
 
     def __gt__(self, other):
-        return _Operation(_gt, self, other)
+        return _Operation(Op.gt, self, other)
 
     def __le__(self, other):
-        return _Operation(_le, self, other)
+        return _Operation(Op.le, self, other)
 
     def __ge__(self, other):
-        return _Operation(_ge, self, other)
+        return _Operation(Op.ge, self, other)
 
     def __xor__(self, other):
-        return _Operation(_xor, self, other)
+        return _Operation(Op.xor, self, other)
 
     def __or__(self, other):
-        return _Operation(_or, self, other)
+        return _Operation(Op.or_, self, other)
 
     def __and__(self, other):
-        return _Operation(_and, self, other)
-
-
-def _pow(a, b, /):
-    return f"pow({a}, {b})"
-
-
-def _mul(a, b, /):
-    return f"({a} * {b})"
-
-
-def _truediv(a, b, /):
-    return f"({a} / {b})"
-
-
-def _floordiv(a, b, /):
-    return f"({a} div {b})"
-
-
-def _mod(a, b, /):
-    return f"({a} mod {b})"
-
-
-def _add(a, b, /):
-    return f"({a} + {b})"
-
-
-def _sub(a, b, /):
-    return f"({a} - {b})"
-
-
-def _eq(a, b, /):
-    return f"({a} == {b})"
-
-
-def _ne(a, b, /):
-    return f"({a} != {b})"
-
-
-def _lt(a, b, /):
-    return f"({a} < {b})"
-
-
-def _gt(a, b, /):
-    return f"({a} > {b})"
-
-
-def _le(a, b, /):
-    return f"({a} <= {b})"
-
-
-def _ge(a, b, /):
-    return f"({a} >= {b})"
-
-
-def _xor(a, b, /):
-    return f"({a} xor {b})"
-
-
-def _or(a, b, /):
-    return f"({a} \\/ {b})"
-
-
-def _and(a, b, /):
-    return f"({a} /\\ {b})"
+        return _Operation(Op.and_, self, other)
