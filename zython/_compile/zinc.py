@@ -6,7 +6,6 @@ from typing import Union
 import zython as zn
 from zython import var
 from zython._compile.ir import IR
-from zython.operations._operation import _Operation
 from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
 from zython.var_par.array import ArrayView, Array
@@ -84,12 +83,7 @@ def _to_str(constraint, flags=None):
 
 
 def _array_view_to_str(view):
-    if hasattr(view.pos, "__index__") or isinstance(view.pos, _Operation):
-        if len(view.array.shape) > 1:
-            raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
-                             "or specify index of element")
-        return f"{view.array.name}[{_to_str(view.pos)}]"
-    elif isinstance(view.pos, tuple):
+    if isinstance(view.pos, tuple):
         if len(view.pos) != len(view.array.shape):
             raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
                              "or specify index of element")
