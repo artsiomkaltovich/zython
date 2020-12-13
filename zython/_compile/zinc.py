@@ -1,5 +1,6 @@
 import inspect
 from collections import UserDict
+from typing import Union
 
 import zython as zn
 from zython import var
@@ -8,7 +9,7 @@ from zython._compile.ir import IR
 from zython.operations._operation import _Operation
 from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
-from zython.var_par.array import ArrayView
+from zython.var_par.array import ArrayView, Array
 
 
 def to_zinc(ir: IR):
@@ -158,21 +159,37 @@ def _and(a, b, /):
 
 
 def _forall(seq, func):
+    indexes, v = _get_indexes_def_and_func_arg(seq)
+
+    parameters = inspect.signature(func).parameters
+    if len(parameters) > 1:
+        raise ValueError("only functions and lambdas with one arguments are supported")
+    elif len(parameters) == 1:
+        if v._name is None:
+            v._name, _ = dict(inspect.signature(func).parameters).popitem()
+        func_str = _to_str(func(v))
+    else:
+        func_str = _to_str(func())
+    indexes = indexes if indexes else f"{v.name} in {seq.start}..{seq.stop - 1}"
+    return f"forall({indexes}){func_str}"
+
+
+def _get_indexes_def_and_func_arg(seq):
     if isinstance(seq, range):
         if seq.step != 1:
             raise ValueError("Step aren't supported")
         v = var(int)
-        parameters = inspect.signature(func).parameters
-        if len(parameters) > 1:
-            raise ValueError("only functions and lambdas with one arguments are supported")
-        elif len(parameters) == 1:
-            v._name, _ = dict(inspect.signature(func).parameters).popitem()
-            func_str = _to_str(func(v))
-        else:
-            func_str = _to_str(func())
-        return f"forall({v.name} in {seq.start}..{seq.stop - 1}){func_str}"
+        def_ = None
+    elif isinstance(seq, ArrayView):
+        # TODO: support
+        raise ValueError(f"seq should be range, but {type(seq)} was specified")
+    elif isinstance(seq, Array):
+        def_, indexes = _get_indexes_def(seq)
+        v = var(seq.type)
+        v._name = f"{seq.name}[{', '.join(indexes)}]"
     else:
         raise ValueError(f"seq should be range, but {type(seq)} was specified")
+    return def_, v
 
 
 def _alldifferent(args):
@@ -234,3 +251,13 @@ class Op2Str(UserDict):
 
 
 Op2Str = Op2Str()
+
+
+def _get_indexes_def(array: Union[Array, ArrayView]):
+    if isinstance(array, ArrayView):
+        raise ValueError("ArrayView isn't supported")
+    elif isinstance(array, Array):
+        indexes_ = [f"i{i}__" for i in range(len(array.shape))]
+        return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array.shape)), indexes_
+    else:
+        raise ValueError(f"{type(array)} isn't supported")
