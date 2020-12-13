@@ -20,7 +20,7 @@ class Flags(enum.Enum):
 def to_zinc(ir: IR):
     result = deque()
     flags = set()
-    _process_vars(ir, result)
+    _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
     result.append(f"solve {ir.how_to_solve};")
     _process_flags(flags, result)
@@ -32,7 +32,7 @@ def _process_flags(flags, result):
         result.appendleft('include "alldifferent.mzn";')
 
 
-def _process_vars(ir, src):
+def _process_vars(ir, src, flags):
     for v in ir.vars.values():
         # TODO: check reserved word are not used as variable name
         declaration = ""
@@ -45,7 +45,7 @@ def _process_vars(ir, src):
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         if v.value is not None:
-            _set_value_as_constraint(ir, v)
+            _set_value_as_constraint(ir, v, flags)
         src.append(declaration)
 
 
@@ -60,9 +60,9 @@ def _process_constraints(ir, src, flags):
         src.append(f"constraint {_to_str(c, flags)};")
 
 
-def _set_value_as_constraint(ir, variable):
+def _set_value_as_constraint(ir, variable, flags):
     # values should be set as constraint or it won't be returned
-    ir.constraints.append(_eq(variable.name, _get_value_decl(variable)))
+    ir.constraints.append(_eq(variable.name, _get_value_decl(variable), flags_=flags))
 
 
 def _get_value_decl(variable):
@@ -93,7 +93,7 @@ def _array_view_to_str(view):
         if len(view.pos) != len(view.array.shape):
             raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
                              "or specify index of element")
-        return f"{view.array.name}{(f'[{p}]' for p in view.pos)}"
+        return f"{view.array.name}[{', '.join(_to_str(p) for p in view.pos)}]"
     elif isinstance(view.pos, slice):
         raise ValueError("slices are not supported in such operations, please use zn.forall")
     else:
@@ -165,7 +165,7 @@ def _and(a, b, /, *, flags_):
 
 
 def _forall(seq, func, *, flags_):
-    indexes, v = _get_indexes_def_and_func_arg(seq, flags_=flags_)
+    indexes, v = _get_indexes_def_and_func_arg(seq)
 
     parameters = inspect.signature(func).parameters
     if len(parameters) > 1:
@@ -180,7 +180,7 @@ def _forall(seq, func, *, flags_):
     return f"forall({indexes})({func_str})"
 
 
-def _get_indexes_def_and_func_arg(seq, *, flags_):
+def _get_indexes_def_and_func_arg(seq):
     if isinstance(seq, range):
         if seq.step != 1:
             raise ValueError("Step aren't supported")
@@ -198,7 +198,7 @@ def _get_indexes_def_and_func_arg(seq, *, flags_):
     return def_, v
 
 
-def _alldifferent(args, *, flags_):
+def _alldifferent(args, /, *, flags_):
     flags_.add(Flags.alldifferent)
     if isinstance(args[0], Array):
         if len(args) > 1:
@@ -209,7 +209,7 @@ def _alldifferent(args, *, flags_):
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 
-def _sum(arg, /):
+def _sum(arg, /, *, flags_):
     if isinstance(arg, ArrayView):
         iterators, indexes = _get_indexes_def(arg)
         return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"
