@@ -73,5 +73,9 @@ class Array(var):
 class ArrayView(Array):
     def __init__(self, array, pos):
         self.array = array
-        self.pos = pos
+        self.pos = pos if isinstance(pos, tuple) else (pos, )
         self._type = array.type
+
+    @property
+    def name(self):
+        return self.array.name
