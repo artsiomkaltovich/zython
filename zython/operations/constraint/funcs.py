@@ -2,7 +2,7 @@ from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
 
 
-class all_different(Constraint):
+class alldifferent(Constraint):
     # TODO: array support?
     def __init__(self, *params):
         super().__init__(Op.alldifferent, params)
