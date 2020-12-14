@@ -14,6 +14,7 @@ Python Model
 
     import zython as zn
 
+
     class MyModel(zn.Model):
         def __init__(self, n):
             self.a = zn.Array(zn.var(int), shape=n)

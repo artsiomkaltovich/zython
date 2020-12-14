@@ -1,3 +1,4 @@
+from zython.operations._operation import _Operation
 from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
 
@@ -8,7 +9,7 @@ class alldifferent(Constraint):
         super().__init__(Op.alldifferent, params)
 
 
-class sum(Constraint):
+class sum(_Operation):
     def __init__(self, array, /):
         super().__init__(Op.sum_, array)
         self._type = array.type

@@ -46,12 +46,3 @@ class _Operation(Constraint):
 
     def __ge__(self, other):
         return _Operation(Op.ge, self, other)
-
-    def __xor__(self, other):
-        return _Operation(Op.xor, self, other)
-
-    def __or__(self, other):
-        return _Operation(Op.or_, self, other)
-
-    def __and__(self, other):
-        return _Operation(Op.and_, self, other)
