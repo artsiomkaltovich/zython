@@ -44,3 +44,40 @@ Partial Sum of 2d Array
 .. testoutput::
 
     7
+
+2D Array, Where Every Element is The Sum of The Previous Elements in The Row and The Column
+-------------------------------------------------------------------------------------------
+
+.. testcode::
+
+    from pprint import pprint
+
+    import zython as zn
+
+
+    class MyModel(zn.Model):
+        def __init__(self, n):
+            self.a = zn.Array(zn.var(int), (n, n))
+
+            self.constraints = [
+                # init first values, so model wan't stuck at all zeroes
+                self.a[0, 0] == 0, self.a[0, 1] == 1, self.a[1, 0] == 1,
+                # init first row and column
+                zn.forall(range(2, n), lambda i: (self.a[0, i] == zn.sum(self.a[0, 0:i]))
+                                                 & (self.a[i, 0] == zn.sum(self.a[0:i, 0]))),
+                # init other items
+                zn.forall(range(1, n),
+                          lambda i: zn.forall(range(1, n),
+                                              lambda j: self.a[i, j]
+                                                        == zn.sum(self.a[i, 0:j]) + zn.sum(self.a[0:i, j])))
+            ]
+
+
+    model = MyModel(5)
+    result = model.solve_satisfy()
+    pprint(result["a"])
+
+
+.. testoutput::
+
+    [[0, 1, 1, 2, 4], [1, 2, 4, 9, 20], [1, 4, 10, 26, 65], [2, 9, 26, 74, 200], [4, 20, 65, 200, 578]]

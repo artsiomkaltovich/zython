@@ -24,6 +24,7 @@ Python Model
 
     import zython as zn
 
+
     class MoneyModel(zn.Model):
         def __init__(self):
             self.S = zn.var(range(1, 10))
