@@ -9,7 +9,24 @@ from zython.var_par.var import var
 
 
 class Model(ABC):
+    """ Base class for user-defined models to solve """
+
     def solve_satisfy(self, all_solutions=False):
+        """ Finds solution that satisfied constraints, or the error message if the model can't be solved
+
+        Parameters
+        ----------
+        all_solutions: bool
+            If True all solutions will be returned.
+            If False only the first solution is returned.
+            Default values is False, so the model will return only one solution, as finding all of them can be
+            calculation hard
+
+        Returns
+        -------
+        Result: python-minizinc result
+            result of the model solution, value of variables can be reached by dict syntax.
+        """
         solver = minizinc.Solver.lookup("gecode")
         model = minizinc.Model()
         model.add_string(self.compile("satisfy"))

@@ -2,7 +2,7 @@ Fibonacci number
 ================
 
 Common exercise for learning new programming language is calculation of
-`Fibonacci numbers<https://en.wikipedia.org/wiki/Fibonacci_number>`_, let look how we can express
+`Fibonacci numbers <https://en.wikipedia.org/wiki/Fibonacci_number>`_, let look how we can express
 model for such calculation in zython.
 
 Python Model

@@ -1,7 +1,7 @@
 Sudoku
 ======
 
-`Sudoku<https://en.wikipedia.org/wiki/Sudoku>`_ is a famous logic puzzle. In the most classic version the objective is
+`Sudoku <https://en.wikipedia.org/wiki/Sudoku>`_ is a famous logic puzzle. In the most classic version the objective is
 to fill 9x9 matrix with 1 to 9 digits with several constraint:
 
 - the should not be any identical digits in any row or columns

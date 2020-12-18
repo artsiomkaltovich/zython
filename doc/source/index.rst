@@ -8,11 +8,16 @@ Welcome to zython's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Examples:
+   :glob:
 
-   _static/
+   guides/send_more_money
+   guides/forall
+   guides/fib
+   guides/sum
+   guides/sudoku
 
-
+   api/modules
 
 Indices and tables
 ==================
