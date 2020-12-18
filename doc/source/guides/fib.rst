@@ -12,6 +12,7 @@ Python Model
 
     import zython as zn
 
+
     class MyModel(zn.Model):
         def __init__(self, n):
             if n < 1:
