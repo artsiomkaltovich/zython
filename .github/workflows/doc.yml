@@ -36,7 +36,6 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt install doublecmd-gtk
-        sudo apt-get install minizinc
         pip install -r requirements.txt
         pip install -r requirements_dev.txt
         pip install -r requirements_doc.txt
