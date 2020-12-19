@@ -87,11 +87,14 @@ Zython uses the following libraries:
 - Test is created with [pytest](https://docs.pytest.org/en/stable/) library
 - [tox](https://tox.readthedocs.io/en/latest/) for test execution
 - [flake8](https://flake8.pycqa.org/en/latest/) for coding style checking
+- [sphinx](https://www.sphinx-doc.org/en/master/) for documentation
 
 Requirements necessary for zython run specified in *requirements.txt* file,
-while testing, documentation and development requirements are specified in
-*requirements_dev.txt*. Project can be cloned from github and all dependecies
-can be installed via pip.
+while testing, development requirements are specified in
+*requirements_dev.txt*, and documentation requirements are in *requirements_doc.txt*.
+For example, if you decided to fix bug, and you need no documentation fixes, you shouldn't
+install *requirements_doc.txt*.
+Project can be cloned from github and all dependencies can be installed via pip.
 
     git clone git@github.com:ArtyomKaltovich/zython.git
     python -m venv /path/to/new/venv if needed
@@ -101,6 +104,13 @@ can be installed via pip.
 Note: flake8 isn't specified as dependency in any file, this is made for
 avoiding it installation for every python version tested in CI. You should
 install it manually if you want to check your code before submitting PR.
+You can do it with the following command:
+
+    flake8 zython --count --max-complexity=10 --max-line-length=120 --statistics
+
+You can also run all checking locally:
+
+    sh script/local_test.sh
 
 It is recommended to open new issue and describe a bug or feature request
 before submitting PR. While implementing new feature or fixing bug it is 
