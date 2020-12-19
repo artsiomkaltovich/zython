@@ -2,6 +2,7 @@ from abc import ABC
 
 import minizinc
 
+from zython.result import Result
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
 from zython.operations.constraint.constraint import Constraint
@@ -11,7 +12,7 @@ from zython.var_par.var import var
 class Model(ABC):
     """ Base class for user-defined models to solve """
 
-    def solve_satisfy(self, all_solutions=False):
+    def solve_satisfy(self, all_solutions=False, result_as=None):
         """ Finds solution that satisfied constraints, or the error message if the model can't be solved
 
         Parameters
@@ -24,7 +25,7 @@ class Model(ABC):
 
         Returns
         -------
-        Result: python-minizinc result
+        Result: Result
             result of the model solution, value of variables can be reached by dict syntax.
         """
         solver = minizinc.Solver.lookup("gecode")
@@ -32,7 +33,10 @@ class Model(ABC):
         model.add_string(self.compile("satisfy"))
         inst = minizinc.Instance(solver, model)
         result = inst.solve(all_solutions=all_solutions)
-        return result
+        if result_as is None:
+            return Result(result)
+        else:
+            return result_as(result)
 
     @property
     def constraints(self):

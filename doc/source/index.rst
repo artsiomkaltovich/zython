@@ -12,6 +12,7 @@ Welcome to zython's documentation!
    :glob:
 
    guides/send_more_money
+   guides/color_map
    guides/forall
    guides/fib
    guides/sum
