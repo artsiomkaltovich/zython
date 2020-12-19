@@ -1,5 +1,5 @@
 ``zn.forall`` Constraint
-====================
+========================
 
 ``zn.forall`` constraint is used for defining constraint which should be satisfied for all specified elements of the
 array.

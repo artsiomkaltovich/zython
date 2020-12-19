@@ -2,6 +2,7 @@ from abc import ABC
 
 import minizinc
 
+from zython.result import Result
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
 from zython.operations.constraint.constraint import Constraint
@@ -24,7 +25,7 @@ class Model(ABC):
 
         Returns
         -------
-        Result: python-minizinc result
+        Result: Result
             result of the model solution, value of variables can be reached by dict syntax.
         """
         solver = minizinc.Solver.lookup("gecode")
@@ -32,7 +33,7 @@ class Model(ABC):
         model.add_string(self.compile("satisfy"))
         inst = minizinc.Instance(solver, model)
         result = inst.solve(all_solutions=all_solutions)
-        return result
+        return Result(result)
 
     @property
     def constraints(self):
