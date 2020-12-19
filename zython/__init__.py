@@ -1,5 +1,6 @@
 from zython.var_par.var import var
 from zython.var_par.array import Array
-from .operations.constraint.funcs import alldifferent, sum
-from .operations.constraint.forall import forall
-from .model import Model
+from zython.operations.constraint.funcs import alldifferent, sum
+from zython.operations.constraint.forall import forall
+from zython.model import Model
+from zython.result import as_original
