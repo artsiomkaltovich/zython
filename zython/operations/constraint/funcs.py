@@ -10,6 +10,6 @@ class alldifferent(Constraint):
 
 
 class sum(_Operation):
-    def __init__(self, array, /):
+    def __init__(self, array):  # TODO: make positional only
         super().__init__(Op.sum_, array)
         self._type = array.type

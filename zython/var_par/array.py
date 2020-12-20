@@ -4,7 +4,7 @@ from zython import var
 
 
 class Array(var):
-    def __init__(self, arg, /, shape=None):
+    def __init__(self, arg, shape=None):  # TODO: make positional only
         # TODO: support other then 1d shape
         self._type = None
         self._name = None

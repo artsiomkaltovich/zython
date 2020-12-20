@@ -94,67 +94,67 @@ def _array_view_to_str(view):
         raise ValueError(f"Only int and tuples supported as indexes, but {type(view.pos)} was used")
 
 
-def _pow(a, b, /, *, flags_):
+def _pow(a, b, *, flags_):  # TODO: make positional only
     return f"pow({_to_str(a)}, {_to_str(b)})"
 
 
-def _mul(a, b, /, *, flags_):
+def _mul(a, b, *, flags_):
     return f"({_to_str(a)} * {_to_str(b)})"
 
 
-def _truediv(a, b, /, *, flags_):
+def _truediv(a, b, *, flags_):
     return f"({_to_str(a)} / {_to_str(b)})"
 
 
-def _floatdiv(a, b, /, *, flags_):
+def _floatdiv(a, b, *, flags_):
     return f"({_to_str(a)} div {_to_str(b)})"
 
 
-def _mod(a, b, /, *, flags_):
+def _mod(a, b, *, flags_):
     return f"({_to_str(a)} mod {_to_str(b)})"
 
 
-def _add(a, b, /, *, flags_):
+def _add(a, b, *, flags_):
     return f"({_to_str(a)} + {_to_str(b)})"
 
 
-def _sub(a, b, /, *, flags_):
+def _sub(a, b, *, flags_):
     return f"({_to_str(a)} - {_to_str(b)})"
 
 
-def _eq(a, b, /, *, flags_):
+def _eq(a, b, *, flags_):
     return f"({_to_str(a)} == {_to_str(b)})"
 
 
-def _ne(a, b, /, *, flags_):
+def _ne(a, b, *, flags_):
     return f"({_to_str(a)} != {_to_str(b)})"
 
 
-def _lt(a, b, /, *, flags_):
+def _lt(a, b, *, flags_):
     return f"({_to_str(a)} < {_to_str(b)})"
 
 
-def _gt(a, b, /, *, flags_):
+def _gt(a, b, *, flags_):
     return f"({_to_str(a)} > {_to_str(b)})"
 
 
-def _le(a, b, /, *, flags_):
+def _le(a, b, *, flags_):
     return f"({_to_str(a)} <= {_to_str(b)})"
 
 
-def _ge(a, b, /, *, flags_):
+def _ge(a, b, *, flags_):
     return f"({_to_str(a)} >= {_to_str(b)})"
 
 
-def _xor(a, b, /, *, flags_):
+def _xor(a, b, *, flags_):
     return f"({_to_str(a)} xor {_to_str(b)})"
 
 
-def _or(a, b, /, *, flags_):
+def _or(a, b, *, flags_):
     return f"({_to_str(a)} \\/ {_to_str(b)})"
 
 
-def _and(a, b, /, *, flags_):
+def _and(a, b, *, flags_):
     return f"({_to_str(a)} /\\ {_to_str(b)})"
 
 
@@ -192,7 +192,7 @@ def _get_indexes_def_and_func_arg(seq):
     return def_, v
 
 
-def _alldifferent(args, /, *, flags_):
+def _alldifferent(args, *, flags_):
     flags_.add(Flags.alldifferent)
     if isinstance(args[0], Array):
         if len(args) > 1:
@@ -203,7 +203,7 @@ def _alldifferent(args, /, *, flags_):
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 
-def _sum(arg, /, *, flags_):
+def _sum(arg, *, flags_):
     if isinstance(arg, ArrayView):
         iterators, indexes = _get_indexes_def(arg)
         return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"

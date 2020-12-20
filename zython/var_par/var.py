@@ -5,7 +5,7 @@ from zython.operations.constraint.constraint import Constraint
 
 
 class var(_Operation):
-    def __init__(self, type_or_value, /):
+    def __init__(self, type_or_value):  # TODO: make positional only
         self._name = None
         self._value = None
         self._type = type_or_value
