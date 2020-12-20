@@ -23,12 +23,11 @@ programs.
 
 - You should have minizinc install and have it executable in ``$PATH``.
 You can download it from [official site](https://www.minizinc.org/).
-- Python 3.8+
+- Python 3.6+
 
 ### Installation
 
 The project will be added to pypi.
-``pip install zython``
 
 ### Usage
 
