@@ -21,7 +21,7 @@ programs.
 
 ### Prerequisites
 
-- You should have minizinc install and have it executable in ``$PATH``.
+- You should have minizinc >=2.5 install and have it executable in ``$PATH``.
 You can download it from [official site](https://www.minizinc.org/).
 - Python 3.6+
 
