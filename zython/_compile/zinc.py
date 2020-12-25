@@ -19,6 +19,7 @@ class Flags(enum.Enum):
 def to_zinc(ir: IR):
     result = deque()
     flags = set()
+    _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
     result.append(f"solve {ir.how_to_solve};")
@@ -31,21 +32,29 @@ def _process_flags(flags, result):
         result.appendleft('include "alldifferent.mzn";')
 
 
-def _process_vars(ir, src, flags):
-    for v in ir.vars.values():
+def _process_pars_and_vars(vars_or_pars, src, decl_prefix, flags):
+    if not decl_prefix.endswith(" "):
+        decl_prefix += " "
+    for v in vars_or_pars.values():
         # TODO: check reserved word are not used as variable name
         declaration = ""
         if isinstance(v, zn.Array):
             declaration = f"array[{_get_array_shape_decl(v.shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
-            declaration += f"var int: {v.name};"
+            declaration += f"{decl_prefix}int: {v.name};"
         elif isinstance(v.type, range):
-            declaration += f"var {v.type.start}..{v.type.stop - 1}: {v.name};"
+            declaration += f"{decl_prefix}{v.type.start}..{v.type.stop - 1}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
-        if v.value is not None:
-            _set_value_as_constraint(ir, v, flags)
         src.append(declaration)
+
+
+def _process_pars(ir, src, flags):
+    _process_pars_and_vars(ir._pars, src, "", flags)
+
+
+def _process_vars(ir, src, flags):
+    _process_pars_and_vars(ir._vars, src, "var", flags)
 
 
 def _get_array_shape_decl(shape):
@@ -57,11 +66,6 @@ def _process_constraints(ir, src, flags):
     for c in ir.constraints:
         # some constraints, e.g. set value are directly added as strings
         src.append(f"constraint {_to_str(c, flags)};")
-
-
-def _set_value_as_constraint(ir, variable, flags):
-    # values should be set as constraint or it won't be returned
-    ir.constraints.append(_eq(variable.name, _get_value_decl(variable), flags_=flags))
 
 
 def _get_value_decl(variable):

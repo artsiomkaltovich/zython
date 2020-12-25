@@ -1,11 +1,10 @@
 from collections import deque
 
-from zython import var
+from zython import var, par
 
 
-class Array(var):
+class ArrayMixin:
     def __init__(self, arg, shape=None):  # TODO: make positional only
-        # TODO: support other then 1d shape
         self._type = None
         self._name = None
         self._value = None
@@ -70,7 +69,7 @@ class Array(var):
         return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__") and (not isinstance(arg, str))
 
 
-class ArrayView(Array):
+class ArrayView(ArrayMixin):
     def __init__(self, array, pos):
         self.array = array
         self.pos = pos if isinstance(pos, tuple) else (pos, )
@@ -79,3 +78,21 @@ class ArrayView(Array):
     @property
     def name(self):
         return self.array.name
+
+
+class ArrayVar(var, ArrayMixin):
+    def __init__(self, arg, *, shape=None):
+        self._type = arg.type
+        self._shape = shape if isinstance(shape, tuple) else (shape, )
+
+
+class ArrayPar(par, ArrayMixin):
+    pass
+
+
+class Array:
+    def __new__(cls, arg, shape=None):
+        if isinstance(arg, var):
+            return ArrayVar(arg, shape=shape)
+        else:
+            return ArrayPar(arg)
