@@ -33,8 +33,8 @@ class Model(ABC):
         model = minizinc.Model()
         model.add_string(self.compile("satisfy"))
         inst = minizinc.Instance(solver, model)
-        for name, par in self._ir.pars.items():
-            inst[name] = par.value
+        for name, param in self._ir.pars.items():
+            inst[name] = param.value
         result = inst.solve(all_solutions=all_solutions)
         if result_as is None:
             return Result(result)
@@ -67,4 +67,4 @@ class Model(ABC):
             if isinstance(attr, (var, par)):
                 return attr
             if isinstance(attr, Constraint):
-                return par(attr)
+                return var(attr)

@@ -15,9 +15,5 @@ class par(var):
         if self._type is None:
             raise ValueError(f"{value} is a variable of unsupported type")
 
-    @property
-    def value(self):
-        return self._value
-
     def __repr__(self):
         return f"par({self._type}: {self._name} = {self.value})"
