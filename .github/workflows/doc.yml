@@ -20,7 +20,7 @@ jobs:
                          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage"]
 
     env:
-      MINIZINC_URL: matrix.minizinc_image
+      MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
     - uses: actions/checkout@v2
     - name: Add bin/ to PATH
