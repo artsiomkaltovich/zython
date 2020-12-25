@@ -22,23 +22,23 @@ jobs:
     env:
       MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
-      - uses: actions/checkout@v2
-      - name: Add bin/ to PATH
-        run: |
-          mkdir -p ${{ github.workspace }}/bin
-          echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
-      - name: Cache MiniZinc
-        id: cache-minizinc
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/bin/minizinc
-          key: ${{ env.MINIZINC_URL }}
-      - name: Download MiniZinc
-        if: steps.cache-minizinc.outputs.cache-hit != 'true'
-        run: |
-          sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
-          sudo chmod +x ${{ github.workspace }}/bin/minizinc
-          minizinc --version
+    - uses: actions/checkout@v2
+    - name: Add bin/ to PATH
+      run: |
+        mkdir -p ${{ github.workspace }}/bin
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+    - name: Cache MiniZinc
+      id: cache-minizinc
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/bin/minizinc
+        key: ${{ env.MINIZINC_URL }}
+    - name: Download MiniZinc
+      if: steps.cache-minizinc.outputs.cache-hit != 'true'
+      run: |
+        sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
+        sudo chmod +x ${{ github.workspace }}/bin/minizinc
+        minizinc --version
 
     - name: Cache dev modules
       uses: actions/cache@v2
