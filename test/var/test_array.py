@@ -10,7 +10,6 @@ def test_creating(array):
             self.a = zn.Array(array)
 
     model = MyModel(array)
-    assert model.a.value == (1, 2, 3, 4)
     assert model.a.shape == (4, )
     assert len(model.a) == 4
 
@@ -21,7 +20,6 @@ def test_2d_correct():
             self.a = zn.Array(array)
 
     model = MyModel([[1, 2], [1, 3]])
-    assert model.a.value == (1, 2, 1, 3)
     assert model.a.shape == (2, 2)
     assert len(model.a) == 2
 

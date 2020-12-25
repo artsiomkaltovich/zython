@@ -1,3 +1,4 @@
+import inspect
 from collections import deque
 
 from zython import var, par
@@ -59,6 +60,7 @@ class ArrayPar(par, ArrayMixin):
             raise ValueError(f"var or sequence is expected as the first argument, but {type(arg)} was passed")
 
     def _create_array(self, arg):
+        is_generator = inspect.isgenerator(arg)
         shape = []
         queue = deque()
         level = 0
@@ -82,13 +84,20 @@ class ArrayPar(par, ArrayMixin):
         if not isinstance(arg, int):
             raise ValueError("Only array with dtype int are supported")
         self._type = type(arg)
+        values = [arg]
+        self._check_and_set_values(is_generator, level, queue, values)
+        self._shape = tuple(shape)
+
+    def _check_and_set_values(self, is_generator, level, queue, values):
         for val, new_level in queue:
             if not isinstance(val, self._type):
                 raise ValueError(f"All elements of the array should be the same type, "
                                  f"but {self._type} and {type(val)} were found")
             if _can_create_array_from(val) or level != new_level:
                 raise ValueError("Subarrays of different length are not supported")
-        self._shape = tuple(shape)
+            values.append(val)
+        if is_generator:
+            self._value = values
 
 
 class Array:
