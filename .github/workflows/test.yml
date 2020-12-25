@@ -16,12 +16,11 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.6']
-        minizinc_image:
-          - {name: "latest", url: "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage"}
-          - {name: "2.5.0", url: "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage"}
+        minizinc_image: [ "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
+                          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage" ]
 
     env:
-      MINIZINC_URL: ${{ matrix.minizinc_image.url }}
+      MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
     - uses: actions/checkout@v2
     - name: Add bin/ to PATH
