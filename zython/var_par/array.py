@@ -52,7 +52,7 @@ class ArrayPar(par, ArrayMixin):
     def __init__(self, arg):
         self._type = None
         self._name = None
-        self._value = None
+        self._value = arg
         self._shape = None
         self._create_array(arg)
         if self._type is None:
@@ -79,7 +79,6 @@ class ArrayPar(par, ArrayMixin):
                 raise ValueError("Subarrays of different length are not supported, length of all subarrays "
                                  f"at level {level} should be {old_length}, but one has {length}")
             level = new_level
-        values = [arg]
         if not isinstance(arg, int):
             raise ValueError("Only array with dtype int are supported")
         self._type = type(arg)
@@ -89,8 +88,6 @@ class ArrayPar(par, ArrayMixin):
                                  f"but {self._type} and {type(val)} were found")
             if _can_create_array_from(val) or level != new_level:
                 raise ValueError("Subarrays of different length are not supported")
-            values.append(val)
-        self._value = tuple(values)
         self._shape = tuple(shape)
 
 
