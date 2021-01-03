@@ -100,16 +100,19 @@ class ArrayPar(par, ArrayMixin):
             self._value = self._flatten_to_shaped(flatten_values)
 
     def _flatten_to_shaped(self, flatten_values):
-        for s in reversed(self._shape[1:]):
-            values = []
-            start = 0
-            end = 0
-            while end < len(flatten_values):
-                end = start + s
-                values.append(flatten_values[start:end])
-                start = end
-            flatten_values = values
-        return values
+        if len(self._shape) > 1:
+            for s in reversed(self._shape[1:]):
+                values = []
+                start = 0
+                end = 0
+                while end < len(flatten_values):
+                    end = start + s
+                    values.append(flatten_values[start:end])
+                    start = end
+                flatten_values = values
+            return values
+        else:
+            return flatten_values
 
 
 class Array:
