@@ -1,5 +1,5 @@
 ``Array.ndims`` and ``Array.size`` Methods
-=========================================
+==========================================
 
 `Zython` provides the way of customization and retrospection of the array in the model in order to get its number of
 dimension and number of items in every dimensions.
