@@ -10,8 +10,7 @@ def test_creating(array):
             self.a = zn.Array(array)
 
     model = MyModel(array)
-    assert model.a.shape == (4, )
-    assert len(model.a) == 4
+    assert model.a._shape == (4, )
 
 
 def test_2d_correct():
@@ -21,8 +20,7 @@ def test_2d_correct():
 
     array = [[1, 2], [1, 3]]
     model = MyModel(array)
-    assert model.a.shape == (2, 2)
-    assert len(model.a) == 2
+    assert model.a._shape == (2, 2)
     assert model.a.value == array
 
 
@@ -36,8 +34,7 @@ def test_2d_gen():
 
     r = (range(i, i + 3) for i in range(2))
     model = MyModel(((j for j in i) for i in r))
-    assert model.a.shape == (2, 3)
-    assert len(model.a) == 2
+    assert model.a._shape == (2, 3)
     assert model.a.value == [[0, 1, 2], [1, 2, 3]]
 
 
@@ -51,8 +48,7 @@ def test_3d_gen():
 
     r = ((range(i, i + 3) for i in range(2)) for _ in range(4))
     model = MyModel(((j for j in i) for i in r))
-    assert model.a.shape == (4, 2, 3)
-    assert len(model.a) == 4
+    assert model.a._shape == (4, 2, 3)
     assert model.a.value == [[[0, 1, 2], [1, 2, 3]], [[0, 1, 2], [1, 2, 3]], [[0, 1, 2], [1, 2, 3]], [[0, 1, 2], [1, 2, 3]]]
 
 
@@ -74,3 +70,54 @@ def test_different_length(array):
 
     with pytest.raises(ValueError, match="Subarrays of different length are not supported"):
         MyModel(array)
+
+
+class TestPos:
+    def test_int_1d(self):
+        a = zn.Array([1, 2, 3])
+        a = a[1]
+        assert a.pos == (1,)
+
+    def test_tuple_1d(self):
+        a = zn.Array([1, 2, 3])
+        with pytest.raises(ValueError, match="Array has 1 dimensions but 2 were specified"):
+            _ = a[1, 0]
+
+    def test_neg_int(self):
+        a = zn.Array([1, 2, 3])
+        with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
+            _ = a[-1]
+
+    def test_step(self):
+        a = zn.Array([1, 2, 3])
+        with pytest.raises(AssertionError, match="Step other then 1 isn't supported for now"):
+            _ = a[1:3:2]
+
+    @pytest.mark.parametrize("pos", [slice(-1, 2), slice(1, -2), slice(-1, -2)])
+    def test_neg_slice_2d(self, pos):
+        a = zn.Array([[1], [2], [3]])
+        with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
+            _ = a[pos]
+
+    @pytest.mark.parametrize("pos, expected", [((1, 2), (1, 2)),
+                                               ((0, slice(1, 3)), (0, slice(1, 3, 1)))])
+    def test_2d(self, pos, expected):
+        a = zn.Array([[1, 2], [2, 3], [3, 4]])
+        a = a[pos]
+        assert a.pos == expected
+
+    @pytest.mark.parametrize("pos, expected", [(1, (1, slice(None, None, 1))),
+                                               (slice(None, 2), (slice(None, 2, 1), slice(None, None, 1))),
+                                               (slice(1, None), (slice(1, None, 1), slice(None, None, 1)))])
+    def test_2d_added_last_dim(self, pos, expected):
+        a = zn.Array([[1, 2], [2, 3], [3, 4]])
+        a = a[pos]
+        assert a.pos == expected
+
+
+class TestSize:
+    @pytest.mark.parametrize("dim", (-1, 3))
+    def test_wrong_dim(self, dim):
+        a = zn.Array([[1, 2], [2, 3], [3, 4]])
+        with pytest.raises(ValueError, match=f"Array has 0\\.\\.2 dimensions, but {dim} were specified"):
+            a.size(dim)
