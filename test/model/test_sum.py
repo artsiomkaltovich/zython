@@ -12,7 +12,6 @@ def test_2d():
     r = (range(i, i + 3) for i in range(3))
     model = MyModel(((j for j in i) for i in r))
     result = model.solve_satisfy()
-    assert result["a"] == [[0, 1, 2], [1, 2, 3], [2, 3, 4]]
     assert result["s1"] == 1
     assert result["s2"] == 7
     assert result["s3"] == 4
@@ -28,6 +27,5 @@ def test_3():
     array = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
     model = MyModel(array)
     result = model.solve_satisfy()
-    assert result["a"] == [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
     assert result["s"] == 36
     assert result["s1"] == 22

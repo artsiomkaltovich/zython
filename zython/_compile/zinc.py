@@ -3,12 +3,11 @@ import inspect
 from collections import UserDict, deque
 from typing import Union
 
-import zython as zn
 from zython import var
 from zython._compile.ir import IR
 from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
-from zython.var_par.array import ArrayView, Array
+from zython.var_par.array import ArrayView, ArrayMixin
 
 
 class Flags(enum.Enum):
@@ -19,6 +18,7 @@ class Flags(enum.Enum):
 def to_zinc(ir: IR):
     result = deque()
     flags = set()
+    _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
     result.append(f"solve {ir.how_to_solve};")
@@ -31,21 +31,36 @@ def _process_flags(flags, result):
         result.appendleft('include "alldifferent.mzn";')
 
 
-def _process_vars(ir, src, flags):
-    for v in ir.vars.values():
+def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
+    if not decl_prefix.endswith(" "):
+        decl_prefix += " "
+    for v in vars_or_pars.values():
         # TODO: check reserved word are not used as variable name
         declaration = ""
-        if isinstance(v, zn.Array):
+        if isinstance(v, ArrayMixin):
             declaration = f"array[{_get_array_shape_decl(v.shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
-            declaration += f"var int: {v.name};"
+            declaration += f"{decl_prefix}int: {v.name};"
         elif isinstance(v.type, range):
-            declaration += f"var {v.type.start}..{v.type.stop - 1}: {v.name};"
+            declaration += f"{decl_prefix}{v.type.start}..{v.type.stop - 1}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
-        if v.value is not None:
-            _set_value_as_constraint(ir, v, flags)
         src.append(declaration)
+        if isinstance(v.value, Constraint):
+            _set_value_as_constraint(ir, v, flags)
+
+
+def _process_pars(ir, src, flags):
+    _process_pars_and_vars(ir, ir._pars, src, "", flags)
+
+
+def _process_vars(ir, src, flags):
+    _process_pars_and_vars(ir, ir._vars, src, "var", flags)
+
+
+def _set_value_as_constraint(ir, variable, flags):
+    # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
+    ir.constraints.append(_eq(variable.name, _get_value_decl(variable), flags_=flags))
 
 
 def _get_array_shape_decl(shape):
@@ -57,11 +72,6 @@ def _process_constraints(ir, src, flags):
     for c in ir.constraints:
         # some constraints, e.g. set value are directly added as strings
         src.append(f"constraint {_to_str(c, flags)};")
-
-
-def _set_value_as_constraint(ir, variable, flags):
-    # values should be set as constraint or it won't be returned
-    ir.constraints.append(_eq(variable.name, _get_value_decl(variable), flags_=flags))
 
 
 def _get_value_decl(variable):
@@ -183,7 +193,7 @@ def _get_indexes_def_and_func_arg(seq):
     elif isinstance(seq, ArrayView):
         # TODO: support
         raise ValueError(f"seq should be range, but {type(seq)} was specified")
-    elif isinstance(seq, Array):
+    elif isinstance(seq, ArrayMixin):
         def_, indexes = _get_indexes_def(seq)
         v = var(seq.type)
         v._name = f"{seq.name}[{', '.join(indexes)}]"
@@ -194,7 +204,7 @@ def _get_indexes_def_and_func_arg(seq):
 
 def _alldifferent(args, *, flags_):
     flags_.add(Flags.alldifferent)
-    if isinstance(args[0], Array):
+    if isinstance(args[0], ArrayMixin):
         if len(args) > 1:
             raise ValueError("Several arrays are not supported")
         arg = args[0]
@@ -207,7 +217,7 @@ def _sum(arg, *, flags_):
     if isinstance(arg, ArrayView):
         iterators, indexes = _get_indexes_def(arg)
         return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"
-    elif isinstance(arg, Array):
+    elif isinstance(arg, ArrayMixin):
         return f"sum({arg.name})"
     else:
         raise ValueError(f"Only arrays and array views are supported as sum argument, but {type(arg)} was specified.")
@@ -240,7 +250,7 @@ class Op2Str(UserDict):
 Op2Str = Op2Str()
 
 
-def _get_indexes_def(array: Union[Array, ArrayView]):
+def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
     if isinstance(array, ArrayView):
         iterators = []
         indexes = []
@@ -270,7 +280,7 @@ def _get_indexes_def(array: Union[Array, ArrayView]):
             indexes.append(var_name)
             iterators.append(f"{var_name} in 0..{array.array.shape[level] - 1}")
         return iterators, indexes
-    elif isinstance(array, Array):
+    elif isinstance(array, ArrayMixin):
         indexes_ = [f"i{i}__" for i in range(len(array.shape))]
         return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array.shape)), indexes_
     else:

@@ -12,13 +12,33 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         python-version: ['3.6']
+        minizinc_image: ["https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
+                         "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage"]
 
+    env:
+      MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
     - uses: actions/checkout@v2
+    - name: Add bin/ to PATH
+      run: |
+        mkdir -p ${{ github.workspace }}/bin
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+    - name: Cache MiniZinc
+      id: cache-minizinc
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/bin/minizinc
+        key: ${{ env.MINIZINC_URL }}
+    - name: Download MiniZinc
+      if: steps.cache-minizinc.outputs.cache-hit != 'true'
+      run: |
+        sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
+        sudo chmod +x ${{ github.workspace }}/bin/minizinc
+        minizinc --version
 
     - name: Cache dev modules
       uses: actions/cache@v2
@@ -34,7 +54,6 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        sudo apt-get install minizinc
         pip install -r requirements.txt
         pip install -r requirements_dev.txt
         pip install -r requirements_doc.txt

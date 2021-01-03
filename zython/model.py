@@ -6,6 +6,7 @@ from zython.result import Result
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
 from zython.operations.constraint.constraint import Constraint
+from zython.var_par.par import par
 from zython.var_par.var import var
 
 
@@ -32,6 +33,8 @@ class Model(ABC):
         model = minizinc.Model()
         model.add_string(self.compile("satisfy"))
         inst = minizinc.Instance(solver, model)
+        for name, param in self._ir.pars.items():
+            inst[name] = param.value
         result = inst.solve(all_solutions=all_solutions)
         if result_as is None:
             return Result(result)
@@ -59,9 +62,9 @@ class Model(ABC):
         assert hasattr(self, "_src"), "Please solve or compile first"
         return self._src
 
-    def get_var_attr(self, attr_name: str, attr):
+    def _get_var_or_par_attr(self, attr_name: str, attr):
         if not attr_name.startswith("_"):
-            if isinstance(attr, var):
+            if isinstance(attr, (var, par)):
                 return attr
             if isinstance(attr, Constraint):
                 return var(attr)

@@ -1,4 +1,5 @@
 from zython.var_par.var import var
+from zython.var_par.par import par
 from zython.var_par.array import Array
 from zython.operations.constraint.funcs import alldifferent, sum
 from zython.operations.constraint.forall import forall
