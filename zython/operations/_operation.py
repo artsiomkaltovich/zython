@@ -5,6 +5,8 @@ from zython.operations.constraint.constraint import Constraint
 class _Operation(Constraint):
     def __init__(self, op, *params):
         super(_Operation, self).__init__(op, *params)
+        if op == Op.size:
+            self._type = int
 
     def __pow__(self, power, modulo=None):
         if modulo is not None:

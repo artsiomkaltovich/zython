@@ -38,7 +38,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
         # TODO: check reserved word are not used as variable name
         declaration = ""
         if isinstance(v, ArrayMixin):
-            declaration = f"array[{_get_array_shape_decl(v.shape)}] of "  # TODO: refactor var vs par
+            declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
             declaration += f"{decl_prefix}int: {v.name};"
         elif isinstance(v.type, range):
@@ -77,7 +77,7 @@ def _process_constraints(ir, src, flags):
 def _get_value_decl(variable):
     if isinstance(variable.value, tuple):
         # TODO: support 2 and more d
-        return f"array{len(variable.shape)}d({_get_array_shape_decl(variable.shape)}, " \
+        return f"array{len(variable._shape)}d({_get_array_shape_decl(variable._shape)}, " \
                f"[{', '.join(str(v) for v in variable.value)}])"
     return _to_str(variable.value)
 
@@ -94,7 +94,7 @@ def _to_str(constraint, flags=None):
 
 def _array_view_to_str(view):
     if isinstance(view.pos, tuple):
-        if len(view.pos) != len(view.array.shape):
+        if len(view.pos) != len(view.array._shape):
             raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
                              "or specify index of element")
         return f"{view.array.name}[{', '.join(_to_str(p) for p in view.pos)}]"
@@ -223,6 +223,10 @@ def _sum(arg, *, flags_):
         raise ValueError(f"Only arrays and array views are supported as sum argument, but {type(arg)} was specified.")
 
 
+def _size(array: ArrayMixin, dim: int, *, flags_):
+    return f"max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1"
+
+
 class Op2Str(UserDict):
     def __init__(self):
         self.data = {}
@@ -245,6 +249,7 @@ class Op2Str(UserDict):
         self[Op.alldifferent] = _alldifferent
         self[Op.forall] = _forall
         self[Op.sum_] = _sum
+        self[Op.size] = _size
 
 
 Op2Str = Op2Str()
@@ -255,13 +260,12 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
         iterators = []
         indexes = []
         i = 0
-        level = 0
         for level, pos in enumerate(array.pos):
             if isinstance(pos, slice):
                 if pos.step is not None and pos.step != 1:
                     raise ValueError("step isn't suported for now")
                 var_name = f"i{i}__"
-                stop = pos.stop - 1 if pos.stop else array.array.shape[level] - 1
+                stop = pos.stop - 1 if pos.stop else array.array._shape[level] - 1
                 start = pos.start if pos.start else 0
                 if isinstance(start, int) and isinstance(stop, int) and start > stop:
                     raise ValueError(f"start ({start}) should be smaller then stop ({stop})")
@@ -275,13 +279,9 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
             else:
                 raise ValueError("Only int and slice are supported as indexes")
             indexes.append(var_name)
-        for level in range(level + 1, len(array.array.shape)):
-            var_name = f"i{level}__"
-            indexes.append(var_name)
-            iterators.append(f"{var_name} in 0..{array.array.shape[level] - 1}")
         return iterators, indexes
     elif isinstance(array, ArrayMixin):
-        indexes_ = [f"i{i}__" for i in range(len(array.shape))]
-        return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array.shape)), indexes_
+        indexes_ = [f"i{i}__" for i in range(len(array._shape))]
+        return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array._shape)), indexes_
     else:
         raise ValueError(f"{type(array)} isn't supported")

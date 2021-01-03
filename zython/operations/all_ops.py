@@ -21,3 +21,4 @@ class Op(enum.Enum):
     alldifferent = enum.auto()
     forall = enum.auto()
     sum_ = enum.auto()
+    size = enum.auto()

@@ -1,8 +1,11 @@
 import inspect
+import itertools
 from collections import deque
+from typing import Type
 
 from zython import var, par
 from zython.operations._operation import _Operation
+from zython.operations.all_ops import Op
 
 
 def _can_create_array_from(arg):
@@ -10,6 +13,10 @@ def _can_create_array_from(arg):
 
 
 class ArrayMixin(_Operation):
+    _shape: tuple
+    _name: str
+    _type: Type
+
     @property
     def name(self):
         assert self._name, "name wasn't specified"
@@ -19,26 +26,65 @@ class ArrayMixin(_Operation):
     def type(self):
         return self._type
 
-    @property
-    def shape(self):
-        return self._shape
-
-    def __len__(self):
-        return self.shape[0]
-
     def __getitem__(self, item):
         return ArrayView(self, item)
+
+    def ndims(self):
+        return len(self._shape)
+
+    def size(self, dim=0):
+        """ returns constraint, which is evaluated as the number of items in the specified dimension of the array.
+
+        Parameters
+        ----------
+        dim: int
+            dimension of the array
+
+        Returns
+        -------
+        size: _Operation
+            Operation which is evaluated as number of the items in specified dimension by the model
+        """
+        if 0 <= dim < self.ndims():
+            return _Operation(Op.size, self, dim)
+        raise ValueError(f"Array has 0..{self.ndims()} dimensions, but {dim} were specified")
 
 
 class ArrayView(ArrayMixin):
     def __init__(self, array, pos):
-        self.array = array
-        self.pos = pos if isinstance(pos, tuple) else (pos, )
+        self.array: ArrayMixin = array
+        # pos is a tuple with the same size as number of array dimensions, the user can specify less iterators,
+        # slice(None, None, 1) will be added to fit the number of dimensions, so compilers shouldn't worry about it
+        self.pos = self._get_pos(pos)
         self._type = array.type
+
+    def _get_pos(self, pos):
+        if not isinstance(pos, tuple):
+            pos = [pos]
+        repeat = itertools.repeat(slice(None, None, 1), self.array.ndims() - len(pos))
+        pos = tuple(self._process_pos_item(p) for p in itertools.chain(pos, repeat))
+        if len(pos) > self.array.ndims():
+            raise ValueError(f"Array has {self.array.ndims()} dimensions but {len(pos)} were specified")
+        return pos
 
     @property
     def name(self):
         return self.array.name
+
+    def _is_neg_index(self, p):
+        if isinstance(p, int) and p < 0:
+            raise ValueError(f"Negative indexes are not supported for now, but {p} was specified")
+
+    def _process_pos_item(self, p):
+        if isinstance(p, slice):
+            self._is_neg_index(p.start)
+            self._is_neg_index(p.stop)
+            if p.step is None:
+                p = slice(p.start, p.stop, 1)
+            assert p.step == 1, f"Step other then 1 isn't supported for now, but {p.step} was specified"
+        else:
+            self._is_neg_index(p)
+        return p
 
 
 class ArrayVar(var, ArrayMixin):
