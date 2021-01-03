@@ -84,20 +84,32 @@ class ArrayPar(par, ArrayMixin):
         if not isinstance(arg, int):
             raise ValueError("Only array with dtype int are supported")
         self._type = type(arg)
-        values = [arg]
-        self._check_and_set_values(is_generator, level, queue, values)
         self._shape = tuple(shape)
+        self._check_and_set_values(arg, is_generator, level, queue)
 
-    def _check_and_set_values(self, is_generator, level, queue, values):
+    def _check_and_set_values(self, arg, is_generator, level, queue):
+        flatten_values = [arg]
         for val, new_level in queue:
             if not isinstance(val, self._type):
                 raise ValueError(f"All elements of the array should be the same type, "
                                  f"but {self._type} and {type(val)} were found")
             if _can_create_array_from(val) or level != new_level:
                 raise ValueError("Subarrays of different length are not supported")
-            values.append(val)
+            flatten_values.append(val)
         if is_generator:
-            self._value = values
+            self._value = self._flatten_to_shaped(flatten_values)
+
+    def _flatten_to_shaped(self, flatten_values):
+        for s in reversed(self._shape[1:]):
+            values = []
+            start = 0
+            end = 0
+            while end < len(flatten_values):
+                end = start + s
+                values.append(flatten_values[start:end])
+                start = end
+            flatten_values = values
+        return values
 
 
 class Array:
