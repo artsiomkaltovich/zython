@@ -42,7 +42,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
             declaration += f"{decl_prefix}int: {v.name};"
-        elif isinstance(v.type, range):
+        elif is_range(v.type):
             declaration += f"{decl_prefix}{_to_str(v.type.start)}..{_to_str(v.type.stop - 1)}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
@@ -52,11 +52,11 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
 
 
 def _process_pars(ir, src, flags):
-    _process_pars_and_vars(ir, ir._pars, src, "", flags)
+    _process_pars_and_vars(ir, ir.pars, src, "", flags)
 
 
 def _process_vars(ir, src, flags):
-    _process_pars_and_vars(ir, ir._vars, src, "var", flags)
+    _process_pars_and_vars(ir, ir.vars, src, "var", flags)
 
 
 def _set_value_as_constraint(ir, variable, flags):

@@ -2,17 +2,19 @@ import inspect
 
 from zython.operations._operation import _Operation
 from zython.operations.constraint.constraint import Constraint
+from zython.var_par.types import is_range
 
 
 class var(_Operation):
     def __init__(self, type_):  # TODO: make positional only
         self._name = None
         self._value = None
+        self._type = None
         if isinstance(type_, Constraint):
             self._type = type_.type
             self._value = type_
         else:
-            if isinstance(type_, range):
+            if is_range(type_):
                 if type_.step != 1:
                     raise ValueError("Step values other than 1 are not supported")
                 self._type = type_
