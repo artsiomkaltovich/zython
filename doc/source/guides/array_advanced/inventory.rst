@@ -43,18 +43,37 @@ Python Model
                                                   lambda k2: self.inventory[i + k1, j + k2] == obj_idx))
 
 
-    model = MyModel([[1, 2], [2, 1], [4, 1], [2, 2]], (5, 4))
-    result = model.solve_satisfy()
-    print(result["inventory"])
+    # functions to check result correctness
+    def check(r, objects):
+        for obj, (height, width) in enumerate(objects):
+            find_obj(r, obj, width, height)
 
-    model = MyModel([[1, 2], [2, 2], [3, 1]], (3, 3))
-    result = model.solve_satisfy()
-    print(result["inventory"])
+
+    def find_obj(r, obj, width, height):
+        for i in range(len(r)):
+            for j in range(len(r[0])):
+                if r[i][j] == obj:
+                    for h in range(1, height):
+                        for w in range(1, width):
+                            assert r[i + h][j + w] == obj
+                    return
+        raise AssertionError("obj {} not found".format(obj))
+
+
+    objects1 = [[1, 2], [2, 1], [4, 1], [2, 2]]
+    shape1 = (5, 4)
+    objects2 = [[1, 2], [2, 1], [4, 1], [2, 2]]
+    shape2 = (5, 4)
+    for objects, shape in zip((objects1, objects2), (shape1, shape2)):
+        model = MyModel(objects, shape)
+        result = model.solve_satisfy()
+        r = result["inventory"]
+        check(r, objects)
+    print("all checks pass")
 
 .. testoutput::
 
-    [[2, 1, 3, 3], [2, 1, 3, 3], [2, 0, 0, -1], [2, -1, -1, -1], [-1, -1, -1, -1]]
-    [[2, 0, 0], [2, 1, 1], [2, 1, 1]]
+    all checks pass
 
 
 .. warning::
