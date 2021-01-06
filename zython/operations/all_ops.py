@@ -20,5 +20,6 @@ class Op(enum.Enum):
     pow = enum.auto()
     alldifferent = enum.auto()
     forall = enum.auto()
+    exists = enum.auto()
     sum_ = enum.auto()
     size = enum.auto()

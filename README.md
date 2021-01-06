@@ -11,7 +11,7 @@ expression ``SEND+MORE=MONEY`` will be hold, or how many color you should have
 to brush map of Australia and two states with the same border won't have any
 common color, or try to understand which units you should hire in your 
 favourite strategy game, so you will have the strongest army for that amount
-of many you can use CP.
+of money you can use CP.
 
 Zython lets you express such model with pure python, so there is no need to
 learning new language and you can easily integrate CP into your python 

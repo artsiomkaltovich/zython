@@ -4,7 +4,7 @@ CryptArithmetic Problem
 In such kind of problem all letters should be replaced with digits with two
 main restriction:
 
-- equation will be true
+- equation should be hold
 - the same digit can't be assign to different letters and vise versa.
 
 The very common example of such problem is the following:

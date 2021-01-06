@@ -11,12 +11,9 @@ Welcome to zython's documentation!
    :caption: Examples:
    :glob:
 
-   guides/send_more_money
-   guides/color_map
-   guides/forall
-   guides/fib
-   guides/sum
-   guides/sudoku
+   guides/getting_started
+   guides/array_basics
+   guides/array_advanced
 
    api/modules
 

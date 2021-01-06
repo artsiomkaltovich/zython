@@ -8,6 +8,7 @@ from zython._compile.ir import IR
 from zython.operations.all_ops import Op
 from zython.operations.constraint.constraint import Constraint
 from zython.var_par.array import ArrayView, ArrayMixin
+from zython.var_par.types import is_range
 
 
 class Flags(enum.Enum):
@@ -41,8 +42,8 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
             declaration += f"{decl_prefix}int: {v.name};"
-        elif isinstance(v.type, range):
-            declaration += f"{decl_prefix}{v.type.start}..{v.type.stop - 1}: {v.name};"
+        elif is_range(v.type):
+            declaration += f"{decl_prefix}{_to_str(v.type.start)}..{_to_str(v.type.stop - 1)}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         src.append(declaration)
@@ -51,11 +52,11 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
 
 
 def _process_pars(ir, src, flags):
-    _process_pars_and_vars(ir, ir._pars, src, "", flags)
+    _process_pars_and_vars(ir, ir.pars, src, "", flags)
 
 
 def _process_vars(ir, src, flags):
-    _process_pars_and_vars(ir, ir._vars, src, "var", flags)
+    _process_pars_and_vars(ir, ir.vars, src, "var", flags)
 
 
 def _set_value_as_constraint(ir, variable, flags):
@@ -169,37 +170,13 @@ def _and(a, b, *, flags_):
 
 
 def _forall(seq, func, *, flags_):
-    indexes, v = _get_indexes_def_and_func_arg(seq)
-
-    parameters = inspect.signature(func).parameters
-    if len(parameters) > 1:
-        raise ValueError("only functions and lambdas with one arguments are supported")
-    elif len(parameters) == 1:
-        if v._name is None:
-            v._name, _ = dict(inspect.signature(func).parameters).popitem()
-        func_str = _to_str(func(v), flags_)
-    else:
-        func_str = _to_str(func(), flags_)
-    indexes = indexes if indexes else f"{v.name} in {seq.start}..{seq.stop - 1}"
+    func_str, indexes = _get_indexes_and_cycle_body(seq, func, flags_)
     return f"forall({indexes})({func_str})"
 
 
-def _get_indexes_def_and_func_arg(seq):
-    if isinstance(seq, range):
-        if seq.step != 1:
-            raise ValueError("Step aren't supported")
-        v = var(int)
-        def_ = None
-    elif isinstance(seq, ArrayView):
-        # TODO: support
-        raise ValueError(f"seq should be range, but {type(seq)} was specified")
-    elif isinstance(seq, ArrayMixin):
-        def_, indexes = _get_indexes_def(seq)
-        v = var(seq.type)
-        v._name = f"{seq.name}[{', '.join(indexes)}]"
-    else:
-        raise ValueError(f"seq should be range, but {type(seq)} was specified")
-    return def_, v
+def _exists(seq, func, *, flags_):
+    func_str, indexes = _get_indexes_and_cycle_body(seq, func, flags_)
+    return f"exists({indexes})({func_str})"
 
 
 def _alldifferent(args, *, flags_):
@@ -248,11 +225,53 @@ class Op2Str(UserDict):
         self[Op.pow] = _pow
         self[Op.alldifferent] = _alldifferent
         self[Op.forall] = _forall
+        self[Op.exists] = _exists
         self[Op.sum_] = _sum
         self[Op.size] = _size
 
+    def __missing__(self, key):
+        raise ValueError(f"Function {key} is undefined")
+
 
 Op2Str = Op2Str()
+
+
+def _get_indexes_and_cycle_body(seq, func, flags_):
+    indexes, v = _get_indexes_def_and_func_arg(seq)
+    if isinstance(func, Constraint):
+        func_str = _to_str(func, flags_)
+    else:
+        func_str = _extract_func_body(flags_, func, v)
+    indexes = indexes if indexes else f"{v.name} in {_to_str(seq.start, flags_)}..{_to_str(seq.stop - 1, flags_)}"
+    return func_str, indexes
+
+
+def _extract_func_body(flags_, func, v):
+    parameters = inspect.signature(func).parameters
+    if len(parameters) > 1:
+        raise ValueError("only functions and lambdas with one arguments are supported")
+    elif len(parameters) == 1:
+        if v._name is None:
+            v._name, _ = dict(inspect.signature(func).parameters).popitem()
+        func_str = _to_str(func(v), flags_)
+    else:
+        func_str = _to_str(func(), flags_)
+    return func_str
+
+
+def _get_indexes_def_and_func_arg(seq):
+    if is_range(seq):
+        if seq.step != 1:
+            raise ValueError("Step aren't supported")
+        v = var(int)
+        def_ = None
+    elif isinstance(seq, ArrayMixin):
+        def_, indexes = _get_indexes_def(seq)
+        v = var(seq.type)
+        v._name = f"{seq.name}[{', '.join(indexes)}]"
+    else:
+        raise ValueError(f"seq should be range, but {type(seq)} was specified")
+    return def_, v
 
 
 def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
