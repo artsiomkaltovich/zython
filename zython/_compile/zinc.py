@@ -22,7 +22,7 @@ def to_zinc(ir: IR):
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
-    result.append(f"solve {ir.how_to_solve};")
+    _process_how_to_solve(ir, result)
     _process_flags(flags, result)
     return "\n".join(result)
 
@@ -73,6 +73,20 @@ def _process_constraints(ir, src, flags):
     for c in ir.constraints:
         # some constraints, e.g. set value are directly added as strings
         src.append(f"constraint {_to_str(c, flags)};")
+
+
+def _process_how_to_solve(ir, result):
+    how_to_solve = ir.how_to_solve
+    if isinstance(how_to_solve, tuple):
+        if len(how_to_solve) == 2:
+            result.append(f"solve {how_to_solve[0]} {_to_str(how_to_solve[1])};")
+            return
+        elif len(how_to_solve) == 1:
+            how_to_solve = how_to_solve[0]
+    if isinstance(how_to_solve, str):
+        result.append(f"solve {how_to_solve};")
+        return
+    assert False, "{} how to solve is unknown".format(ir.how_to_solve)
 
 
 def _get_value_decl(variable):

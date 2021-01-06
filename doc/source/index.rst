@@ -14,6 +14,7 @@ Welcome to zython's documentation!
    guides/getting_started
    guides/array_basics
    guides/array_advanced
+   guides/max_min
 
    api/modules
 
