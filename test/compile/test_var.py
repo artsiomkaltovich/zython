@@ -7,5 +7,5 @@ def test_range_one_arg():
             self.a = zn.var(range(100))
 
     model = MyModel() #
-    src = model.compile()
+    src = model.compile("satisfy")
     assert "var 0..99: a;" in src

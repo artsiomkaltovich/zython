@@ -6,6 +6,7 @@ class par(var):
     def __init__(self, value):  # TODO: make positional onlyif isinstance(type_or_value, int):
         self._name = None
         self._value = None
+        self._type = None
         if isinstance(value, int):
             self._type = int
             self._value = value

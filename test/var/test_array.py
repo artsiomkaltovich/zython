@@ -18,9 +18,9 @@ def test_2d_correct():
         def __init__(self, array):
             self.a = zn.Array(array)
 
-    array = [[1, 2], [1, 3]]
+    array = [[1, 2, 3], [1, 3, 5]]
     model = MyModel(array)
-    assert model.a._shape == (2, 2)
+    assert model.a._shape == (2, 3)
     assert model.a.value == array
 
 
@@ -62,6 +62,18 @@ def test_different_types(array):
         MyModel(array)
 
 
+def test_var_array_without_shape():
+    with pytest.raises(ValueError, match="shape wasn't specified"):
+        zn.Array(zn.var(int))
+
+
+@pytest.mark.parametrize("array", (zn.Array([[1], [2]]), zn.Array(zn.var(int), shape=(1, 2))))
+@pytest.mark.parametrize("indexes", ((2, 0), (0, 2)))
+def test_array_index_error(array, indexes):
+    with pytest.raises(IndexError):
+        array[indexes]
+
+
 @pytest.mark.parametrize("array", (((1, 0, 1), (1, 3)), [[1, 3], [1, 1, 0]], (((1, 1), 1), )))
 def test_different_length(array):
     class MyModel(zn.Model):
@@ -99,7 +111,7 @@ class TestPos:
         with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
             _ = a[pos]
 
-    @pytest.mark.parametrize("pos, expected", [((1, 2), (1, 2)),
+    @pytest.mark.parametrize("pos, expected", [((0, 1), (0, 1)),
                                                ((0, slice(1, 3)), (0, slice(1, 3, 1)))])
     def test_2d(self, pos, expected):
         a = zn.Array([[1, 2], [2, 3], [3, 4]])

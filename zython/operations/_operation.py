@@ -16,11 +16,20 @@ class _Operation(Constraint):
     def __mul__(self, other):
         return _Operation(Op.mul, self, other)
 
+    def __rmul__(self, other):
+        return _Operation(Op.mul, other, self)
+
     def __truediv__(self, other):
         return _Operation(Op.truediv, self, other)
 
+    def __rtruediv__(self, other):
+        return _Operation(Op.mul, other, self)
+
     def __floordiv__(self, other):
         return _Operation(Op.floatdiv, self, other)
+
+    def __rfloordiv__(self, other):
+        return _Operation(Op.mul, other, self)
 
     def __mod__(self, other):
         return _Operation(Op.mod, self, other)
@@ -28,8 +37,14 @@ class _Operation(Constraint):
     def __add__(self, other):
         return _Operation(Op.add, self, other)
 
+    def __radd__(self, other):
+        return _Operation(Op.add, other, self)
+
     def __sub__(self, other):
         return _Operation(Op.sub, self, other)
+
+    def __rsub__(self, other):
+        return _Operation(Op.sub, other, self)
 
     def __eq__(self, other):
         return _Operation(Op.eq, self, other)

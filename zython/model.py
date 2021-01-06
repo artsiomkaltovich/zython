@@ -31,9 +31,15 @@ class Model(ABC):
         Result: Result
             result of the model solution, value of variables can be reached by dict syntax.
         """
+        return self._solve("satisfy", all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+
+    def solve_maximize(self, eq, *, all_solutions=False, result_as=None, verbose=False):  # TODO: position only
+        return self._solve("maximize", eq, all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+
+    def _solve(self, *how_to_solve, all_solutions, result_as, verbose):
         solver = minizinc.Solver.lookup("gecode")
         model = minizinc.Model()
-        src = self.compile("satisfy")
+        src = self.compile(how_to_solve)
         if verbose:
             print(src)
         model.add_string(src)
@@ -54,7 +60,7 @@ class Model(ABC):
     def constraints(self, value):
         self._constraints = value
 
-    def compile(self, how_to_solve="satisfy"):
+    def compile(self, how_to_solve):
         if not hasattr(self, "_ir"):
             self._ir = IR(self, how_to_solve)
             result = to_zinc(self._ir)

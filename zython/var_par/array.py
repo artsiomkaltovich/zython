@@ -61,11 +61,18 @@ class ArrayView(ArrayMixin):
     def _get_pos(self, pos):
         if not isinstance(pos, tuple):
             pos = [pos]
+        self._check_for_index_error(pos)
         repeat = itertools.repeat(slice(None, None, 1), self.array.ndims() - len(pos))
         pos = tuple(self._process_pos_item(p) for p in itertools.chain(pos, repeat))
         if len(pos) > self.array.ndims():
             raise ValueError(f"Array has {self.array.ndims()} dimensions but {len(pos)} were specified")
         return pos
+
+    def _check_for_index_error(self, pos):
+        for p, s in zip(pos, self.array._shape):
+            if isinstance(p, int):
+                if p >= s:
+                    raise IndexError()
 
     @property
     def name(self):
@@ -89,6 +96,8 @@ class ArrayView(ArrayMixin):
 
 class ArrayVar(var, ArrayMixin):
     def __init__(self, arg, *, shape=None):
+        if not shape:
+            raise ValueError("shape wasn't specified")
         self._type = arg.type
         self._value = None
         self._name = None
