@@ -134,3 +134,21 @@ class TestSize:
         a = zn.Array([[1, 2], [2, 3], [3, 4]])
         with pytest.raises(ValueError, match=f"Array has 0\\.\\.2 dimensions, but {dim} were specified"):
             a.size(dim)
+
+    @pytest.mark.parametrize("array", [zn.Array([[1, 2], [2, 3], [3, 4]]), zn.Array(zn.var(int), shape=(3, 2))])
+    @pytest.mark.parametrize("dim, expected", ((0, 3), (1, 2)))
+    def test_dim(self, array, dim, expected):
+        class MyModel(zn.Model):
+            def __init__(self, array):
+                self.a = array
+                self.s = self.a.size(dim)
+                self.s2 = self.a.size(dim) * 2  # test arithmetic operations
+                self.s_bigger_2 = self.a.size(dim) > 2  # test compare operations
+                assert self.s.type is int
+                assert self.s2.type is int
+                assert self.s_bigger_2.type is int
+
+        result = MyModel(array).solve_satisfy()
+        assert result["s"] == expected
+        assert result["s_bigger_2"] == (expected > 2)
+        assert result["s2"] == (expected * 2)

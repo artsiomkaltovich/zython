@@ -1,3 +1,4 @@
+from numbers import Number
 from typing import Optional, Callable, Union, Type
 
 import zython
@@ -57,22 +58,22 @@ class _Operation(_Constraint):
         return self.sub(other, self)
 
     def __eq__(self, other):
-        return _Operation(_Op_code.eq, self, other, type_=bool)
+        return _Operation(_Op_code.eq, self, other, type_=int)
 
     def __ne__(self, other):
-        return _Operation(_Op_code.ne, self, other, type_=bool)
+        return _Operation(_Op_code.ne, self, other, type_=int)
 
     def __lt__(self, other):
-        return _Operation(_Op_code.lt, self, other, type_=bool)
+        return _Operation(_Op_code.lt, self, other, type_=int)
 
     def __gt__(self, other):
-        return _Operation(_Op_code.gt, self, other, type_=bool)
+        return _Operation(_Op_code.gt, self, other, type_=int)
 
     def __le__(self, other):
-        return _Operation(_Op_code.le, self, other, type_=bool)
+        return _Operation(_Op_code.le, self, other, type_=int)
 
     def __ge__(self, other):
-        return _Operation(_Op_code.ge, self, other, type_=bool)
+        return _Operation(_Op_code.ge, self, other, type_=int)
 
     # below method is used for validation and control of _Operation creation
     # when you create _Operation as _Operation(_Op_code.exists, seq, iter_var, func)
@@ -99,10 +100,12 @@ class _Operation(_Constraint):
 
     @staticmethod
     def floordiv(left, right):
+        _validate_div(left, right)
         return _Operation(_Op_code.floordiv, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def mod(left, right):
+        _validate_div(left, right)
         return _Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
@@ -118,7 +121,7 @@ class _Operation(_Constraint):
                iter_var: Optional["zython.var_par.var"] = None,
                func: Optional[Union["_Operation", Callable]] = None,
                type_: Optional[Type] = None):
-        return _Operation(_Op_code.exists, seq, iter_var, func, type_=type_)
+        return _Constraint(_Op_code.exists, seq, iter_var, func, type_=type_)
 
     @staticmethod
     def forall(seq: Union["zython.var_par.types._range",
@@ -127,7 +130,7 @@ class _Operation(_Constraint):
                iter_var: Optional["zython.var_par.var"] = None,
                func: Optional[Union["_Operation", Callable]] = None,
                type_: Optional[Type] = None):
-        return _Operation(_Op_code.forall, seq, iter_var, func, type_=type_)
+        return _Constraint(_Op_code.forall, seq, iter_var, func, type_=type_)
 
     @staticmethod
     def sum(seq: Union["zython.var_par.types._range",
@@ -137,3 +140,8 @@ class _Operation(_Constraint):
             func: Optional[Union["_Operation", Callable]] = None,
             type_: Optional[Type] = None):
         return _Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
+
+
+def _validate_div(left, right):
+    if isinstance(right, Number) and right == 0 or getattr(right, "value", 1) == 0:
+        raise ValueError("right part of expression can't be 0")

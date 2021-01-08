@@ -45,7 +45,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
         if v.type is int:
             declaration += f"{decl_prefix}int: {v.name};"
         elif is_range(v.type):
-            declaration += f"{decl_prefix}{_to_str(v.type.start)}..{_to_str(v.type.stop - 1)}: {v.name};"
+            declaration += f"{decl_prefix}{to_str(v.type.start)}..{to_str(v.type.stop - 1)}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         src.append(declaration)
@@ -74,14 +74,14 @@ def _get_array_shape_decl(shape):
 def _process_constraints(ir, src, flags):
     for c in ir.constraints:
         # some constraints, e.g. set value are directly added as strings
-        src.append(f"constraint {_to_str(c, flags)};")
+        src.append(f"constraint {to_str(c, flags)};")
 
 
 def _process_how_to_solve(ir, result):
     how_to_solve = ir.how_to_solve
     if isinstance(how_to_solve, tuple):
         if len(how_to_solve) == 2:
-            result.append(f"solve {how_to_solve[0]} {_to_str(how_to_solve[1])};")
+            result.append(f"solve {how_to_solve[0]} {to_str(how_to_solve[1])};")
             return
         elif len(how_to_solve) == 1:
             how_to_solve = how_to_solve[0]
@@ -96,12 +96,12 @@ def _get_value_decl(variable):
         # TODO: support 2 and more d
         return f"array{len(variable._shape)}d({_get_array_shape_decl(variable._shape)}, " \
                f"[{', '.join(str(v) for v in variable.value)}])"
-    return _to_str(variable.value)
+    return to_str(variable.value)
 
 
-def _to_str(constraint, flags=None):
+def to_str(constraint, flags=None):
     if isinstance(constraint, ArrayView):
-        return _array_view_to_str(constraint)
+        return _compile_array_view(constraint)
     elif isinstance(constraint, var):
         return constraint.name
     elif isinstance(constraint, _Constraint):
@@ -109,12 +109,12 @@ def _to_str(constraint, flags=None):
     return str(constraint)
 
 
-def _array_view_to_str(view):
+def _compile_array_view(view):
     if isinstance(view.pos, tuple):
         if len(view.pos) != len(view.array._shape):
             raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
                              "or specify index of element")
-        return f"{view.array.name}[{', '.join(_to_str(p) for p in view.pos)}]"
+        return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
     elif isinstance(view.pos, slice):
         raise ValueError("slices are not supported in such operations, please use zn.forall")
     else:
@@ -122,67 +122,67 @@ def _array_view_to_str(view):
 
 
 def _pow(a, b, *, flags_):  # TODO: make positional only
-    return f"pow({_to_str(a)}, {_to_str(b)})"
+    return f"pow({to_str(a)}, {to_str(b)})"
 
 
 def _mul(a, b, *, flags_):
-    return f"({_to_str(a)} * {_to_str(b)})"
+    return f"({to_str(a)} * {to_str(b)})"
 
 
 def _truediv(a, b, *, flags_):
-    return f"({_to_str(a)} / {_to_str(b)})"
+    return f"({to_str(a)} / {to_str(b)})"
 
 
 def _floatdiv(a, b, *, flags_):
-    return f"({_to_str(a)} div {_to_str(b)})"
+    return f"({to_str(a)} div {to_str(b)})"
 
 
 def _mod(a, b, *, flags_):
-    return f"({_to_str(a)} mod {_to_str(b)})"
+    return f"({to_str(a)} mod {to_str(b)})"
 
 
 def _add(a, b, *, flags_):
-    return f"({_to_str(a)} + {_to_str(b)})"
+    return f"({to_str(a)} + {to_str(b)})"
 
 
 def _sub(a, b, *, flags_):
-    return f"({_to_str(a)} - {_to_str(b)})"
+    return f"({to_str(a)} - {to_str(b)})"
 
 
 def _eq(a, b, *, flags_):
-    return f"({_to_str(a)} == {_to_str(b)})"
+    return f"({to_str(a)} == {to_str(b)})"
 
 
 def _ne(a, b, *, flags_):
-    return f"({_to_str(a)} != {_to_str(b)})"
+    return f"({to_str(a)} != {to_str(b)})"
 
 
 def _lt(a, b, *, flags_):
-    return f"({_to_str(a)} < {_to_str(b)})"
+    return f"({to_str(a)} < {to_str(b)})"
 
 
 def _gt(a, b, *, flags_):
-    return f"({_to_str(a)} > {_to_str(b)})"
+    return f"({to_str(a)} > {to_str(b)})"
 
 
 def _le(a, b, *, flags_):
-    return f"({_to_str(a)} <= {_to_str(b)})"
+    return f"({to_str(a)} <= {to_str(b)})"
 
 
 def _ge(a, b, *, flags_):
-    return f"({_to_str(a)} >= {_to_str(b)})"
+    return f"({to_str(a)} >= {to_str(b)})"
 
 
 def _xor(a, b, *, flags_):
-    return f"({_to_str(a)} xor {_to_str(b)})"
+    return f"({to_str(a)} xor {to_str(b)})"
 
 
 def _or(a, b, *, flags_):
-    return f"({_to_str(a)} \\/ {_to_str(b)})"
+    return f"({to_str(a)} \\/ {to_str(b)})"
 
 
 def _and(a, b, *, flags_):
-    return f"({_to_str(a)} /\\ {_to_str(b)})"
+    return f"({to_str(a)} /\\ {to_str(b)})"
 
 
 def _forall(seq, iter_var, operation, *, flags_):
@@ -215,7 +215,7 @@ def _alldifferent(args, *, flags_):
 
 
 def _size(array: ArrayMixin, dim: int, *, flags_):
-    return f"max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1"
+    return f"(max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1)"
 
 
 def _circuit(array: ArrayMixin, flags_):
@@ -268,7 +268,7 @@ def _sum_for_array_or_slice(arg):
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
     indexes = _get_indexes_def_and_func_arg(seq, iter_var, flags_)
-    func_str = _to_str(func, flags_)
+    func_str = to_str(func, flags_)
     return func_str, indexes
 
 
@@ -276,7 +276,7 @@ def _get_indexes_def_and_func_arg(seq, iter_var, flags_):
     if is_range(seq):
         if seq.step != 1:
             raise ValueError("Step aren't supported")
-        def_ = f"{iter_var.name} in {_to_str(seq.start, flags_)}..{_to_str(seq.stop - 1, flags_)}"
+        def_ = f"{iter_var.name} in {to_str(seq.start, flags_)}..{to_str(seq.stop - 1, flags_)}"
     elif isinstance(seq, ArrayMixin):
         def_, indexes = _get_indexes_def(seq)
         iter_var._name = f"{seq.name}[{', '.join(indexes)}]"
@@ -299,7 +299,7 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
                 start = pos.start if pos.start else 0
                 if isinstance(start, int) and isinstance(stop, int) and start > stop:
                     raise ValueError(f"start ({start}) should be smaller then stop ({stop})")
-                def_ = f"{var_name} in {_to_str(start)}..{_to_str(stop)}"
+                def_ = f"{var_name} in {to_str(start)}..{to_str(stop)}"
                 iterators.append(def_)
                 i += 1
             elif isinstance(pos, int):
