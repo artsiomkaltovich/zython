@@ -1,7 +1,7 @@
 import enum
 
 
-class Op(enum.Enum):
+class _Op_code(enum.Enum):
     add = enum.auto()
     sub = enum.auto()
     eq = enum.auto()
@@ -15,11 +15,12 @@ class Op(enum.Enum):
     or_ = enum.auto()
     mul = enum.auto()
     truediv = enum.auto()
-    floatdiv = enum.auto()
+    floordiv = enum.auto()
     mod = enum.auto()
     pow = enum.auto()
     alldifferent = enum.auto()
-    forall = enum.auto()
-    exists = enum.auto()
-    sum_ = enum.auto()
+    forall = enum.auto()  # 3 params: (seq, iter_var=None, func=None)
+    exists = enum.auto()  # 3 params: (seq, iter_var=None, func=None)
+    sum_ = enum.auto()    # 3 params: (seq, iter_var=None, func=None)
     size = enum.auto()
+    circuit = enum.auto()

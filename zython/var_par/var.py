@@ -1,7 +1,7 @@
 import inspect
 
 from zython.operations._operation import _Operation
-from zython.operations.constraint.constraint import Constraint
+from zython.operations._constraint import _Constraint
 from zython.var_par.types import is_range
 
 
@@ -10,7 +10,7 @@ class var(_Operation):
         self._name = None
         self._value = None
         self._type = None
-        if isinstance(type_, Constraint):
+        if isinstance(type_, _Constraint):
             self._type = type_.type
             self._value = type_
         else:

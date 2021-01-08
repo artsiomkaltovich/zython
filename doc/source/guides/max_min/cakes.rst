@@ -7,7 +7,7 @@ make with your amount of supplies and raise maximum amount of money to donate it
 
 .. image:: ../../_static/img/cupcakes.jpg
   :width: 600
-  :alt: Cupcakes (origin: https://www.freepik.com/lifeforstock)
+  :alt: Cupcakes (Source: https://www.freepik.com/lifeforstock )
 
 Python Model
 ------------

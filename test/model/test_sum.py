@@ -1,13 +1,14 @@
 import zython as zn
+import zython.operations.functions_and_predicates
 
 
 def test_2d():
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
-            self.s1 = zn.sum(self.a[0, 1:2])
-            self.s2 = zn.sum(self.a[2:, 1:])
-            self.s3 = zn.sum(self.a[2:, 2:])
+            self.s1 = zython.operations.functions_and_predicates.sum(self.a[0, 1:2])
+            self.s2 = zython.operations.functions_and_predicates.sum(self.a[2:, 1:])
+            self.s3 = zython.operations.functions_and_predicates.sum(self.a[2:, 2:])
 
     r = (range(i, i + 3) for i in range(3))
     model = MyModel(((j for j in i) for i in r))
@@ -21,8 +22,8 @@ def test_3():
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
-            self.s = zn.sum(self.a)
-            self.s1 = zn.sum(self.a[:, 1:])
+            self.s = zython.operations.functions_and_predicates.sum(self.a)
+            self.s1 = zython.operations.functions_and_predicates.sum(self.a[:, 1:])
 
     array = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
     model = MyModel(array)

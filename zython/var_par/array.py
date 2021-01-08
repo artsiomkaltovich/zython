@@ -4,15 +4,14 @@ from collections import deque
 from typing import Type
 
 from zython import var, par
-from zython.operations._operation import _Operation
-from zython.operations.all_ops import Op
+from zython.operations import _operation
 
 
 def _can_create_array_from(arg):
     return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__") and (not isinstance(arg, str))
 
 
-class ArrayMixin(_Operation):
+class ArrayMixin(_operation._Operation):
     _shape: tuple
     _name: str
     _type: Type
@@ -45,9 +44,7 @@ class ArrayMixin(_Operation):
         size: _Operation
             Operation which is evaluated as number of the items in specified dimension by the model
         """
-        if 0 <= dim < self.ndims():
-            return _Operation(Op.size, self, dim)
-        raise ValueError(f"Array has 0..{self.ndims()} dimensions, but {dim} were specified")
+        return _operation._Operation.size(self, dim)
 
 
 class ArrayView(ArrayMixin):
@@ -101,7 +98,7 @@ class ArrayVar(var, ArrayMixin):
         self._type = arg.type
         self._value = None
         self._name = None
-        self._shape = shape if isinstance(shape, tuple) else (shape, )
+        self._shape = shape if isinstance(shape, tuple) else (shape,)
 
 
 class ArrayPar(par, ArrayMixin):

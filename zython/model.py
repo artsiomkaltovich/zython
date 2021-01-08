@@ -5,7 +5,7 @@ import minizinc
 from zython.result import Result
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
-from zython.operations.constraint.constraint import Constraint
+from zython.operations._constraint import _Constraint
 from zython.var_par.par import par
 from zython.var_par.var import var
 
@@ -35,6 +35,9 @@ class Model(ABC):
 
     def solve_maximize(self, eq, *, all_solutions=False, result_as=None, verbose=False):  # TODO: position only
         return self._solve("maximize", eq, all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+
+    def solve_minimize(self, eq, *, all_solutions=False, result_as=None, verbose=False):  # TODO: position only
+        return self._solve("minimize", eq, all_solutions=all_solutions, result_as=result_as, verbose=verbose)
 
     def _solve(self, *how_to_solve, all_solutions, result_as, verbose):
         solver = minizinc.Solver.lookup("gecode")
@@ -77,5 +80,5 @@ class Model(ABC):
         if not attr_name.startswith("_"):
             if isinstance(attr, (var, par)):
                 return attr
-            if isinstance(attr, Constraint):
+            if isinstance(attr, _Constraint):
                 return var(attr)

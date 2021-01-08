@@ -1,12 +1,11 @@
 import enum
-import inspect
 from collections import UserDict, deque
 from typing import Union
 
 from zython import var
 from zython._compile.ir import IR
-from zython.operations.all_ops import Op
-from zython.operations.constraint.constraint import Constraint
+from zython.operations._op_codes import _Op_code
+from zython.operations._constraint import _Constraint
 from zython.var_par.array import ArrayView, ArrayMixin
 from zython.var_par.types import is_range
 
@@ -14,6 +13,7 @@ from zython.var_par.types import is_range
 class Flags(enum.Enum):
     none = enum.auto()
     alldifferent = enum.auto()
+    circuit = enum.auto()
 
 
 def to_zinc(ir: IR):
@@ -30,6 +30,8 @@ def to_zinc(ir: IR):
 def _process_flags(flags, result):
     if Flags.alldifferent in flags:
         result.appendleft('include "alldifferent.mzn";')
+    if Flags.circuit in flags:
+        result.appendleft('include "circuit.mzn";')
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
@@ -47,7 +49,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         src.append(declaration)
-        if isinstance(v.value, Constraint):
+        if isinstance(v.value, _Constraint):
             _set_value_as_constraint(ir, v, flags)
 
 
@@ -102,7 +104,7 @@ def _to_str(constraint, flags=None):
         return _array_view_to_str(constraint)
     elif isinstance(constraint, var):
         return constraint.name
-    elif isinstance(constraint, Constraint):
+    elif isinstance(constraint, _Constraint):
         return Op2Str[constraint.op](*constraint.params, flags_=flags)
     return str(constraint)
 
@@ -183,14 +185,22 @@ def _and(a, b, *, flags_):
     return f"({_to_str(a)} /\\ {_to_str(b)})"
 
 
-def _forall(seq, func, *, flags_):
-    func_str, indexes = _get_indexes_and_cycle_body(seq, func, flags_)
+def _forall(seq, iter_var, operation, *, flags_):
+    func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
     return f"forall({indexes})({func_str})"
 
 
-def _exists(seq, func, *, flags_):
-    func_str, indexes = _get_indexes_and_cycle_body(seq, func, flags_)
+def _exists(seq, iter_var, operation, *, flags_):
+    func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
     return f"exists({indexes})({func_str})"
+
+
+def _sum(seq, iter_var, operation, *, flags_):
+    if operation is None:
+        return _sum_for_array_or_slice(seq)
+    else:
+        func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
+        return f"sum({indexes})({func_str})"
 
 
 def _alldifferent(args, *, flags_):
@@ -204,7 +214,49 @@ def _alldifferent(args, *, flags_):
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 
-def _sum(arg, *, flags_):
+def _size(array: ArrayMixin, dim: int, *, flags_):
+    return f"max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1"
+
+
+def _circuit(array: ArrayMixin, flags_):
+    flags_.add(Flags.circuit)
+    return f"circuit({array.name})"
+
+
+class Op2Str(UserDict):
+    def __init__(self):
+        self.data = {}
+        self[_Op_code.add] = _add
+        self[_Op_code.sub] = _sub
+        self[_Op_code.eq] = _eq
+        self[_Op_code.ne] = _ne
+        self[_Op_code.lt] = _lt
+        self[_Op_code.gt] = _gt
+        self[_Op_code.le] = _le
+        self[_Op_code.ge] = _ge
+        self[_Op_code.xor] = _xor
+        self[_Op_code.and_] = _and
+        self[_Op_code.or_] = _or
+        self[_Op_code.mul] = _mul
+        self[_Op_code.truediv] = _truediv
+        self[_Op_code.floordiv] = _floatdiv
+        self[_Op_code.mod] = _mod
+        self[_Op_code.pow] = _pow
+        self[_Op_code.alldifferent] = _alldifferent
+        self[_Op_code.forall] = _forall
+        self[_Op_code.exists] = _exists
+        self[_Op_code.sum_] = _sum
+        self[_Op_code.size] = _size
+        self[_Op_code.circuit] = _circuit
+
+    def __missing__(self, key):
+        raise ValueError(f"Function {key} is undefined")
+
+
+Op2Str = Op2Str()
+
+
+def _sum_for_array_or_slice(arg):
     if isinstance(arg, ArrayView):
         iterators, indexes = _get_indexes_def(arg)
         return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"
@@ -214,78 +266,23 @@ def _sum(arg, *, flags_):
         raise ValueError(f"Only arrays and array views are supported as sum argument, but {type(arg)} was specified.")
 
 
-def _size(array: ArrayMixin, dim: int, *, flags_):
-    return f"max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1"
-
-
-class Op2Str(UserDict):
-    def __init__(self):
-        self.data = {}
-        self[Op.add] = _add
-        self[Op.sub] = _sub
-        self[Op.eq] = _eq
-        self[Op.ne] = _ne
-        self[Op.lt] = _lt
-        self[Op.gt] = _gt
-        self[Op.le] = _le
-        self[Op.ge] = _ge
-        self[Op.xor] = _xor
-        self[Op.and_] = _and
-        self[Op.or_] = _or
-        self[Op.mul] = _mul
-        self[Op.truediv] = _truediv
-        self[Op.floatdiv] = _floatdiv
-        self[Op.mod] = _mod
-        self[Op.pow] = _pow
-        self[Op.alldifferent] = _alldifferent
-        self[Op.forall] = _forall
-        self[Op.exists] = _exists
-        self[Op.sum_] = _sum
-        self[Op.size] = _size
-
-    def __missing__(self, key):
-        raise ValueError(f"Function {key} is undefined")
-
-
-Op2Str = Op2Str()
-
-
-def _get_indexes_and_cycle_body(seq, func, flags_):
-    indexes, v = _get_indexes_def_and_func_arg(seq)
-    if isinstance(func, Constraint):
-        func_str = _to_str(func, flags_)
-    else:
-        func_str = _extract_func_body(flags_, func, v)
-    indexes = indexes if indexes else f"{v.name} in {_to_str(seq.start, flags_)}..{_to_str(seq.stop - 1, flags_)}"
+def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
+    indexes = _get_indexes_def_and_func_arg(seq, iter_var, flags_)
+    func_str = _to_str(func, flags_)
     return func_str, indexes
 
 
-def _extract_func_body(flags_, func, v):
-    parameters = inspect.signature(func).parameters
-    if len(parameters) > 1:
-        raise ValueError("only functions and lambdas with one arguments are supported")
-    elif len(parameters) == 1:
-        if v._name is None:
-            v._name, _ = dict(inspect.signature(func).parameters).popitem()
-        func_str = _to_str(func(v), flags_)
-    else:
-        func_str = _to_str(func(), flags_)
-    return func_str
-
-
-def _get_indexes_def_and_func_arg(seq):
+def _get_indexes_def_and_func_arg(seq, iter_var, flags_):
     if is_range(seq):
         if seq.step != 1:
             raise ValueError("Step aren't supported")
-        v = var(int)
-        def_ = None
+        def_ = f"{iter_var.name} in {_to_str(seq.start, flags_)}..{_to_str(seq.stop - 1, flags_)}"
     elif isinstance(seq, ArrayMixin):
         def_, indexes = _get_indexes_def(seq)
-        v = var(seq.type)
-        v._name = f"{seq.name}[{', '.join(indexes)}]"
+        iter_var._name = f"{seq.name}[{', '.join(indexes)}]"
     else:
         raise ValueError(f"seq should be range, but {type(seq)} was specified")
-    return def_, v
+    return def_
 
 
 def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
