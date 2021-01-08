@@ -1,6 +1,6 @@
 import pytest
+
 import zython as zn
-import zython.operations.functions_and_predicates
 
 
 @pytest.mark.parametrize("array", [[1, 2, 3, 4], (1, 2, 3, 4), (i + 1 for i in range(4))],
@@ -29,9 +29,9 @@ def test_2d_gen():
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
-            self.s1 = zython.operations.functions_and_predicates.sum(self.a[0, 1:2])
-            self.s2 = zython.operations.functions_and_predicates.sum(self.a[2:, 1:])
-            self.s3 = zython.operations.functions_and_predicates.sum(self.a[2:, 2:])
+            self.s1 = zn.sum(self.a[0, 1:2])
+            self.s2 = zn.sum(self.a[2:, 1:])
+            self.s3 = zn.sum(self.a[2:, 2:])
 
     r = (range(i, i + 3) for i in range(2))
     model = MyModel(((j for j in i) for i in r))
@@ -43,9 +43,9 @@ def test_3d_gen():
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
-            self.s1 = zython.operations.functions_and_predicates.sum(self.a[0, 1:2])
-            self.s2 = zython.operations.functions_and_predicates.sum(self.a[2:, 1:])
-            self.s3 = zython.operations.functions_and_predicates.sum(self.a[2:, 2:])
+            self.s1 = zn.sum(self.a[0, 1:2])
+            self.s2 = zn.sum(self.a[2:, 1:])
+            self.s3 = zn.sum(self.a[2:, 2:])
 
     r = ((range(i, i + 3) for i in range(2)) for _ in range(4))
     model = MyModel(((j for j in i) for i in r))
