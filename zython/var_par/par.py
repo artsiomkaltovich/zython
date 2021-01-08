@@ -1,5 +1,5 @@
 from zython import var
-from zython.operations.constraint.constraint import Constraint
+from zython.operations._constraint import _Constraint
 
 
 class par(var):
@@ -10,7 +10,7 @@ class par(var):
         if isinstance(value, int):
             self._type = int
             self._value = value
-        elif isinstance(value, Constraint):
+        elif isinstance(value, _Constraint):
             self._type = value.type
             self._value = value
         if self._type is None:
