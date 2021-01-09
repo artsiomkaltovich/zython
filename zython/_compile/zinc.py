@@ -211,7 +211,7 @@ def _alldifferent(args, *, flags_):
             raise ValueError("Several arrays are not supported")
         arg = args[0]
         def_, indexes = _get_indexes_def(arg)
-        return f"alldifferent([{arg.name}[{', '.join(indexes)}] | {', '.join(def_)}])"
+        return f"alldifferent([{arg.name}[{', '.join(indexes)}] | {def_}])"
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 
@@ -259,8 +259,8 @@ Op2Str = Op2Str()
 
 def _sum_for_array_or_slice(arg):
     if isinstance(arg, ArrayView):
-        iterators, indexes = _get_indexes_def(arg)
-        return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"
+        def_, indexes = _get_indexes_def(arg)
+        return f"sum({def_})({arg.array.name}[{', '.join(indexes)}])"
     elif isinstance(arg, ArrayMixin):
         return f"sum({arg.name})"
     else:
@@ -322,7 +322,7 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView, Tuple[var], List[var]])
             else:
                 raise ValueError("Only int and slice are supported as indexes")
             indexes.append(var_name)
-        return iterators, indexes
+        return ",".join(iterators), indexes
     elif isinstance(array, ArrayMixin):
         indexes_ = [f"i{i}__" for i in range(len(array._shape))]
         return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array._shape)), indexes_

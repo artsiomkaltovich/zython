@@ -64,7 +64,7 @@ def forall(seq: Union["zython.var_par.types._range",
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
         sequence to apply ``func``
-    func: Constraint or Callable
+    func: Constraint or Callable, optional
         Constraint every element in seq should satisfy or function which returns such constraint.
         If function or lambda it should be with 0 or 1 arguments only.
 
@@ -89,7 +89,41 @@ def forall(seq: Union["zython.var_par.types._range",
     return Constraint.forall(seq, iter_var, operation)
 
 
-def sum(seq, func=None):
+def sum(seq: Union["zython.var_par.types._range",
+                   "zython.var_par.types.orig_range",
+                   "zython.var_par.array.ArrayMixin",
+                   Sequence[zython.var]],
+        func: Optional[Union["Constraint", Callable]] = None) -> Operation:
+    """ Calculate the sum of the ``seq`` according with ``func``
+
+    Iterates through elements in seq and calculate their sum, you can modify summarized expressions
+    by specifying ``func`` parameter.
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence to sum up
+    func: Operation or Callable, optional
+        Operation which will be executed with every element and later sum up. Or function which returns
+        such operation.
+        If function or lambda it should be with 0 or 1 arguments only.
+
+    Returns
+    -------
+    result: Operation
+        Operation which will calculate the sum
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zython.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=4)
+    >>> model = MyModel()
+    >>> model.solve_minimize(zn.sum(model.a))
+    Solution(objective=4, a=[1, 1, 1, 1])
+    """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     if isinstance(seq, ArrayMixin) and operation is None:
         type_ = seq.type
@@ -97,4 +131,4 @@ def sum(seq, func=None):
         type_ = operation.type
     if type_ is None:
         raise ValueError("Can't derive the type of {} expression".format(func))
-    return Operation(_Op_code.sum_, seq, iter_var, operation, type_=type_)
+    return Operation.sum(seq, iter_var, operation, type_=type_)
