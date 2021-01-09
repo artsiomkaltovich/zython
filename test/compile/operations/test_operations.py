@@ -50,3 +50,12 @@ class TestBinary:
     def test_wrong_mod(self):
         with pytest.raises(ValueError, match="right part of expression can't be 0"):
             self.v % 0
+
+    @pytest.mark.parametrize("op, sign", ((operator.and_, "/\\"), (operator.or_, "\\/"), (operator.xor, "xor")))
+    def test_binary_logical(self, op, sign):
+        result = op(self.p > self.v, 2 > self.v)
+        assert to_str(result) == f"(({self.p.name} > {self.v.name}) {sign} ({self.v.name} < 2))"
+
+    def test_invert(self):
+        result = ~(self.p < self.v)
+        assert to_str(result) == f"(not({self.p.name} < {self.v.name}))"

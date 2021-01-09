@@ -1,32 +1,123 @@
+from typing import Union, Callable, Optional
+
 from zython.operations import _iternal
 from zython.operations._op_codes import _Op_code
-from zython.operations._constraint import _Constraint
-from zython.operations._operation import _Operation
+from zython.operations.constraint import Constraint
+from zython.operations.operation import Operation
 from zython.var_par.array import ArrayMixin
+from zython.var_par.types import ZnSequence
 
 
-class alldifferent(_Constraint):
-    # TODO: array support?
-    def __init__(self, *params):
-        super().__init__(_Op_code.alldifferent, params)
+def exists(seq: ZnSequence,
+           func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
+    """ Specify constraint which should be true for `at least` one element in ``seq``.
 
+    The method has the same signature as ``forall``.
 
-class circuit(_Constraint):
-    def __init__(self, array):
-        super().__init__(_Op_code.circuit, array)
+    See Also
+    --------
+    forall
 
+    Examples
+    --------
 
-def exists(seq, func=None):
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.var(range(0, 10))
+    ...         self.b = zn.var(range(0, 10))
+    ...         self.c = zn.var(range(0, 10))
+    ...         self.constraints = [zn.exists((self.a, self.b, self.c), lambda elem: elem > 0)]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> sorted((result["a"], result["b"], result["c"]))
+    [0, 0, 1]
+    """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return _Operation(_Op_code.exists, seq, iter_var, operation)
+    return Constraint.exists(seq, iter_var, operation)
 
 
-def forall(seq, func=None):
+def forall(seq: ZnSequence,
+           func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
+    """
+    Takes expression (that is, constraint) or function which return constraint
+        and make them a single constraint which should be true for every element in the array.
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence to apply ``func``
+    func: Constraint or Callable, optional
+        Constraint every element in seq should satisfy or function which returns such constraint.
+        If function or lambda it should be with 0 or 1 arguments only.
+
+    Returns
+    -------
+    result: Constraint
+        resulted constraint
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(int), shape=3)
+    ...         self.constraints = [zn.forall(self.a, lambda elem: elem > 0)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[1, 1, 1])
+    """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return _Operation(_Op_code.forall, seq, iter_var, operation)
+    return Constraint.forall(seq, iter_var, operation)
 
 
-def sum(seq, func=None):
+def sum(seq: ZnSequence,
+        func: Optional[Union["Constraint", Callable]] = None) -> Operation:
+    """ Calculate the sum of the ``seq`` according with ``func``
+
+    Iterates through elements in seq and calculate their sum, you can modify summarized expressions
+    by specifying ``func`` parameter.
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence to sum up
+    func: Operation or Callable, optional
+        Operation which will be executed with every element and later sum up. Or function which returns
+        such operation.
+        If function or lambda it should be with 0 or 1 arguments only.
+
+    Returns
+    -------
+    result: Operation
+        Operation which will calculate the sum
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=4)
+    >>> model = MyModel()
+    >>> model.solve_minimize(zn.sum(model.a))
+    Solution(objective=4, a=[1, 1, 1, 1])
+
+    # find minimal integer sides of the right triangle
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.var(int)
+    ...         self.b = zn.var(int)
+    ...         self.c = zn.var(int)
+    ...         self.constraints = [self.c ** 2 == zn.sum((self.a, self.b), lambda i: i ** 2),
+    ...                             zn.forall((self.a, self.b, self.c), lambda i: i > 0)]
+    >>> model = MyModel()
+    >>> model.solve_minimize(model.c)
+    Solution(objective=5, a=4, b=3, c=5)
+    """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     if isinstance(seq, ArrayMixin) and operation is None:
         type_ = seq.type
@@ -34,4 +125,50 @@ def sum(seq, func=None):
         type_ = operation.type
     if type_ is None:
         raise ValueError("Can't derive the type of {} expression".format(func))
-    return _Operation(_Op_code.sum_, seq, iter_var, operation, type_=type_)
+    return Operation.sum(seq, iter_var, operation, type_=type_)
+
+
+class alldifferent(Constraint):
+    """ requires all the variables appearing in its argument to be different
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence which elements of which should be distinct
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=5)
+    ...         self.x = zn.var(range(3))
+    ...         self.y = zn.var(range(3))
+    ...         self.z = zn.var(range(3))
+    ...         self.constraints = [zn.alldifferent(self.a[:3]), zn.alldifferent((self.x, self.y, self.z))]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[3, 2, 1, 1, 1], x=2, y=1, z=0)
+    """
+    def __init__(self, seq: ZnSequence):
+        super().__init__(_Op_code.alldifferent, seq)
+
+
+class circuit(Constraint):
+    """ Constrains the elements of ``seq`` to define a circuit where x[i] = j means that j is the successor of i.
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(5)), shape=5)
+    ...         self.constraints = [zn.circuit(self.a)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[2, 4, 3, 1, 0])
+    """
+    def __init__(self, seq: ZnSequence):
+        super().__init__(_Op_code.circuit, seq)

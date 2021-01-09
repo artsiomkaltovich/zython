@@ -39,7 +39,7 @@ Python Model
             self.constraints = [(self.S * 1000 + self.E * 100 + self.N * 10 + self.D +
                                  self.M * 1000 + self.O * 100 + self.R * 10 + self.E ==
                                  self.M * 10000 + self.O * 1000 + self.N * 100 + self.E * 10 + self.Y),
-                                 zn.alldifferent(self.S, self.E, self.N, self.D, self.M, self.O, self.R, self.Y)]
+                                 zn.alldifferent((self.S, self.E, self.N, self.D, self.M, self.O, self.R, self.Y))]
 
     model = MoneyModel()
     result = model.solve_satisfy()

@@ -1,11 +1,12 @@
 import enum
 from collections import UserDict, deque
-from typing import Union
+from functools import singledispatch
+from typing import Union, Tuple, List
 
 from zython import var
 from zython._compile.ir import IR
 from zython.operations._op_codes import _Op_code
-from zython.operations._constraint import _Constraint
+from zython.operations.constraint import Constraint
 from zython.var_par.array import ArrayView, ArrayMixin
 from zython.var_par.types import is_range
 
@@ -49,7 +50,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         src.append(declaration)
-        if isinstance(v.value, _Constraint):
+        if isinstance(v.value, Constraint):
             _set_value_as_constraint(ir, v, flags)
 
 
@@ -104,7 +105,7 @@ def to_str(constraint, flags=None):
         return _compile_array_view(constraint)
     elif isinstance(constraint, var):
         return constraint.name
-    elif isinstance(constraint, _Constraint):
+    elif isinstance(constraint, Constraint):
         return Op2Str[constraint.op](*constraint.params, flags_=flags)
     return str(constraint)
 
@@ -173,6 +174,10 @@ def _ge(a, b, *, flags_):
     return f"({to_str(a)} >= {to_str(b)})"
 
 
+def _invert(a, *, flags_):
+    return f"(not{to_str(a)})"
+
+
 def _xor(a, b, *, flags_):
     return f"({to_str(a)} xor {to_str(b)})"
 
@@ -205,12 +210,9 @@ def _sum(seq, iter_var, operation, *, flags_):
 
 def _alldifferent(args, *, flags_):
     flags_.add(Flags.alldifferent)
-    if isinstance(args[0], ArrayMixin):
-        if len(args) > 1:
-            raise ValueError("Several arrays are not supported")
-        arg = args[0]
-        def_, indexes = _get_indexes_def(arg)
-        return f"alldifferent([{arg.name}[{', '.join(indexes)}] | {', '.join(def_)}])"
+    if isinstance(args, ArrayMixin):
+        def_, indexes = _get_indexes_def(args)
+        return f"alldifferent([{args.name}[{', '.join(indexes)}] | {def_}])"
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 
@@ -234,6 +236,7 @@ class Op2Str(UserDict):
         self[_Op_code.gt] = _gt
         self[_Op_code.le] = _le
         self[_Op_code.ge] = _ge
+        self[_Op_code.invert] = _invert
         self[_Op_code.xor] = _xor
         self[_Op_code.and_] = _and
         self[_Op_code.or_] = _or
@@ -258,8 +261,8 @@ Op2Str = Op2Str()
 
 def _sum_for_array_or_slice(arg):
     if isinstance(arg, ArrayView):
-        iterators, indexes = _get_indexes_def(arg)
-        return f"sum({', '.join(iterators)})({arg.array.name}[{', '.join(indexes)}])"
+        def_, indexes = _get_indexes_def(arg)
+        return f"sum({def_})({arg.array.name}[{', '.join(indexes)}])"
     elif isinstance(arg, ArrayMixin):
         return f"sum({arg.name})"
     else:
@@ -272,21 +275,33 @@ def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
     return func_str, indexes
 
 
+@singledispatch
 def _get_indexes_def_and_func_arg(seq, iter_var, flags_):
     if is_range(seq):
         if seq.step != 1:
             raise ValueError("Step aren't supported")
         def_ = f"{iter_var.name} in {to_str(seq.start, flags_)}..{to_str(seq.stop - 1, flags_)}"
-    elif isinstance(seq, ArrayMixin):
-        def_, indexes = _get_indexes_def(seq)
-        iter_var._name = f"{seq.name}[{', '.join(indexes)}]"
     else:
         raise ValueError(f"seq should be range, but {type(seq)} was specified")
     return def_
 
 
-def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
-    if isinstance(array, ArrayView):
+@_get_indexes_def_and_func_arg.register(ArrayMixin)
+def _(seq, iter_var, flags_):
+    def_, indexes = _get_indexes_def(seq)
+    iter_var._name = f"{seq.name}[{', '.join(indexes)}]"
+    return def_
+
+
+@_get_indexes_def_and_func_arg.register(list)
+@_get_indexes_def_and_func_arg.register(tuple)
+def _(seq, iter_var, flags_):
+    def_ = f"{iter_var.name} in [{', '.join(s.name for s in seq)}]"
+    return def_
+
+
+def _get_indexes_def(array: Union[ArrayMixin, ArrayView, Tuple[var], List[var]]):
+    if isinstance(array, ArrayView):  # do not singledispatching because the order is important
         iterators = []
         indexes = []
         i = 0
@@ -309,7 +324,7 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView]):
             else:
                 raise ValueError("Only int and slice are supported as indexes")
             indexes.append(var_name)
-        return iterators, indexes
+        return ",".join(iterators), indexes
     elif isinstance(array, ArrayMixin):
         indexes_ = [f"i{i}__" for i in range(len(array._shape))]
         return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array._shape)), indexes_

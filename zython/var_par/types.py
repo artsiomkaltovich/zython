@@ -1,4 +1,7 @@
-from zython.operations._operation import _Operation
+import zython
+from typing import Union, Sequence
+
+from zython.operations.operation import Operation
 
 orig_range = range
 
@@ -12,7 +15,7 @@ class _range:
         if stop is None:
             stop = start
             start = 0
-        if isinstance(start, _Operation) or isinstance(stop, _Operation) or isinstance(step, _Operation):
+        if isinstance(start, Operation) or isinstance(stop, Operation) or isinstance(step, Operation):
             self = super().__new__(cls)
             self.start = start
             self.stop = stop
@@ -20,3 +23,6 @@ class _range:
             return self
         else:
             return orig_range(start, stop, step)
+
+
+ZnSequence = Union[_range, orig_range, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]

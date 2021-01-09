@@ -10,6 +10,7 @@ class _Op_code(enum.Enum):
     gt = enum.auto()
     le = enum.auto()
     ge = enum.auto()
+    invert = enum.auto()
     xor = enum.auto()
     and_ = enum.auto()
     or_ = enum.auto()
