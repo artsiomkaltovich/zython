@@ -174,6 +174,10 @@ def _ge(a, b, *, flags_):
     return f"({to_str(a)} >= {to_str(b)})"
 
 
+def _invert(a, *, flags_):
+    return f"(not{to_str(a)})"
+
+
 def _xor(a, b, *, flags_):
     return f"({to_str(a)} xor {to_str(b)})"
 
@@ -235,6 +239,7 @@ class Op2Str(UserDict):
         self[_Op_code.gt] = _gt
         self[_Op_code.le] = _le
         self[_Op_code.ge] = _ge
+        self[_Op_code.invert] = _invert
         self[_Op_code.xor] = _xor
         self[_Op_code.and_] = _and
         self[_Op_code.or_] = _or

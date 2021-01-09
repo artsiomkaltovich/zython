@@ -14,6 +14,9 @@ class Constraint:
     def type(self):
         return self._type
 
+    def __invert__(self):
+        return Constraint(_Op_code.invert, self)
+
     def __xor__(self, other):
         return Constraint(_Op_code.xor, self, other)
 
