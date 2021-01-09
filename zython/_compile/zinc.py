@@ -210,12 +210,9 @@ def _sum(seq, iter_var, operation, *, flags_):
 
 def _alldifferent(args, *, flags_):
     flags_.add(Flags.alldifferent)
-    if isinstance(args[0], ArrayMixin):
-        if len(args) > 1:
-            raise ValueError("Several arrays are not supported")
-        arg = args[0]
-        def_, indexes = _get_indexes_def(arg)
-        return f"alldifferent([{arg.name}[{', '.join(indexes)}] | {def_}])"
+    if isinstance(args, ArrayMixin):
+        def_, indexes = _get_indexes_def(args)
+        return f"alldifferent([{args.name}[{', '.join(indexes)}] | {def_}])"
     return f"alldifferent([{', '.join(v.name for v in args)}])"
 
 

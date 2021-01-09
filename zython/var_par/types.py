@@ -1,3 +1,6 @@
+import zython
+from typing import Union, Sequence
+
 from zython.operations.operation import Operation
 
 orig_range = range
@@ -20,3 +23,6 @@ class _range:
             return self
         else:
             return orig_range(start, stop, step)
+
+
+ZnSequence = Union[_range, orig_range, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]

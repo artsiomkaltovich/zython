@@ -6,8 +6,8 @@ class Result:
 
     Warnings
     --------
-    It is supposed this class is used by package itself only, there should be now need for user to create it,
-    but they can use this class as base class for their purpose.
+    It is supposed this class is used by package itself only, there should be no need for user to create it,
+    but they can use this class as base class for their extensions.
 
     """
     def __init__(self, mzn_result):
