@@ -1,6 +1,6 @@
 import enum
 from collections import UserDict, deque
-from functools import singledispatch
+from functools import singledispatch, partial
 from typing import Union, Tuple, List
 
 from zython import var
@@ -8,7 +8,7 @@ from zython._compile.ir import IR
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.var_par.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, ZnSequence
 
 
 class Flags(enum.Enum):
@@ -64,7 +64,7 @@ def _process_vars(ir, src, flags):
 
 def _set_value_as_constraint(ir, variable, flags):
     # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
-    ir.constraints.append(_eq(variable.name, _get_value_decl(variable), flags_=flags))
+    ir.constraints.append(_binary_op("==", variable.name, _get_value_decl(variable), flags_=flags))
 
 
 def _get_array_shape_decl(shape):
@@ -126,86 +126,28 @@ def _pow(a, b, *, flags_):  # TODO: make positional only
     return f"pow({to_str(a)}, {to_str(b)})"
 
 
-def _mul(a, b, *, flags_):
-    return f"({to_str(a)} * {to_str(b)})"
+def _binary_op(sign, a, b, *, flags_):
+    return f"({to_str(a)} {sign} {to_str(b)})"
 
 
-def _truediv(a, b, *, flags_):
-    return f"({to_str(a)} / {to_str(b)})"
+def _unary_op(sign, a, *, flags_):
+    return f"({sign}{to_str(a)})"
 
 
-def _floatdiv(a, b, *, flags_):
-    return f"({to_str(a)} div {to_str(b)})"
-
-
-def _mod(a, b, *, flags_):
-    return f"({to_str(a)} mod {to_str(b)})"
-
-
-def _add(a, b, *, flags_):
-    return f"({to_str(a)} + {to_str(b)})"
-
-
-def _sub(a, b, *, flags_):
-    return f"({to_str(a)} - {to_str(b)})"
-
-
-def _eq(a, b, *, flags_):
-    return f"({to_str(a)} == {to_str(b)})"
-
-
-def _ne(a, b, *, flags_):
-    return f"({to_str(a)} != {to_str(b)})"
-
-
-def _lt(a, b, *, flags_):
-    return f"({to_str(a)} < {to_str(b)})"
-
-
-def _gt(a, b, *, flags_):
-    return f"({to_str(a)} > {to_str(b)})"
-
-
-def _le(a, b, *, flags_):
-    return f"({to_str(a)} <= {to_str(b)})"
-
-
-def _ge(a, b, *, flags_):
-    return f"({to_str(a)} >= {to_str(b)})"
-
-
-def _invert(a, *, flags_):
-    return f"(not{to_str(a)})"
-
-
-def _xor(a, b, *, flags_):
-    return f"({to_str(a)} xor {to_str(b)})"
-
-
-def _or(a, b, *, flags_):
-    return f"({to_str(a)} \\/ {to_str(b)})"
-
-
-def _and(a, b, *, flags_):
-    return f"({to_str(a)} /\\ {to_str(b)})"
-
-
-def _forall(seq, iter_var, operation, *, flags_):
+def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
     func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
-    return f"forall({indexes})({func_str})"
-
-
-def _exists(seq, iter_var, operation, *, flags_):
-    func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
-    return f"exists({indexes})({func_str})"
+    return f"{op}({indexes})({func_str})"
 
 
 def _sum(seq, iter_var, operation, *, flags_):
     if operation is None:
         return _sum_for_array_or_slice(seq)
     else:
-        func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
-        return f"sum({indexes})({func_str})"
+        return _two_brackets_op("sum", seq, iter_var, operation, flags_=flags_)
+
+
+def _call_func(func, *params, flags_):
+    return f"{func}({', '.join(to_str(p) for p in params)})"
 
 
 def _alldifferent(args, *, flags_):
@@ -228,26 +170,27 @@ def _circuit(array: ArrayMixin, flags_):
 class Op2Str(UserDict):
     def __init__(self):
         self.data = {}
-        self[_Op_code.add] = _add
-        self[_Op_code.sub] = _sub
-        self[_Op_code.eq] = _eq
-        self[_Op_code.ne] = _ne
-        self[_Op_code.lt] = _lt
-        self[_Op_code.gt] = _gt
-        self[_Op_code.le] = _le
-        self[_Op_code.ge] = _ge
-        self[_Op_code.invert] = _invert
-        self[_Op_code.xor] = _xor
-        self[_Op_code.and_] = _and
-        self[_Op_code.or_] = _or
-        self[_Op_code.mul] = _mul
-        self[_Op_code.truediv] = _truediv
-        self[_Op_code.floordiv] = _floatdiv
-        self[_Op_code.mod] = _mod
+        self[_Op_code.add] = partial(_binary_op, "+")
+        self[_Op_code.sub] = partial(_binary_op, "-")
+        self[_Op_code.eq] = partial(_binary_op, "==")
+        self[_Op_code.ne] = partial(_binary_op, "!=")
+        self[_Op_code.lt] = partial(_binary_op, "<")
+        self[_Op_code.gt] = partial(_binary_op, ">")
+        self[_Op_code.le] = partial(_binary_op, "<=")
+        self[_Op_code.ge] = partial(_binary_op, ">=")
+        self[_Op_code.xor] = partial(_binary_op, "xor")
+        self[_Op_code.and_] = partial(_binary_op, "/\\")
+        self[_Op_code.or_] = partial(_binary_op, "\\/")
+        self[_Op_code.mul] = partial(_binary_op, "*")
+        self[_Op_code.truediv] = partial(_binary_op, "/")
+        self[_Op_code.floordiv] = partial(_binary_op, "div")
+        self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.pow] = _pow
+        self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.alldifferent] = _alldifferent
-        self[_Op_code.forall] = _forall
-        self[_Op_code.exists] = _exists
+        self[_Op_code.forall] = partial(_two_brackets_op, "forall")
+        self[_Op_code.exists] = partial(_two_brackets_op, "exists")
+        self[_Op_code.count] = partial(_call_func, "count")
         self[_Op_code.sum_] = _sum
         self[_Op_code.size] = _size
         self[_Op_code.circuit] = _circuit

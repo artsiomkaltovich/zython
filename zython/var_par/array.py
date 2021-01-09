@@ -41,7 +41,7 @@ class ArrayMixin(operation.Operation):
 
         Returns
         -------
-        size: _Operation
+        size: Operation
             Operation which is evaluated as number of the items in specified dimension by the model
         """
         return operation.Operation.size(self, dim)
