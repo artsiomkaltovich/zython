@@ -8,7 +8,7 @@ from zython._compile.ir import IR
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.var_par.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range, ZnSequence
+from zython.var_par.types import is_range
 
 
 class Flags(enum.Enum):
@@ -64,7 +64,7 @@ def _process_vars(ir, src, flags):
 
 def _set_value_as_constraint(ir, variable, flags):
     # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
-    ir.constraints.append(_binary_op("==", variable.name, _get_value_decl(variable), flags_=flags))
+    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value), flags_=flags))
 
 
 def _get_array_shape_decl(shape):
@@ -89,15 +89,7 @@ def _process_how_to_solve(ir, result):
     if isinstance(how_to_solve, str):
         result.append(f"solve {how_to_solve};")
         return
-    assert False, "{} how to solve is unknown".format(ir.how_to_solve)
-
-
-def _get_value_decl(variable):
-    if isinstance(variable.value, tuple):
-        # TODO: support 2 and more d
-        return f"array{len(variable._shape)}d({_get_array_shape_decl(variable._shape)}, " \
-               f"[{', '.join(str(v) for v in variable.value)}])"
-    return to_str(variable.value)
+    assert False, "{} how to solve is unknown".format(ir.how_to_solve)  # pragma: no cover
 
 
 def to_str(constraint, flags=None):
@@ -150,21 +142,28 @@ def _call_func(func, *params, flags_):
     return f"{func}({', '.join(to_str(p) for p in params)})"
 
 
-def _alldifferent(args, *, flags_):
-    flags_.add(Flags.alldifferent)
-    if isinstance(args, ArrayMixin):
-        def_, indexes = _get_indexes_def(args)
-        return f"alldifferent([{args.name}[{', '.join(indexes)}] | {def_}])"
-    return f"alldifferent([{', '.join(v.name for v in args)}])"
-
-
 def _size(array: ArrayMixin, dim: int, *, flags_):
     return f"(max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1)"
 
 
-def _circuit(array: ArrayMixin, flags_):
-    flags_.add(Flags.circuit)
-    return f"circuit({array.name})"
+def _global_constraint(constraint, *params, flags_):
+    def _process_params(params):
+        assert isinstance(params, (tuple, list)), f"{type(params)}"
+        assert len(params) == 1, f"sequence with one element is expected, but {len(params)} were found"
+        params = params[0]
+        if isinstance(params, (tuple, list)):
+            if len(params) > 1:
+                return f"[{', '.join(to_str(p) for p in params)}]"
+            return to_str(params[0])
+        elif isinstance(params, ArrayView):
+            def_, indexes = _get_indexes_def(params)
+            return f"[{params.name}[{', '.join(indexes)}] | {def_}]"
+        elif isinstance(params, ArrayMixin):
+            return to_str(params)
+        assert False, f"{type(params)}"  # pragma: no cover
+
+    flags_.add(getattr(Flags, constraint))
+    return _call_func(constraint, _process_params(params), flags_=flags_)
 
 
 class Op2Str(UserDict):
@@ -187,15 +186,15 @@ class Op2Str(UserDict):
         self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.pow] = _pow
         self[_Op_code.invert] = partial(_unary_op, "not")
-        self[_Op_code.alldifferent] = _alldifferent
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
         self[_Op_code.count] = partial(_call_func, "count")
         self[_Op_code.sum_] = _sum
         self[_Op_code.size] = _size
-        self[_Op_code.circuit] = _circuit
+        self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
+        self[_Op_code.circuit] = partial(_global_constraint, "circuit")
 
-    def __missing__(self, key):
+    def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")
 
 
@@ -251,7 +250,7 @@ def _get_indexes_def(array: Union[ArrayMixin, ArrayView, Tuple[var], List[var]])
         for level, pos in enumerate(array.pos):
             if isinstance(pos, slice):
                 if pos.step is not None and pos.step != 1:
-                    raise ValueError("step isn't suported for now")
+                    raise ValueError("step isn't supported for now")
                 var_name = f"i{i}__"
                 stop = pos.stop - 1 if pos.stop else array.array._shape[level] - 1
                 start = pos.start if pos.start else 0
