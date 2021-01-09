@@ -1,4 +1,4 @@
-from zython.operations._operation import _Operation
+from zython.operations.operation import Operation
 
 orig_range = range
 
@@ -12,7 +12,7 @@ class _range:
         if stop is None:
             stop = start
             start = 0
-        if isinstance(start, _Operation) or isinstance(stop, _Operation) or isinstance(step, _Operation):
+        if isinstance(start, Operation) or isinstance(stop, Operation) or isinstance(step, Operation):
             self = super().__new__(cls)
             self.start = start
             self.stop = stop

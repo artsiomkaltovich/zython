@@ -5,7 +5,7 @@ import minizinc
 from zython.result import Result
 from zython._compile.ir import IR
 from zython._compile.zinc import to_zinc
-from zython.operations._constraint import _Constraint
+from zython.operations.constraint import Constraint
 from zython.var_par.par import par
 from zython.var_par.var import var
 
@@ -80,5 +80,5 @@ class Model(ABC):
         if not attr_name.startswith("_"):
             if isinstance(attr, (var, par)):
                 return attr
-            if isinstance(attr, _Constraint):
+            if isinstance(attr, Constraint):
                 return var(attr)

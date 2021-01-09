@@ -2,7 +2,7 @@ from numbers import Number
 from typing import Optional, Callable, Union, Type
 
 import zython
-from zython.operations._constraint import _Constraint
+from zython.operations.constraint import Constraint
 from zython.operations._op_codes import _Op_code
 
 
@@ -10,9 +10,9 @@ def _get_wider_type(left, right):
     return int
 
 
-class _Operation(_Constraint):
+class Operation(Constraint):
     def __init__(self, op, *params, type_=None):
-        super(_Operation, self).__init__(op, *params, type_=type_)
+        super(Operation, self).__init__(op, *params, type_=type_)
 
     def __pow__(self, power, modulo=None):
         return self.pow(self, power, modulo)
@@ -58,22 +58,22 @@ class _Operation(_Constraint):
         return self.sub(other, self)
 
     def __eq__(self, other):
-        return _Operation(_Op_code.eq, self, other, type_=int)
+        return Operation(_Op_code.eq, self, other, type_=int)
 
     def __ne__(self, other):
-        return _Operation(_Op_code.ne, self, other, type_=int)
+        return Operation(_Op_code.ne, self, other, type_=int)
 
     def __lt__(self, other):
-        return _Operation(_Op_code.lt, self, other, type_=int)
+        return Operation(_Op_code.lt, self, other, type_=int)
 
     def __gt__(self, other):
-        return _Operation(_Op_code.gt, self, other, type_=int)
+        return Operation(_Op_code.gt, self, other, type_=int)
 
     def __le__(self, other):
-        return _Operation(_Op_code.le, self, other, type_=int)
+        return Operation(_Op_code.le, self, other, type_=int)
 
     def __ge__(self, other):
-        return _Operation(_Op_code.ge, self, other, type_=int)
+        return Operation(_Op_code.ge, self, other, type_=int)
 
     # below method is used for validation and control of _Operation creation
     # when you create _Operation as _Operation(_Op_code.exists, seq, iter_var, func)
@@ -82,64 +82,46 @@ class _Operation(_Constraint):
 
     @staticmethod
     def add(left, right):
-        return _Operation(_Op_code.add, left, right, type_=_get_wider_type(left, right))
+        return Operation(_Op_code.add, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def sub(left, right):
-        return _Operation(_Op_code.sub, left, right, type_=_get_wider_type(left, right))
+        return Operation(_Op_code.sub, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def pow(base, power, modulo=None):
         if modulo is not None:
             raise ValueError("modulo is not supported")
-        return _Operation(_Op_code.pow, base, power, type_=_get_wider_type(base, power))
+        return Operation(_Op_code.pow, base, power, type_=_get_wider_type(base, power))
 
     @staticmethod
     def mul(left, right):
-        return _Operation(_Op_code.mul, left, right, type_=_get_wider_type(left, right))
+        return Operation(_Op_code.mul, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def floordiv(left, right):
         _validate_div(left, right)
-        return _Operation(_Op_code.floordiv, left, right, type_=_get_wider_type(left, right))
+        return Operation(_Op_code.floordiv, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def mod(left, right):
         _validate_div(left, right)
-        return _Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
+        return Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
 
     @staticmethod
     def size(array: "zython.var_par.array.ArrayMixin", dim: int):
         if 0 <= dim < array.ndims():
-            return _Operation(_Op_code.size, array, dim, type_=int)
+            return Operation(_Op_code.size, array, dim, type_=int)
         raise ValueError(f"Array has 0..{array.ndims()} dimensions, but {dim} were specified")
-
-    @staticmethod
-    def exists(seq: Union["zython.var_par.types._range",
-                          "zython.var_par.types.orig_range",
-                          "zython.var_par.array.ArrayMixin"],
-               iter_var: Optional["zython.var_par.var"] = None,
-               func: Optional[Union["_Operation", Callable]] = None,
-               type_: Optional[Type] = None):
-        return _Constraint(_Op_code.exists, seq, iter_var, func, type_=type_)
-
-    @staticmethod
-    def forall(seq: Union["zython.var_par.types._range",
-                          "zython.var_par.types.orig_range",
-                          "zython.var_par.array.ArrayMixin"],
-               iter_var: Optional["zython.var_par.var"] = None,
-               func: Optional[Union["_Operation", Callable]] = None,
-               type_: Optional[Type] = None):
-        return _Constraint(_Op_code.forall, seq, iter_var, func, type_=type_)
 
     @staticmethod
     def sum(seq: Union["zython.var_par.types._range",
                        "zython.var_par.types.orig_range",
                        "zython.var_par.array.ArrayMixin"],
             iter_var: Optional["zython.var_par.var"] = None,
-            func: Optional[Union["_Operation", Callable]] = None,
+            func: Optional[Union["Operation", Callable]] = None,
             type_: Optional[Type] = None):
-        return _Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
+        return Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
 
 
 def _validate_div(left, right):
