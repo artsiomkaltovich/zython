@@ -1,6 +1,9 @@
+import re
+
 import pytest
 
 import zython as zn
+from zython.operations._op_codes import _Op_code
 
 
 @pytest.mark.parametrize("array", [[1, 2, 3, 4], (1, 2, 3, 4), (i + 1 for i in range(4))],
@@ -103,7 +106,7 @@ class TestPos:
 
     def test_step(self):
         a = zn.Array([1, 2, 3])
-        with pytest.raises(AssertionError, match="Step other then 1 isn't supported for now"):
+        with pytest.raises(ValueError, match="step other then 1 isn't supported, but it is 2"):
             _ = a[1:3:2]
 
     @pytest.mark.parametrize("pos", [slice(-1, 2), slice(1, -2), slice(-1, -2)])
@@ -112,6 +115,12 @@ class TestPos:
         with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
             _ = a[pos]
 
+    @pytest.mark.parametrize("start", (10, 15))
+    def test_slice_wrong_start(self, start):
+        array = zn.Array(zn.var(int), shape=(3, 2, 4))
+        with pytest.raises(ValueError, match=re.escape(f"start({start}) should be smaller then stop(10)")):
+            _ = array[1, start:10]
+
     @pytest.mark.parametrize("pos, expected", [((0, 1), (0, 1)),
                                                ((0, slice(1, 3)), (0, slice(1, 3, 1)))])
     def test_2d(self, pos, expected):
@@ -119,13 +128,15 @@ class TestPos:
         a = a[pos]
         assert a.pos == expected
 
-    @pytest.mark.parametrize("pos, expected", [(1, (1, slice(None, None, 1))),
-                                               (slice(None, 2), (slice(None, 2, 1), slice(None, None, 1))),
-                                               (slice(1, None), (slice(1, None, 1), slice(None, None, 1)))])
-    def test_2d_added_last_dim(self, pos, expected):
-        a = zn.Array([[1, 2], [2, 3], [3, 4]])
-        a = a[pos]
-        assert a.pos == expected
+    @pytest.mark.parametrize("pos", (1, slice(1, 2)))
+    @pytest.mark.parametrize("array", (zn.Array([[1, 2], [2, 3], [3, 4]]), zn.Array(zn.var(int), shape=(3, 2, 4))))
+    def test_added_last_dim(self, pos, array):
+        ndim = array.ndims()
+        array = array[pos]
+        assert len(array.pos) == ndim
+        assert array.pos[1].start == 0
+        assert array.pos[1].stop.op == _Op_code.size
+        assert array.pos[1].step == 1
 
 
 class TestSize:

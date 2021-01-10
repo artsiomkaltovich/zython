@@ -1,5 +1,6 @@
 from typing import Union, Callable, Optional
 
+import zython.var_par.var  # for type hint
 from zython.operations import _iternal
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
@@ -172,3 +173,27 @@ class circuit(Constraint):
     """
     def __init__(self, seq: ZnSequence):
         super().__init__(_Op_code.circuit, seq)
+
+
+class count(Operation):
+    """ Returns the number of occurrences of ``value`` in ``seq``.
+
+    Examples
+    --------
+
+    Simple timeshedule problem: you with your neighbor wanted to deside who will wash the dishes in the next week.
+    You should do it 3 days (because you've bought fancy doormat) and your neighbour - 4 days.
+
+    >>> from collections import Counter
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(2)), shape=7)
+    ...         self.constraints = [zn.count(self.a, 0) == 3, zn.count(self.a, 1) == 4]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"])
+    Counter({1: 4, 0: 3})
+    """
+    def __init__(self, seq: ZnSequence, value: ["zython.var_par.var.var"]):
+        super().__init__(_Op_code.count, seq, value)
