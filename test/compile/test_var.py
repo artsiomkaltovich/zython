@@ -20,11 +20,12 @@ def test_slice_model():
     class MyModel(zn.Model):
         def __init__(self):
             self.a = zn.Array([[1, 2, 3], [4, 5, 6]])
-            self.b = zn.sum(self.a[:, 2:3])
+            self.start = zn.par(1)
+            self.b = zn.sum(self.a[:, self.start + 1:self.start * 3])
 
     model = MyModel()
     result = model.solve_satisfy(verbose=True)
-    print(result)
+    assert 9 == result["b"]
 
 
 def create_var(name):
@@ -39,13 +40,17 @@ def create_par(name):
     return p
 
 
-def create_par_array1d(name):
-    p = zn.Array(range(5))
+def create_array(name, ndims):
+    p = zn.Array(zn.var(range(5)), shape=(5,) * ndims)
     p._name = name
     return p
 
 
 class TestTypeToStr:
+    @pytest.mark.parametrize("v, expected", [(create_var("a"), "a"), (create_par("b"), "b"),
+                                             (create_array("arr", 2), "arr")])
+    def test_var_to_str(self, v, expected):
+        assert to_str(v) == expected
 
     @pytest.mark.parametrize("r, expected", [(range(100), "0..99"), (range(1, 10), "1..9"), (range(0, 100), "0..99"),
                                              (range(-10, 10), "-10..9"), (range(-10, -9), "-10..-10")])
@@ -66,6 +71,24 @@ class TestTypeToStr:
         p = create_par("b")
         assert "(a - 1)..((b + 1) - 1)" == to_str(range(v - 1, p + 1))
 
-    @pytest.mark.parametrize("array, pos, expected", [(create_par_array1d("a"), slice(2, 3), "fdf")])
+    @pytest.mark.parametrize("array, pos, expected", [(create_array("z", 3), (1, 2, 3), "z[1, 2, 3]"),
+                                                      (create_array("g", 1), 2, "g[2]")])
+    def test_indexes(self, array, pos, expected):
+        assert to_str(array[pos]) == expected
+
+    # slices with start or stop == None is tested as model in sum tests due to complex minizinc expression
+    @pytest.mark.parametrize("array, pos, expected",
+                             [(create_array("a", 1), slice(2, 3), "slice_1d(a, [2..2], 0..0)"),
+                              (create_array("b", 2), (4, slice(2, 4)), "slice_2d(b, [4..4, 2..3], 0..0, 0..1)"),
+                              (create_array("c", 3), (slice(1, 2), 4, slice(2, 4)),
+                               "slice_3d(c, [1..1, 4..4, 2..3], 0..0, 0..0, 0..1)")])
     def test_slice(self, array, pos, expected):
         assert expected == to_str(array[pos])
+
+    @pytest.mark.parametrize("collection, expected", [((1, create_array("a", 2)[1, 2], 3, create_par("c")),
+                                                       "[1, a[1, 2], 3, c]"),
+                                                      ([1, create_par("c") + create_array("a", 2)[1, 2] + 3],
+                                                       "[1, ((c + a[1, 2]) + 3)]")
+                                                      ])
+    def test_tuple_and_list_to_array(self, collection, expected):
+        assert to_str(collection) == expected

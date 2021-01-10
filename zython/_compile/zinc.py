@@ -5,8 +5,10 @@ from typing import Union, Tuple, List
 
 from zython import var
 from zython._compile.ir import IR
+from zython._helpers._start_stop_step_validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
+from zython.operations.operation import Operation
 from zython.var_par.array import ArrayView, ArrayMixin
 from zython.var_par.types import is_range
 
@@ -92,7 +94,9 @@ def _process_how_to_solve(ir, result):
     assert False, "{} how to solve is unknown".format(ir.how_to_solve)  # pragma: no cover
 
 
+@singledispatch
 def to_str(stmt, flags=None):
+    # order is important
     if isinstance(stmt, ArrayView):
         return _compile_array_view(stmt)
     elif isinstance(stmt, var):
@@ -104,30 +108,26 @@ def to_str(stmt, flags=None):
     return str(stmt)
 
 
+@to_str.register(tuple)
+@to_str.register(list)
+def _(stmt, flags=None):
+    return f"[{', '.join(to_str(s) for s in stmt)}]"
+
+
 def _range_or_slice_to_str(stmt):
-    if not isinstance(stmt.step, int) or stmt.step != 1:
-        raise ValueError(f"step other then 1 isn't supported, but it is {stmt.step}")
-    if isinstance(stmt.start, int) and isinstance(stmt.stop, int) and stmt.start >= stmt.stop:
-        raise ValueError(f"start({stmt.start}) should be smaller then stop({stmt.stop})")
+    _start_stop_step_validate(stmt)
     return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
 
 
 @singledispatch
-def _fill_the_slice(stmt, array_length: int):
-    assert False
+def _fill_the_slice(stmt):
+    assert isinstance(stmt, (Operation, int))
+    return slice(stmt, stmt + 1, 1)
 
 
 @_fill_the_slice.register(slice)
-def _(obj, array_length):
-    start = obj.start if obj.start is not None else 0
-    stop = obj.stop if obj.stop is not None else array_length  # -1 is processed in _range_or_slice_to_str
-    step = obj.step if obj.step is not None else 1
-    return slice(start, stop, step)
-
-
-@_fill_the_slice.register(int)
-def _(stmt, array_length):
-    return slice(stmt, stmt + 1, 1)
+def _(obj):
+    return obj
 
 
 def _compile_array_view(view):
@@ -136,16 +136,13 @@ def _compile_array_view(view):
     assert isinstance(pos, tuple), "Array index should be converted to tuple by IR class"
     assert ndim == len(view.array._shape), "Array index should specify all dimensions, see ArrayView.__init__"
     if any(isinstance(p, slice) for p in pos):
-        slices = [_fill_the_slice(p, view.array.size(dim)) for dim, p in enumerate(pos)]
+        slices = [_fill_the_slice(p) for p in pos]
         slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
         new_index_set = ", ".join(_range_or_slice_to_str(range(s.stop - s.start)) for s in slices)
         return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set})"
-    assert False
-    return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
-    if isinstance(view.pos, slice):
-        raise ValueError("slices are not supported in such operations, please use zn.forall")
     else:
-        raise ValueError(f"Only int and tuples supported as indexes, but {type(view.pos)} was used")
+        assert all(isinstance(p, (Operation, int)) for p in pos)
+        return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
 
 
 def _pow(a, b, *, flags_):  # TODO: make positional only
