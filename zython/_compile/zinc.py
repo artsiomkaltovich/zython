@@ -92,23 +92,57 @@ def _process_how_to_solve(ir, result):
     assert False, "{} how to solve is unknown".format(ir.how_to_solve)  # pragma: no cover
 
 
-def to_str(constraint, flags=None):
-    if isinstance(constraint, ArrayView):
-        return _compile_array_view(constraint)
-    elif isinstance(constraint, var):
-        return constraint.name
-    elif isinstance(constraint, Constraint):
-        return Op2Str[constraint.op](*constraint.params, flags_=flags)
-    return str(constraint)
+def to_str(stmt, flags=None):
+    if isinstance(stmt, ArrayView):
+        return _compile_array_view(stmt)
+    elif isinstance(stmt, var):
+        return stmt.name
+    elif isinstance(stmt, Constraint):
+        return Op2Str[stmt.op](*stmt.params, flags_=flags)
+    elif is_range(stmt):
+        return _range_or_slice_to_str(stmt)
+    return str(stmt)
+
+
+def _range_or_slice_to_str(stmt):
+    if not isinstance(stmt.step, int) or stmt.step != 1:
+        raise ValueError(f"step other then 1 isn't supported, but it is {stmt.step}")
+    if isinstance(stmt.start, int) and isinstance(stmt.stop, int) and stmt.start >= stmt.stop:
+        raise ValueError(f"start({stmt.start}) should be smaller then stop({stmt.stop})")
+    return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
+
+
+@singledispatch
+def _fill_the_slice(stmt, array_length: int):
+    assert False
+
+
+@_fill_the_slice.register(slice)
+def _(obj, array_length):
+    start = obj.start if obj.start is not None else 0
+    stop = obj.stop if obj.stop is not None else array_length  # -1 is processed in _range_or_slice_to_str
+    step = obj.step if obj.step is not None else 1
+    return slice(start, stop, step)
+
+
+@_fill_the_slice.register(int)
+def _(stmt, array_length):
+    return slice(stmt, stmt + 1, 1)
 
 
 def _compile_array_view(view):
-    if isinstance(view.pos, tuple):
-        if len(view.pos) != len(view.array._shape):
-            raise ValueError("Accessing of subarrays are not supported in such operations, please use zn.forall "
-                             "or specify index of element")
-        return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
-    elif isinstance(view.pos, slice):
+    pos = view.pos
+    ndim = len(view.pos)
+    assert isinstance(pos, tuple), "Array index should be converted to tuple by IR class"
+    assert ndim == len(view.array._shape), "Array index should specify all dimensions, see ArrayView.__init__"
+    if any(isinstance(p, slice) for p in pos):
+        slices = [_fill_the_slice(p, view.array.size(dim)) for dim, p in enumerate(pos)]
+        slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
+        new_index_set = ", ".join(_range_or_slice_to_str(range(s.stop - s.start)) for s in slices)
+        return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set})"
+    assert False
+    return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
+    if isinstance(view.pos, slice):
         raise ValueError("slices are not supported in such operations, please use zn.forall")
     else:
         raise ValueError(f"Only int and tuples supported as indexes, but {type(view.pos)} was used")
@@ -203,8 +237,7 @@ Op2Str = Op2Str()
 
 def _sum_for_array_or_slice(arg):
     if isinstance(arg, ArrayView):
-        def_, indexes = _get_indexes_def(arg)
-        return f"sum({def_})({arg.array.name}[{', '.join(indexes)}])"
+        return f"sum({to_str(arg)})"
     elif isinstance(arg, ArrayMixin):
         return f"sum({arg.name})"
     else:
