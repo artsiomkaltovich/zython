@@ -178,23 +178,8 @@ def _size(array: ArrayMixin, dim: int, *, flags_):
 
 
 def _global_constraint(constraint, *params, flags_):
-    def _process_params(params):
-        assert isinstance(params, (tuple, list)), f"{type(params)}"
-        assert len(params) == 1, f"sequence with one element is expected, but {len(params)} were found"
-        params = params[0]
-        if isinstance(params, (tuple, list)):
-            if len(params) > 1:
-                return f"[{', '.join(to_str(p) for p in params)}]"
-            return to_str(params[0])
-        elif isinstance(params, ArrayView):
-            def_, indexes = _get_indexes_def(params)
-            return f"[{params.name}[{', '.join(indexes)}] | {def_}]"
-        elif isinstance(params, ArrayMixin):
-            return to_str(params)
-        assert False, f"{type(params)}"  # pragma: no cover
-
     flags_.add(getattr(Flags, constraint))
-    return _call_func(constraint, _process_params(params), flags_=flags_)
+    return _call_func(constraint, *params, flags_=flags_)
 
 
 class Op2Str(UserDict):
@@ -238,29 +223,8 @@ def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
     return func_str, indexes
 
 
-@singledispatch
 def _get_indexes_def_and_func_arg(seq, iter_var, flags_):
-    if is_range(seq):
-        if seq.step != 1:
-            raise ValueError("Step aren't supported")
-        def_ = f"{iter_var.name} in {to_str(seq.start, flags_)}..{to_str(seq.stop - 1, flags_)}"
-    else:
-        raise ValueError(f"seq should be range, but {type(seq)} was specified")
-    return def_
-
-
-@_get_indexes_def_and_func_arg.register(ArrayMixin)
-def _(seq, iter_var, flags_):
-    def_, indexes = _get_indexes_def(seq)
-    iter_var._name = f"{seq.name}[{', '.join(indexes)}]"
-    return def_
-
-
-@_get_indexes_def_and_func_arg.register(list)
-@_get_indexes_def_and_func_arg.register(tuple)
-def _(seq, iter_var, flags_):
-    def_ = f"{iter_var.name} in [{', '.join(s.name for s in seq)}]"
-    return def_
+    return f"{iter_var.name} in {to_str(seq, flags_)}"
 
 
 def _get_indexes_def(array: Union[ArrayMixin, ArrayView, Tuple[var], List[var]]):
