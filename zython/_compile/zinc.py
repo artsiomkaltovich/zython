@@ -164,7 +164,7 @@ def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
 
 def _sum(seq, iter_var, operation, *, flags_):
     if operation is None:
-        return _sum_for_array_or_slice(seq)
+        return _call_func("sum", seq, flags_=flags_)
     else:
         return _two_brackets_op("sum", seq, iter_var, operation, flags_=flags_)
 
@@ -230,15 +230,6 @@ class Op2Str(UserDict):
 
 
 Op2Str = Op2Str()
-
-
-def _sum_for_array_or_slice(arg):
-    if isinstance(arg, ArrayView):
-        return f"sum({to_str(arg)})"
-    elif isinstance(arg, ArrayMixin):
-        return f"sum({arg.name})"
-    else:
-        raise ValueError(f"Only arrays and array views are supported as sum argument, but {type(arg)} was specified.")
 
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
