@@ -4,7 +4,7 @@ from collections import deque
 from typing import Type
 
 from zython import var, par
-from zython._helpers._start_stop_step_validate import _start_stop_step_validate
+from zython._helpers.validate import _start_stop_step_validate
 from zython.operations import operation
 
 

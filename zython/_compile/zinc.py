@@ -1,11 +1,10 @@
 import enum
 from collections import UserDict, deque
 from functools import singledispatch, partial
-from typing import Union, Tuple, List
 
 from zython import var
 from zython._compile.ir import IR
-from zython._helpers._start_stop_step_validate import _start_stop_step_validate
+from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
@@ -38,17 +37,15 @@ def _process_flags(flags, result):
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
-    if not decl_prefix.endswith(" "):
-        decl_prefix += " "
     for v in vars_or_pars.values():
         # TODO: check reserved word are not used as variable name
         declaration = ""
         if isinstance(v, ArrayMixin):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
-            declaration += f"{decl_prefix}int: {v.name};"
+            declaration += f"{decl_prefix} int: {v.name};"
         elif is_range(v.type):
-            declaration += f"{decl_prefix}{to_str(v.type.start)}..{to_str(v.type.stop - 1)}: {v.name};"
+            declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
         else:
             raise TypeError(f"Type {v.type} are not supported, please specify int or range")
         src.append(declaration)
@@ -86,8 +83,8 @@ def _process_how_to_solve(ir, result):
         if len(how_to_solve) == 2:
             result.append(f"solve {how_to_solve[0]} {to_str(how_to_solve[1])};")
             return
-        elif len(how_to_solve) == 1:
-            how_to_solve = how_to_solve[0]
+        assert len(how_to_solve) == 1
+        how_to_solve = how_to_solve[0]
     if isinstance(how_to_solve, str):
         result.append(f"solve {how_to_solve};")
         return
@@ -158,7 +155,7 @@ def _unary_op(sign, a, *, flags_):
 
 
 def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
-    func_str, indexes = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
+    indexes, func_str = _get_indexes_and_cycle_body(seq, iter_var, operation, flags_)
     return f"{op}({indexes})({func_str})"
 
 
@@ -218,42 +215,4 @@ Op2Str = Op2Str()
 
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
-    indexes = _get_indexes_def_and_func_arg(seq, iter_var, flags_)
-    func_str = to_str(func, flags_)
-    return func_str, indexes
-
-
-def _get_indexes_def_and_func_arg(seq, iter_var, flags_):
-    return f"{iter_var.name} in {to_str(seq, flags_)}"
-
-
-def _get_indexes_def(array: Union[ArrayMixin, ArrayView, Tuple[var], List[var]]):
-    if isinstance(array, ArrayView):  # do not singledispatching because the order is important
-        iterators = []
-        indexes = []
-        i = 0
-        for level, pos in enumerate(array.pos):
-            if isinstance(pos, slice):
-                if pos.step is not None and pos.step != 1:
-                    raise ValueError("step isn't supported for now")
-                var_name = f"i{i}__"
-                stop = pos.stop - 1 if pos.stop else array.array._shape[level] - 1
-                start = pos.start if pos.start else 0
-                if isinstance(start, int) and isinstance(stop, int) and start > stop:
-                    raise ValueError(f"start ({start}) should be smaller then stop ({stop})")
-                def_ = f"{var_name} in {to_str(start)}..{to_str(stop)}"
-                iterators.append(def_)
-                i += 1
-            elif isinstance(pos, int):
-                var_name = str(pos)
-            elif isinstance(pos, var):
-                var_name = pos.name
-            else:
-                raise ValueError("Only int and slice are supported as indexes")
-            indexes.append(var_name)
-        return ",".join(iterators), indexes
-    elif isinstance(array, ArrayMixin):
-        indexes_ = [f"i{i}__" for i in range(len(array._shape))]
-        return ", ".join(f"{index} in 0..{s - 1}" for index, s in zip(indexes_, array._shape)), indexes_
-    else:
-        raise ValueError(f"{type(array)} isn't supported")
+    return f"{iter_var.name} in {to_str(seq, flags_)}", to_str(func, flags_)
