@@ -18,11 +18,6 @@ class ArrayMixin(operation.Operation):
     _type: Type
 
     @property
-    def name(self):
-        assert self._name, "name wasn't specified"
-        return self._name
-
-    @property
     def type(self):
         return self._type
 
@@ -156,6 +151,7 @@ class ArrayPar(par, ArrayMixin):
 
     def _flatten_to_shaped(self, flatten_values):
         if len(self._shape) > 1:
+            values = []
             for s in reversed(self._shape[1:]):
                 values = []
                 start = 0

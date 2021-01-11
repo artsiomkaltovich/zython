@@ -121,6 +121,13 @@ class Operation(Constraint):
             type_: Optional[Type] = None):
         return Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
 
+    @staticmethod
+    def count(seq: "zython.var_par.types.ZnSequence",
+              iter_var: Optional["zython.var_par.var.var"] = None,
+              func: Optional[Union["Operation", Callable]] = None,
+              type_: Optional[Type] = None):
+        return Operation(_Op_code.count, seq, iter_var, func, type_=type_)
+
 
 def _validate_div(left, right):
     if isinstance(right, Number) and right == 0 or getattr(right, "value", 1) == 0:

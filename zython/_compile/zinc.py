@@ -159,19 +159,23 @@ def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
     return f"{op}({indexes})({func_str})"
 
 
-def _sum(seq, iter_var, operation, *, flags_):
-    if operation is None:
-        return _call_func("sum", seq, flags_=flags_)
+def _one_or_two_brackets(op, seq, iter_var, operation, *, flags_):
+    if iter_var is None:
+        return _call_func(op, seq, operation, flags_=flags_)
     else:
-        return _two_brackets_op("sum", seq, iter_var, operation, flags_=flags_)
+        return _two_brackets_op(op, seq, iter_var, operation, flags_=flags_)
 
 
 def _call_func(func, *params, flags_):
-    return f"{func}({', '.join(to_str(p) for p in params)})"
+    return f"{func}({', '.join(to_str(p) for p in params if p is not None)})"
 
 
 def _size(array: ArrayMixin, dim: int, *, flags_):
-    return f"(max(index_set_{dim + 1}of{array.ndims()}({array.name})) + 1)"
+    ndims = array.ndims()
+    if ndims > 1:
+        return f"(max(index_set_{dim + 1}of{ndims}({array.name})) + 1)"
+    else:
+        return f"(max(index_set({array.name})) + 1)"
 
 
 def _global_constraint(constraint, *params, flags_):
@@ -201,8 +205,8 @@ class Op2Str(UserDict):
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
-        self[_Op_code.count] = partial(_call_func, "count")
-        self[_Op_code.sum_] = _sum
+        self[_Op_code.count] = partial(_one_or_two_brackets, "count")
+        self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
         self[_Op_code.size] = _size
         self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
         self[_Op_code.circuit] = partial(_global_constraint, "circuit")

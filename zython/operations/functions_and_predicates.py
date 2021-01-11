@@ -129,6 +129,42 @@ def sum(seq: ZnSequence,
     return Operation.sum(seq, iter_var, operation, type_=type_)
 
 
+def count(seq: ZnSequence, value: Union[Operation, Callable[[ZnSequence], Operation]]) -> Operation:
+    """ Returns the number of occurrences of ``value`` in ``seq``.
+
+    Examples
+    --------
+
+    Simple timeshedule problem: you with your neighbor wanted to deside who will wash the dishes in the next week.
+    You should do it 3 days (because you've bought fancy doormat) and your neighbour - 4 days.
+
+    >>> from collections import Counter
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(2)), shape=7)
+    ...         self.constraints = [zn.count(self.a, 0) == 3, zn.count(self.a, 1) == 4]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"])
+    Counter({1: 4, 0: 3})
+
+    ``zn.alldifferent`` could be emulated via ``zn.count``
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(10)), shape=4)
+    ...         self.constraints = [zn.forall(range(self.a.size(0)),
+    ...                                       lambda i: zn.count(self.a, lambda elem: elem == self.a[i]) == 1)]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"])
+    Counter({3: 1, 2: 1, 1: 1, 0: 1})
+    """
+    iter_var, operation = _iternal.get_iter_var_and_op(seq, value)
+    return Operation.count(seq, iter_var, operation, type_=int)
+
+
 class alldifferent(Constraint):
     """ requires all the variables appearing in its argument to be different
 
@@ -173,27 +209,3 @@ class circuit(Constraint):
     """
     def __init__(self, seq: ZnSequence):
         super().__init__(_Op_code.circuit, seq)
-
-
-class count(Operation):
-    """ Returns the number of occurrences of ``value`` in ``seq``.
-
-    Examples
-    --------
-
-    Simple timeshedule problem: you with your neighbor wanted to deside who will wash the dishes in the next week.
-    You should do it 3 days (because you've bought fancy doormat) and your neighbour - 4 days.
-
-    >>> from collections import Counter
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.Array(zn.var(range(2)), shape=7)
-    ...         self.constraints = [zn.count(self.a, 0) == 3, zn.count(self.a, 1) == 4]
-    >>> model = MyModel()
-    >>> result = model.solve_satisfy()
-    >>> Counter(result["a"])
-    Counter({1: 4, 0: 3})
-    """
-    def __init__(self, seq: ZnSequence, value: ["zython.var_par.var.var"]):
-        super().__init__(_Op_code.count, seq, value)
