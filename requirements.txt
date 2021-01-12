@@ -1,1 +1,1 @@
-minizinc
+minizinc >= 0.4.2
