@@ -1,3 +1,4 @@
 sphinx
 pytest
 pytest-sphinx
+nox

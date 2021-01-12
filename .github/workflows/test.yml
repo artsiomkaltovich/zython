@@ -53,14 +53,12 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      run: |
-        pip install flake8 tox
     - name: Check minizinc version
       run: |
         minizinc --version
     - name: Lint with flake8
       run: |
-        flake8 zython --count --max-complexity=10 --max-line-length=120 --statistics
+        nox -s lint
     - name: Test with tox and pytest
       run: |
-        tox
+        nox -x test --reuse-existing-virtualenvs
