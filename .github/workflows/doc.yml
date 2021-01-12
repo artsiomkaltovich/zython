@@ -55,6 +55,9 @@ jobs:
     - name: Check minizinc version
       run: |
         minizinc --version
+    - name: Install nox
+      run: |
+        pip install nox
     - name: Doc tests
       run: |
         nox -s doc --reuse-existing-virtualenvs
