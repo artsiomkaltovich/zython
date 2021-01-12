@@ -63,4 +63,4 @@ jobs:
         nox -s lint
     - name: Test with tox and pytest
       run: |
-        nox -x test --reuse-existing-virtualenvs
+        nox -s test --reuse-existing-virtualenvs
