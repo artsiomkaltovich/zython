@@ -15,6 +15,7 @@ def _can_create_array_from(arg):
 class ArrayMixin(operation.Operation):
     _shape: tuple
     _name: str
+    name: str  # remove pycharm warnings, this property is handled by var\par base class
     _type: Type
 
     @property

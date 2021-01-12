@@ -1,6 +1,5 @@
 from typing import Union, Callable, Optional
 
-import zython.var_par.var  # for type hint
 from zython.operations import _iternal
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint

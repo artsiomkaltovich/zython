@@ -72,10 +72,10 @@ def _get_array_shape_decl(shape):
     return f"{', '.join(result)}"
 
 
-def _process_constraints(ir, src, flags):
+def _process_constraints(ir, src, flags_):
     for c in ir.constraints:
         # some constraints, e.g. set value are directly added as strings
-        src.append(f"constraint {to_str(c, flags)};")
+        src.append(f"constraint {to_str(c, flags_=flags_)};")
 
 
 def _process_how_to_solve(ir, result):
@@ -93,14 +93,15 @@ def _process_how_to_solve(ir, result):
 
 
 @singledispatch
-def to_str(stmt, flags=None):
+def to_str(stmt, *, flatten_array=False, flags_=None):
     # order is important
-    if isinstance(stmt, ArrayView):
-        return _compile_array_view(stmt)
+    if isinstance(stmt, ArrayMixin):
+        stmt = _compile_array_view(stmt) if isinstance(stmt, ArrayView) else stmt
+        return _array_to_str(stmt, flatten_array=flatten_array)
     elif isinstance(stmt, var):
         return stmt.name
     elif isinstance(stmt, Constraint):
-        return Op2Str[stmt.op](*stmt.params, flags_=flags)
+        return Op2Str[stmt.op](*stmt.params, flags_=flags_)
     elif is_range(stmt):
         return _range_or_slice_to_str(stmt)
     return str(stmt)
@@ -108,7 +109,7 @@ def to_str(stmt, flags=None):
 
 @to_str.register(tuple)
 @to_str.register(list)
-def _(stmt, flags=None):
+def _(stmt, *, flatten_array=False, flags_=None):
     return f"[{', '.join(to_str(s) for s in stmt)}]"
 
 
@@ -140,13 +141,26 @@ def _compile_array_view(view):
         if slices_count == len(pos):
             return slice_def
         elif slices_count == 1:
-            return _call_func(f"array1d", slice_def, flags_=None)
+            return _flatt_array(slice_def)
         else:
             decrised_index_set = [i for i in itertools.compress(slices, slices_pos)]
             return _call_func(f"array{len(decrised_index_set)}d", *decrised_index_set, slice_def, flags_=None)
     else:
         assert all(isinstance(p, (Operation, int)) for p in pos)
         return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
+
+
+def _flatt_array(array):
+    return _call_func("array1d", array, flags_=None)
+
+
+def _array_to_str(array, flatten_array=False):
+    assert isinstance(array, (ArrayMixin, str))
+    name = array if isinstance(array, str) else array.name
+    if flatten_array:
+        return _call_func("array1d", name, flags_=None)
+    else:
+        return name
 
 
 def _compile_slice(ndim, pos, view):
@@ -174,15 +188,15 @@ def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
     return f"{op}({indexes})({func_str})"
 
 
-def _one_or_two_brackets(op, seq, iter_var, operation, *, flags_):
+def _one_or_two_brackets(op, seq, iter_var, operation, *, flatten_array=False, flags_):
     if iter_var is None:
-        return _call_func(op, seq, operation, flags_=flags_)
+        return _call_func(op, seq, operation, flatten_array=flatten_array, flags_=flags_)
     else:
         return _two_brackets_op(op, seq, iter_var, operation, flags_=flags_)
 
 
-def _call_func(func, *params, flags_):
-    return f"{func}({', '.join(to_str(p) for p in params if p is not None)})"
+def _call_func(func, *params, flatten_array=False, flags_):
+    return f"{func}({', '.join(to_str(p, flatten_array=flatten_array) for p in params if p is not None)})"
 
 
 def _size(array: ArrayMixin, dim: int, *, flags_):
@@ -227,7 +241,8 @@ class Op2Str(UserDict):
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
-        self[_Op_code.count] = partial(_one_or_two_brackets, "count")
+        # minizinc 2.5.0 doesn't support 2d array counting
+        self[_Op_code.count] = partial(_one_or_two_brackets, "count", flatten_array=True)
         self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
         self[_Op_code.min_] = partial(_array_comprehension_call, "min")
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
@@ -243,7 +258,7 @@ Op2Str = Op2Str()
 
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
-    return f"{iter_var.name} in {to_str(seq, flags_)}", to_str(func, flags_)
+    return f"{iter_var.name} in {to_str(seq, flags_=flags_)}", to_str(func, flags_=flags_)
 
 
 def _compile_array_comprehension(seq, iter_var, func, flags_):
