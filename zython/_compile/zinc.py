@@ -1,4 +1,5 @@
 import enum
+import itertools
 from collections import UserDict, deque
 from functools import singledispatch, partial
 
@@ -132,14 +133,28 @@ def _compile_array_view(view):
     ndim = len(view.pos)
     assert isinstance(pos, tuple), "Array index should be converted to tuple by IR class"
     assert ndim == len(view.array._shape), "Array index should specify all dimensions, see ArrayView.__init__"
-    if any(isinstance(p, slice) for p in pos):
-        slices = [_fill_the_slice(p) for p in pos]
-        slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
-        new_index_set = ", ".join(_range_or_slice_to_str(range(s.stop - s.start)) for s in slices)
-        return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set})"
+    slices_pos = [isinstance(p, slice) for p in pos]
+    slices_count = sum(slices_pos)
+    if slices_count:
+        slice_def, slices = _compile_slice(ndim, pos, view)
+        if slices_count == len(pos):
+            return slice_def
+        elif slices_count == 1:
+            return _call_func(f"array1d", slice_def, flags_=None)
+        else:
+            decrised_index_set = [i for i in itertools.compress(slices, slices_pos)]
+            return _call_func(f"array{len(decrised_index_set)}d", *decrised_index_set, slice_def, flags_=None)
     else:
         assert all(isinstance(p, (Operation, int)) for p in pos)
         return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
+
+
+def _compile_slice(ndim, pos, view):
+    slices = [_fill_the_slice(p) for p in pos]
+    slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
+    new_index_set = [_range_or_slice_to_str(range(s.stop - s.start)) for s in slices]
+    new_index_set_str = ", ".join(new_index_set)
+    return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
 
 def _pow(a, b, *, flags_):  # TODO: make positional only
@@ -183,6 +198,13 @@ def _global_constraint(constraint, *params, flags_):
     return _call_func(constraint, *params, flags_=flags_)
 
 
+def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
+    if iter_var is not None:
+        return _call_func(op, _compile_array_comprehension(seq, iter_var, operation, flags_), flags_=flags_)
+    else:
+        return _call_func(op, seq, flags_=flags_)
+
+
 class Op2Str(UserDict):
     def __init__(self):
         self.data = {}
@@ -207,6 +229,8 @@ class Op2Str(UserDict):
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
         self[_Op_code.count] = partial(_one_or_two_brackets, "count")
         self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
+        self[_Op_code.min_] = partial(_array_comprehension_call, "min")
+        self[_Op_code.max_] = partial(_array_comprehension_call, "max")
         self[_Op_code.size] = _size
         self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
         self[_Op_code.circuit] = partial(_global_constraint, "circuit")
@@ -220,3 +244,8 @@ Op2Str = Op2Str()
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
     return f"{iter_var.name} in {to_str(seq, flags_)}", to_str(func, flags_)
+
+
+def _compile_array_comprehension(seq, iter_var, func, flags_):
+    indexes, func_str = _get_indexes_and_cycle_body(seq, iter_var, func, flags_=flags_)
+    return f"[{func_str} | {indexes}]"
