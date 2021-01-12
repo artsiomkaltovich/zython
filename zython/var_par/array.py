@@ -15,12 +15,8 @@ def _can_create_array_from(arg):
 class ArrayMixin(operation.Operation):
     _shape: tuple
     _name: str
+    name: str  # remove pycharm warnings, this property is handled by var\par base class
     _type: Type
-
-    @property
-    def name(self):
-        assert self._name, "name wasn't specified"
-        return self._name
 
     @property
     def type(self):
@@ -156,6 +152,7 @@ class ArrayPar(par, ArrayMixin):
 
     def _flatten_to_shaped(self, flatten_values):
         if len(self._shape) > 1:
+            values = []
             for s in reversed(self._shape[1:]):
                 values = []
                 start = 0
