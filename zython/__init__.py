@@ -8,3 +8,7 @@ from zython.result import as_original
 
 import builtins
 builtins.range = zython.var_par.types._range
+
+__version__ = "0.1.0"
+
+print("fuck you, python")

@@ -1,5 +1,5 @@
 # zython
-Express constraint programming problem with python and solve it with minizinc
+Express constraint programming problem with python and solve it with minizinc.
 
 Constraint programming (CP) is a paradigm for solving combinatorial problems.
 Minizinc is used for model and optimization problems solving using CP.
