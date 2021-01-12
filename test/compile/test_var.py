@@ -52,6 +52,14 @@ class TestTypeToStr:
     def test_var_to_str(self, v, expected):
         assert to_str(v) == expected
 
+    @pytest.mark.parametrize("v, expected",
+                             [(create_array("arr", 2), "array1d(arr)"),
+                              (create_array("arr", 3)[:1, :1, 1],
+                               "array1d(array2d(0..0, 0..0, slice_3d(arr, [0..0, 0..0, 1..1], 0..0, 0..0, 0..0)))")
+                              ])
+    def test_flatten(self, v, expected):
+        assert to_str(v, flatten_array=True) == expected
+
     @pytest.mark.parametrize("r, expected", [(range(100), "0..99"), (range(1, 10), "1..9"), (range(0, 100), "0..99"),
                                              (range(-10, 10), "-10..9"), (range(-10, -9), "-10..-10")])
     def test_range(self, r, expected):
@@ -79,9 +87,9 @@ class TestTypeToStr:
     # slices with start or stop == None is tested as model in sum tests due to complex minizinc expression
     @pytest.mark.parametrize("array, pos, expected",
                              [(create_array("a", 1), slice(2, 3), "slice_1d(a, [2..2], 0..0)"),
-                              (create_array("b", 2), (4, slice(2, 4)), "slice_2d(b, [4..4, 2..3], 0..0, 0..1)"),
+                              (create_array("b", 2), (4, slice(2, 4)), "array1d(slice_2d(b, [4..4, 2..3], 0..0, 0..1))"),
                               (create_array("c", 3), (slice(1, 2), 4, slice(2, 4)),
-                               "slice_3d(c, [1..1, 4..4, 2..3], 0..0, 0..0, 0..1)")])
+                               "array2d(0..0, 0..1, slice_3d(c, [1..1, 4..4, 2..3], 0..0, 0..0, 0..1))")])
     def test_slice(self, array, pos, expected):
         assert expected == to_str(array[pos])
 
