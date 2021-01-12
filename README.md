@@ -84,7 +84,7 @@ While zython makes it possible to describe this model using python only:
 Zython uses the following libraries:
  
 - Test is created with [pytest](https://docs.pytest.org/en/stable/) library
-- [tox](https://tox.readthedocs.io/en/latest/) for test execution
+- [nox](https://nox.thea.codes/en/stable/index.html) for test execution
 - [flake8](https://flake8.pycqa.org/en/latest/) for coding style checking
 - [sphinx](https://www.sphinx-doc.org/en/master/) for documentation
 
@@ -105,11 +105,11 @@ avoiding it installation for every python version tested in CI. You should
 install it manually if you want to check your code before submitting PR.
 You can do it with the following command:
 
-    flake8 zython --count --max-complexity=10 --max-line-length=120 --statistics
+    nox -s lint
 
 You can also run all checking locally:
 
-    sh script/local_test.sh
+    nox --reuse-existing-virtualenvs
 
 It is recommended to open new issue and describe a bug or feature request
 before submitting PR. While implementing new feature or fixing bug it is 
