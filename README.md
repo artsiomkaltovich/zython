@@ -1,6 +1,6 @@
 # zython
 
-![zython intro image](https://raw.githubusercontent.com/ArtyomKaltovich/zython_brand/master/logos/intro.png?token=ACQ7TD3WNYGVSABBCKUTLSS77IBO2)
+![zython intro image](https://raw.githubusercontent.com/ArtyomKaltovich/zython_brand/master/logos/intro.png)
 Express constraint programming problem with python and solve it with minizinc
 
 Constraint programming (CP) is a paradigm for solving combinatorial problems.
