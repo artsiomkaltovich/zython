@@ -61,7 +61,7 @@ jobs:
       - name: Install twine
         run: |
           pip install twine
-          pip install -r requirements_doc.txt
+          sudo apt-get install python3-sphinx &&
       - name: deploy
         run: |
           #python setup.py bdist_wheel &&
