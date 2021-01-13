@@ -65,6 +65,5 @@ jobs:
       - name: deploy
         run: |
           python setup.py bdist_wheel &&
-          twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
-          cd doc &&
-          make github
+          python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
+          sh script\deploy_doc.sh
