@@ -56,8 +56,6 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-20.04
-    env:
-      PATH: ${{ matrix.minizinc_image }}
     steps:
       - uses: actions/checkout@v2
       - name: Install requirements
