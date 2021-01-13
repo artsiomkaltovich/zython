@@ -4,8 +4,6 @@
 name: On release
 
 on:
-  push:
-    branches: [ release ]
   pull_request:
     branches: [ release ]
 
@@ -15,63 +13,41 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ["3.6"] # , "3.7", "3.8", "3.9", "pypy3"]
-        minizinc_image: [ #"https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
+        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy3"]
+        minizinc_image: [ "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
                           "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage" ]
 
     env:
       MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
     - uses: actions/checkout@v2
-    #- name: Add bin/ to PATH
-    #  run: |
-    #    mkdir -p ${{ github.workspace }}/bin
-    #    echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
-    #- name: Cache MiniZinc
-    #  id: cache-minizinc
-    #  uses: actions/cache@v2
-    #  with:
-    #    path: ${{ github.workspace }}/bin/minizinc
-    #    key: ${{ env.MINIZINC_URL }}
-    #- name: Download MiniZinc
-    #  if: steps.cache-minizinc.outputs.cache-hit != 'true'
-    #  run: |
-    #    sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
-    #    sudo chmod +x ${{ github.workspace }}/bin/minizinc
-    #    minizinc --version
-#
-    #- name: Set up Python ${{ matrix.python-version }}
-    #  uses: actions/setup-python@v2
-    #  with:
-    #    python-version: ${{ matrix.python-version }}
-    #- name: Check minizinc version
-    #  run: |
-    #    minizinc --version
-    #- name: Install nox
-    #  run: |
-    #    pip install nox
-    #- name: Test
-    #  run: |1
-    #    nox
-  deploy:
-    needs: test
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-      - name: Install requirements
-        run: |
-          pip install twine
-          pip install -r requirements.txt
-          pip install sphinx
-      - name: deploy
-        run: |
-          # python setup.py bdist_wheel &&
-          # python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          cd doc &&
-          sphinx-apidoc ../zython -d 2 -o source/api --force &&
-          make github
+    - name: Add bin/ to PATH
+      run: |
+        mkdir -p ${{ github.workspace }}/bin
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+    - name: Cache MiniZinc
+      id: cache-minizinc
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/bin/minizinc
+        key: ${{ env.MINIZINC_URL }}
+    - name: Download MiniZinc
+      if: steps.cache-minizinc.outputs.cache-hit != 'true'
+      run: |
+        sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
+        sudo chmod +x ${{ github.workspace }}/bin/minizinc
+        minizinc --version
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Check minizinc version
+      run: |
+        minizinc --version
+    - name: Install nox
+      run: |
+        pip install nox
+    - name: Test
+      run: |1
+        nox
