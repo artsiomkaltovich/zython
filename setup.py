@@ -15,10 +15,10 @@ setup(
     description="Express constraint programming problem with python and solve it with minizinc",
     long_description=Path("README.md").read_text(encoding="UTF-8"),
     long_description_content_type="text/markdown",
-    url="TBD",
+    url="https://artyomkaltovich.github.io/zython",
     project_urls={
         "Bug Tracker": "https://github.com/ArtyomKaltovich/zython/issues",
-        "Documentation": "TBD",
+        "Documentation": "https://artyomkaltovich.github.io/zython",
         "Source": "https://github.com/ArtyomKaltovich/zython",
     },
     packages=[p for p in find_packages() if p.startswith("zython")],

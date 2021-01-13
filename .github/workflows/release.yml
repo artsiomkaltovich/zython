@@ -59,4 +59,7 @@ jobs:
     steps:
       - name: deploy
         run: |
-          echo "deploy"
+          python setup.py bdist_wheel &&
+          twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
+          cd doc &&
+          make github

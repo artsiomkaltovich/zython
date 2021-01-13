@@ -6,7 +6,7 @@ nox.options.stop_on_first_error = True
 @nox.session
 def lint(session):
     session.install("flake8")
-    session.run("flake8", "zython", "--count", "--max-complexity=10", "--max-line-length=120", "--statistics")
+    session.run("flake8", "zython", "--count", "--statistics")
 
 
 @nox.session
