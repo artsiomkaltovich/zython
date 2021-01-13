@@ -59,4 +59,4 @@ jobs:
     steps:
       - name: deploy
         run: |
-          echo "deploy"
+          cd doc && make github

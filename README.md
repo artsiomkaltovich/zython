@@ -105,11 +105,12 @@ Project can be cloned from github and all dependencies can be installed via pip.
 Note: flake8 isn't specified as dependency in any file, this is made for
 avoiding it installation for every python version tested in CI. You should
 install it manually if you want to check your code before submitting PR.
-You can do it with the following command:
+You can do it with the following commands:
 
+    pip install flake8
     nox -s lint
 
-You can also run all checking locally:
+You can also run all checks locally:
 
     nox --reuse-existing-virtualenvs
 
