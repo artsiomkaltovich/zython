@@ -61,10 +61,12 @@ jobs:
       - name: Install requirements
         run: |
           pip install twine
-          sudo apt-get install python3-sphinx
           pip install -r requirements.txt
+          pip install sphinx
       - name: deploy
         run: |
+          # python setup.py bdist_wheel &&
+          # python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
           cd doc &&
           sphinx-apidoc ../zython -d 2 -o source/api --force &&
           make github
