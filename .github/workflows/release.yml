@@ -65,9 +65,7 @@ jobs:
           pip install sphinx
       - name: deploy
         run: |
-          whereis python
-          ls `whereis python`
-          echo "$HOME/.local/bin/python/script" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
           # python setup.py bdist_wheel &&
           # python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
           cd doc &&
