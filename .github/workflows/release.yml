@@ -58,6 +58,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
       - name: Install requirements
         run: |
           pip install twine
@@ -65,9 +69,9 @@ jobs:
           pip install sphinx
       - name: deploy
         run: |
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
           # python setup.py bdist_wheel &&
           # python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
           cd doc &&
           sphinx-apidoc ../zython -d 2 -o source/api --force &&
           make github
