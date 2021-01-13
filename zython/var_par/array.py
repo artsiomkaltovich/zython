@@ -4,6 +4,7 @@ from collections import deque
 from typing import Type
 
 from zython import var, par
+from zython._helpers.validate import _start_stop_step_validate
 from zython.operations import operation
 
 
@@ -14,12 +15,8 @@ def _can_create_array_from(arg):
 class ArrayMixin(operation.Operation):
     _shape: tuple
     _name: str
+    name: str  # remove pycharm warnings, this property is handled by var\par base class
     _type: Type
-
-    @property
-    def name(self):
-        assert self._name, "name wasn't specified"
-        return self._name
 
     @property
     def type(self):
@@ -41,7 +38,7 @@ class ArrayMixin(operation.Operation):
 
         Returns
         -------
-        size: _Operation
+        size: Operation
             Operation which is evaluated as number of the items in specified dimension by the model
         """
         return operation.Operation.size(self, dim)
@@ -60,7 +57,7 @@ class ArrayView(ArrayMixin):
             pos = [pos]
         self._check_for_index_error(pos)
         repeat = itertools.repeat(slice(None, None, 1), self.array.ndims() - len(pos))
-        pos = tuple(self._process_pos_item(p) for p in itertools.chain(pos, repeat))
+        pos = tuple(self._process_pos_item(dim, p) for dim, p in enumerate(itertools.chain(pos, repeat)))
         if len(pos) > self.array.ndims():
             raise ValueError(f"Array has {self.array.ndims()} dimensions but {len(pos)} were specified")
         return pos
@@ -79,13 +76,15 @@ class ArrayView(ArrayMixin):
         if isinstance(p, int) and p < 0:
             raise ValueError(f"Negative indexes are not supported for now, but {p} was specified")
 
-    def _process_pos_item(self, p):
+    def _process_pos_item(self, dim, p):
         if isinstance(p, slice):
             self._is_neg_index(p.start)
             self._is_neg_index(p.stop)
-            if p.step is None:
-                p = slice(p.start, p.stop, 1)
-            assert p.step == 1, f"Step other then 1 isn't supported for now, but {p.step} was specified"
+            start = p.start if p.start is not None else 0
+            stop = p.stop if p.stop is not None else self.array.size(dim)
+            step = p.step if p.step is not None else 1
+            p = slice(start, stop, step)
+            _start_stop_step_validate(p)
         else:
             self._is_neg_index(p)
         return p
@@ -153,6 +152,7 @@ class ArrayPar(par, ArrayMixin):
 
     def _flatten_to_shaped(self, flatten_values):
         if len(self._shape) > 1:
+            values = []
             for s in reversed(self._shape[1:]):
                 values = []
                 start = 0

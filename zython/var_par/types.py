@@ -1,4 +1,4 @@
-import zython
+import zython  # for type hints
 from typing import Union, Sequence
 
 from zython.operations.operation import Operation
@@ -26,3 +26,7 @@ class _range:
 
 
 ZnSequence = Union[_range, orig_range, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]
+
+
+def get_type(arg):
+    return getattr(arg, "type", type(arg))

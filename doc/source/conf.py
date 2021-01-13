@@ -13,7 +13,8 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../..'))
-import zython  # foc apidoc collection
+import zython  # for apidoc collection
+version = zython.__version__
 
 
 # -- Project information -----------------------------------------------------

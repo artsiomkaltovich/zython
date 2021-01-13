@@ -2,8 +2,8 @@ from numbers import Number
 from typing import Optional, Callable, Union, Type
 
 import zython
-from zython.operations.constraint import Constraint
 from zython.operations._op_codes import _Op_code
+from zython.operations.constraint import Constraint
 
 
 def _get_wider_type(left, right):
@@ -76,9 +76,9 @@ class Operation(Constraint):
         return Operation(_Op_code.ge, self, other, type_=int)
 
     # below method is used for validation and control of _Operation creation
-    # when you create _Operation as _Operation(_Op_code.exists, seq, iter_var, func)
+    # when you create _Operation as Operation(_Op_code.sum, seq, iter_var, func)
     # it is easy to forgot the order and number of variables, so it is better to call
-    # _Operation.exists which has param names and type hints
+    # Operation.sum which has param names and type hints
 
     @staticmethod
     def add(left, right):
@@ -115,13 +115,32 @@ class Operation(Constraint):
         raise ValueError(f"Array has 0..{array.ndims()} dimensions, but {dim} were specified")
 
     @staticmethod
-    def sum(seq: Union["zython.var_par.types._range",
-                       "zython.var_par.types.orig_range",
-                       "zython.var_par.array.ArrayMixin"],
-            iter_var: Optional["zython.var_par.var"] = None,
+    def sum(seq: "zython.var_par.types.ZnSequence",
+            iter_var: Optional["zython.var_par.var.var"] = None,
             func: Optional[Union["Operation", Callable]] = None,
             type_: Optional[Type] = None):
         return Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
+
+    @staticmethod
+    def count(seq: "zython.var_par.types.ZnSequence",
+              iter_var: Optional["zython.var_par.var.var"] = None,
+              func: Optional[Union["Operation", Callable]] = None,
+              type_: Optional[Type] = None):
+        return Operation(_Op_code.count, seq, iter_var, func, type_=type_)
+
+    @staticmethod
+    def min(seq: "zython.var_par.types.ZnSequence",
+            iter_var: Optional["zython.var_par.var.var"] = None,
+            func: Optional[Union["Operation", Callable]] = None,
+            type_: Optional[Type] = None):
+        return Operation(_Op_code.min_, seq, iter_var, func, type_=type_)
+
+    @staticmethod
+    def max(seq: "zython.var_par.types.ZnSequence",
+            iter_var: Optional["zython.var_par.var.var"] = None,
+            func: Optional[Union["Operation", Callable]] = None,
+            type_: Optional[Type] = None):
+        return Operation(_Op_code.max_, seq, iter_var, func, type_=type_)
 
 
 def _validate_div(left, right):

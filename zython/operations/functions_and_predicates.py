@@ -128,6 +128,125 @@ def sum(seq: ZnSequence,
     return Operation.sum(seq, iter_var, operation, type_=type_)
 
 
+def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], Operation]]) -> Operation:
+    """ Returns the number of occurrences of ``value`` in ``seq``.
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        Sequence to count ``value`` in
+    value: Operation or Callable, optional
+        Operation or constant which will be counted in ``seq``. Or function which returns such value.
+        If function or lambda it should be with 0 or 1 arguments only.
+
+    Returns
+    -------
+    result: Operation
+        Operation which will calculate the number of ``value`` in ``seq``.
+
+    Examples
+    --------
+
+    Simple timeshedule problem: you with your neighbor wanted to deside who will wash the dishes in the next week.
+    You should do it 3 days (because you've bought fancy doormat) and your neighbour - 4 days.
+
+    >>> from collections import Counter
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(2)), shape=7)
+    ...         self.constraints = [zn.count(self.a, 0) == 3, zn.count(self.a, 1) == 4]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"])
+    Counter({1: 4, 0: 3})
+
+    ``zn.alldifferent`` could be emulated via ``zn.count``
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(10)), shape=4)
+    ...         self.constraints = [zn.forall(range(self.a.size(0)),
+    ...                                       lambda i: zn.count(self.a, lambda elem: elem == self.a[i]) == 1)]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"])
+    Counter({3: 1, 2: 1, 1: 1, 0: 1})
+    """
+    iter_var, operation = _iternal.get_iter_var_and_op(seq, value)
+    return Operation.count(seq, iter_var, operation, type_=int)
+
+
+def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
+    """ Finds the smallest object in ``seq``, according to ``key``
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        Sequence to find smallest element in
+    key: Operation or Callable, optional
+        The parameter has the same semantic as in python: specify the operation which result will be latter compared.
+
+    Returns
+    -------
+    result: Operation
+        Operation which will find the smallest element.
+
+    See Also
+    --------
+    max
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array([[1, 2, 3], [-1, -2, -3]])
+    ...         self.m = zn.min(self.a)
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(m=-3)
+    """
+    iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
+    return Operation.min(seq, iter_var, operation, type_=int)
+
+
+def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
+    """ Finds the biggest object in ``seq``, according to ``key``
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        Sequence to find smallest element in
+    key: Operation or Callable, optional
+        The parameter has the same semantic as in python: specify the operation which result will be latter compared.
+
+    Returns
+    -------
+    result: Operation
+        Operation which will find the biggest element.
+
+    See Also
+    --------
+    min
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array([[1, 2, 3], [-1, -2, -3]])
+    ...         self.m = zn.max(range(self.a.size(0)), lambda row: zn.count(self.a[row, :], lambda elem: elem < 0))
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(m=3)
+    """
+    iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
+    return Operation.max(seq, iter_var, operation, type_=int)
+
+
 class alldifferent(Constraint):
     """ requires all the variables appearing in its argument to be different
 

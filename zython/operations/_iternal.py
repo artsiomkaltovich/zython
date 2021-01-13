@@ -3,18 +3,17 @@ from functools import singledispatch
 from typing import Union, Callable, Tuple, Optional
 
 from zython import var
-from zython.operations.operation import Operation
 from zython.operations.constraint import Constraint
-from zython.var_par import types
+from zython.operations.operation import Operation
 from zython.var_par.array import ArrayMixin
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, ZnSequence, get_type
 
 
 @singledispatch
 def _get_variable(seq) -> var:
     if is_range(seq):
         return var(int)
-    raise ValueError(f"seq should be range, but {type(seq)} was specified")
+    assert False, f"{type(seq)} isn't supported, please use Sequence or Array here"
 
 
 @_get_variable.register(ArrayMixin)  # TODO: newer versions of python support type evaluation from hints
@@ -26,16 +25,13 @@ def _(seq: ArrayMixin):
 @_get_variable.register(tuple)
 def _(seq: Union[list, tuple]):
     if seq:
-        for s in seq:
-            if not isinstance(s, var):
-                raise ValueError("Arguments of constraints should be zn.var, but {} was passed".format(type(s)))
-        v = var(seq[0].type)
+        v = var(get_type(seq[0]))
     else:
         raise ValueError("empty sequences are not supported as constraint parameter")
     return v
 
 
-def _extract_func_var_and_op(seq: Union[types._range, types.orig_range, ArrayMixin],
+def _extract_func_var_and_op(seq: ZnSequence,
                              func: Union[Constraint, Callable]) -> Tuple[Optional[var], Operation]:
     variable = None
     parameters = inspect.signature(func).parameters
@@ -52,7 +48,6 @@ def _extract_func_var_and_op(seq: Union[types._range, types.orig_range, ArrayMix
 
 def get_iter_var_and_op(seq, func):
     iter_var = None
-    op = None
     if callable(func):
-        iter_var, op = _extract_func_var_and_op(seq, func)
-    return iter_var, op
+        iter_var, func = _extract_func_var_and_op(seq, func)
+    return iter_var, func
