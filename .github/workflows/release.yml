@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        python-version: ["3.6", "3.7", "3.8", "3.9", "pypy3"]
-        minizinc_image: [ "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
+        python-version: ["3.6"] # , "3.7", "3.8", "3.9", "pypy3"]
+        minizinc_image: [ #"https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.3/MiniZincIDE-2.5.3-x86_64.AppImage",
                           "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage" ]
 
     env:
@@ -57,6 +57,7 @@ jobs:
     needs: test
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v2
       - name: deploy
         run: |
           python setup.py bdist_wheel &&
