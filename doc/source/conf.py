@@ -12,9 +12,12 @@
 #
 import os
 import sys
+
+
 sys.path.insert(0, os.path.abspath('../..'))
+from read_version import read_version
 import zython  # for apidoc collection
-version = zython.__version__
+version = read_version()
 
 
 # -- Project information -----------------------------------------------------

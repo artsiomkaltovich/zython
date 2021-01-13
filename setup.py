@@ -3,12 +3,13 @@
 #  file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from pathlib import Path
 
-import zython
 from setuptools import setup, find_packages
+
+from read_version import read_version
 
 setup(
     name="zython",
-    version=zython.__version__,
+    version=read_version(),
     python_requires=">=3.6",
     author="Artsiom Kaltovich",
     author_email="kaltovichartyom@gmail.com",
