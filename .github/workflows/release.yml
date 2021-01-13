@@ -58,6 +58,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - name: Install twine
+        run: |
+          pip install twine
+          pip install -r requirements_doc.txt
       - name: deploy
         run: |
           python setup.py bdist_wheel &&
