@@ -61,7 +61,7 @@ jobs:
       - name: Install twine
         run: |
           pip install twine
-          sudo apt-get install python3-sphinx &&
+          sudo apt-get install python3-sphinx
       - name: deploy
         run: |
           cd doc &&
