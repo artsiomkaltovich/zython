@@ -14,7 +14,7 @@ help:
 
 github:
 	@make html
-	@cp -a _build/html/. ../docs
+	@cp -a "$(BUILDDIR)"/html/. ../docs
 
 .PHONY: help Makefile
 
