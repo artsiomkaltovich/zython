@@ -4,8 +4,6 @@
 name: On release
 
 on:
-  push:
-    branches: [ release ]
   pull_request:
     branches: [ release ]
 
@@ -51,15 +49,5 @@ jobs:
       run: |
         pip install nox
     - name: Test
-      run: |
+      run: |1
         nox
-  deploy:
-    needs: test
-    runs-on: ubuntu-20.04
-    steps:
-      - name: deploy
-        run: |
-          python setup.py bdist_wheel &&
-          twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose &&
-          cd doc &&
-          make github
