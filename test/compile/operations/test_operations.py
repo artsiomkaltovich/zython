@@ -58,4 +58,4 @@ class TestBinary:
 
     def test_invert(self):
         result = ~(self.p < self.v)
-        assert to_str(result) == f"(not({self.p.name} < {self.v.name}))"
+        assert to_str(result) == f"(not ({self.p.name} < {self.v.name}))"

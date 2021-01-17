@@ -100,3 +100,8 @@ class TestTypeToStr:
                                                       ])
     def test_tuple_and_list_to_array(self, collection, expected):
         assert to_str(collection) == expected
+
+    @pytest.mark.parametrize("gen, expected", [((x for x in create_array("z", 1)), "[z[0], z[1], z[2], z[3], z[4]]"),
+                                               ((x for x in range(3)), "[0, 1, 2]")])
+    def test_generator_to_str(self, gen, expected):
+        assert expected == to_str(gen)

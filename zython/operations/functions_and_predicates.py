@@ -254,6 +254,13 @@ class alldifferent(Constraint):
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
         sequence which elements of which should be distinct
+    except0: bool, optional
+        if set - ``seq`` can contain any amount of 0.
+
+    See Also
+    --------
+    allequal
+    ndistinct
 
     Examples
     --------
@@ -269,9 +276,89 @@ class alldifferent(Constraint):
     >>> model = MyModel()
     >>> model.solve_satisfy()
     Solution(a=[3, 2, 1, 1, 1], x=2, y=1, z=0)
+
+    If ``except0`` flag is set constraint doesn't affect 0'es in the ``seq``
+
+    >>> from collections import Counter
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(5)), shape=6)
+    ...         self.constraints = [zn.alldifferent(self.a, except0=True), zn.sum(self.a) == 10]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"]) == {0: 2, 4: 1, 3: 1, 2: 1, 1: 1}
+    True
+    """
+    def __init__(self, seq: ZnSequence, except0: Optional[bool] = None):
+        if except0:
+            super().__init__(_Op_code.alldifferent_except_0, seq)
+        else:
+            super().__init__(_Op_code.alldifferent, seq)
+
+
+class allequal(Constraint):
+    """ requires all the variables appearing in its argument to be equal
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence which elements of which should be distinct
+
+    See Also
+    --------
+    alldifferent
+    ndistinct
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=(2, 4))
+    ...         self.constraints = [self.a[0, 0] == 5, zn.allequal(self.a)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[[5, 5, 5, 5], [5, 5, 5, 5]])
     """
     def __init__(self, seq: ZnSequence):
-        super().__init__(_Op_code.alldifferent, seq)
+        super().__init__(_Op_code.allequal, seq)
+
+
+class ndistinct(Operation):
+    """ returns the number of distinct values in ``seq``.
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence which elements of which should be distinct
+
+    See Also
+    --------
+    alldifferent
+    ndistinct
+
+    Returns
+    -------
+    n: Operation
+        Operation, which calculates the number of distinct values in ``seq``
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self, n):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=5)
+    ...         self.constraints = [zn.ndistinct(self.a) == n]
+    >>> model = MyModel(3)
+    >>> result = model.solve_satisfy()
+    >>> len(set(result["a"]))
+    3
+    """
+    def __init__(self, seq: ZnSequence):
+        super().__init__(_Op_code.ndistinct, seq)
 
 
 class circuit(Constraint):

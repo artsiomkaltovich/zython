@@ -1,12 +1,12 @@
 # zython
 
 ![zython intro image](https://raw.githubusercontent.com/ArtyomKaltovich/zython_brand/master/logos/intro.png)
-Express constraint programming problem with python and solve it with minizinc
+Express constraint programming problem with python and solve it with minizinc.
 
 Constraint programming (CP) is a paradigm for solving combinatorial problems.
 Minizinc is used for model and optimization problems solving using CP.
-You can express a model as a number of parameter, variables and constraints
-as minizinc will solve it (or said it if there isn't any solution).  
+You can express a model as a number of parameter, variables and constraints - 
+minizinc will solve it (or said it if there isn't any solution).  
 
 If you are wonder which digit should be assigned to letters, so the 
 expression ``SEND+MORE=MONEY`` will be hold, or how many color you should have
@@ -16,7 +16,7 @@ favourite strategy game, so you will have the strongest army for that amount
 of money you can use CP.
 
 Zython lets you express such model with pure python, so there is no need to
-learning new language and you can easily integrate CP into your python 
+learn a new language, and you can easily integrate CP into your python 
 programs.
 
 ## Getting Started
@@ -29,7 +29,7 @@ You can download it from [official site](https://www.minizinc.org/).
 
 ### Installation
 
-The project will be added to pypi.
+    pip install zython
 
 ### Usage
 
@@ -71,12 +71,12 @@ as
 While zython makes it possible to describe this model using python only:
 
     class MyModel(zython.Model):
-    def __init__(self, a: int, b: int, c: int):
-        self.a = var(a)
-        self.b = var(b)
-        self.c = var(c)
-        self.x = var(range(-100, 101))
-        self.constraints = [self.a * self.x ** 2 + self.b * self.x + self.c == 0]
+        def __init__(self, a: int, b: int, c: int):
+            self.a = var(a)
+            self.b = var(b)
+            self.c = var(c)
+            self.x = var(range(-100, 101))
+            self.constraints = [self.a * self.x ** 2 + self.b * self.x + self.c == 0]
 
     model = MyModel(1, 4, 0)
     result = model.solve_satisfy(all_solutions=True)
