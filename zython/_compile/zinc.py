@@ -17,7 +17,9 @@ from zython.var_par.types import is_range
 class Flags(enum.Enum):
     none = enum.auto()
     alldifferent = enum.auto()
+    alldifferent_except_0 = enum.auto()
     all_equal = enum.auto()
+    nvalue = enum.auto()
     circuit = enum.auto()
 
 
@@ -34,7 +36,10 @@ def to_zinc(ir: IR):
 
 def _process_flags(flags, result):
     for flag in flags:
-        result.appendleft(f'include "{flag.name}.mzn";')
+        if flag is Flags.nvalue:
+            result.appendleft('include "nvalue_fn.mzn";')
+        else:
+            result.appendleft(f'include "{flag.name}.mzn";')
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
@@ -173,11 +178,11 @@ def _compile_slice(ndim, pos, view):
 
 
 def _pow(a, b, *, flags_):  # TODO: make positional only
-    return f"pow({to_str(a)}, {to_str(b, flags_=flags_)})"
+    return f"pow({to_str(a, flags_=flags_)}, {to_str(b, flags_=flags_)})"
 
 
 def _binary_op(sign, a, b, *, flags_):
-    return f"({to_str(a)} {sign} {to_str(b, flags_=flags_)})"
+    return f"({to_str(a, flags_=flags_)} {sign} {to_str(b, flags_=flags_)})"
 
 
 def _unary_op(sign, a, *, flags_):
@@ -197,7 +202,8 @@ def _one_or_two_brackets(op, seq, iter_var, operation, *, flatten_array=False, f
 
 
 def _call_func(func, *params, flatten_array=False, flags_):
-    return f"{func}({', '.join(to_str(p, flatten_array=flatten_array) for p in params if p is not None)})"
+    t = partial(to_str, flatten_array=flatten_array, flags_=flags_)
+    return f"{func}({', '.join(t(p) for p in params if p is not None)})"
 
 
 def _size(array: ArrayMixin, dim: int, *, flags_):
@@ -208,9 +214,9 @@ def _size(array: ArrayMixin, dim: int, *, flags_):
         return f"(max(index_set({array.name})) + 1)"
 
 
-def _global_constraint(constraint, *params, flags_):
+def _global_constraint(constraint, *params, flags_, flatten_array=True):
     flags_.add(getattr(Flags, constraint))
-    return _call_func(constraint, *params, flags_=flags_)
+    return _call_func(constraint, *params, flags_=flags_, flatten_array=flatten_array)
 
 
 def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
@@ -249,8 +255,10 @@ class Op2Str(UserDict):
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
         self[_Op_code.size] = _size
         self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
+        self[_Op_code.alldifferent_except_0] = partial(_global_constraint, "alldifferent_except_0")
         self[_Op_code.allequal] = partial(_global_constraint, "all_equal")
-        self[_Op_code.circuit] = partial(_global_constraint, "circuit")
+        self[_Op_code.ndistinct] = partial(_global_constraint, "nvalue")
+        self[_Op_code.circuit] = partial(_global_constraint, "circuit", flatten_array=False)
 
     def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")

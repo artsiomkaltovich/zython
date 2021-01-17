@@ -1,6 +1,7 @@
 ### 0.1.1
 #### Added
-- ``allequal`` and ``ndistinct`` constraints
+- ``allequal`` constraint
+- ``ndistinct`` function
 - ``except_0`` argument to ``alldifferent`` constraint
 
 #### Changed:
