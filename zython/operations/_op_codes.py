@@ -27,4 +27,5 @@ class _Op_code(enum.Enum):
     max_ = enum.auto()
     size = enum.auto()
     alldifferent = enum.auto()
+    allequal = enum.auto()
     circuit = enum.auto()

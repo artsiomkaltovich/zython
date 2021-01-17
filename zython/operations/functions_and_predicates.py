@@ -255,6 +255,11 @@ class alldifferent(Constraint):
     seq: range, array of var, or sequence (list or tuple) of var
         sequence which elements of which should be distinct
 
+    See Also
+    --------
+    allequal
+    ndistinct
+
     Examples
     --------
 
@@ -272,6 +277,35 @@ class alldifferent(Constraint):
     """
     def __init__(self, seq: ZnSequence):
         super().__init__(_Op_code.alldifferent, seq)
+
+
+class allequal(Constraint):
+    """ requires all the variables appearing in its argument to be equal
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence which elements of which should be distinct
+
+    See Also
+    --------
+    alldifferent
+    ndistinct
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 10)), shape=(2, 4))
+    ...         self.constraints = [self.a[0, 0] == 5, zn.allequal(self.a)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[[5, 5, 5, 5], [5, 5, 5, 5]])
+    """
+    def __init__(self, seq: ZnSequence):
+        super().__init__(_Op_code.allequal, seq)
 
 
 class circuit(Constraint):

@@ -1,5 +1,6 @@
 import enum
 import itertools
+import types
 from collections import UserDict, deque
 from functools import singledispatch, partial
 
@@ -16,6 +17,7 @@ from zython.var_par.types import is_range
 class Flags(enum.Enum):
     none = enum.auto()
     alldifferent = enum.auto()
+    all_equal = enum.auto()
     circuit = enum.auto()
 
 
@@ -31,10 +33,8 @@ def to_zinc(ir: IR):
 
 
 def _process_flags(flags, result):
-    if Flags.alldifferent in flags:
-        result.appendleft('include "alldifferent.mzn";')
-    if Flags.circuit in flags:
-        result.appendleft('include "circuit.mzn";')
+    for flag in flags:
+        result.appendleft(f'include "{flag.name}.mzn";')
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
@@ -109,6 +109,7 @@ def to_str(stmt, *, flatten_array=False, flags_=None):
 
 @to_str.register(tuple)
 @to_str.register(list)
+@to_str.register(types.GeneratorType)
 def _(stmt, *, flatten_array=False, flags_=None):
     return f"[{', '.join(to_str(s) for s in stmt)}]"
 
@@ -154,7 +155,7 @@ def _flatt_array(array):
     return _call_func("array1d", array, flags_=None)
 
 
-def _array_to_str(array, flatten_array=False):
+def _array_to_str(array, *, flatten_array=False):
     assert isinstance(array, (ArrayMixin, str))
     name = array if isinstance(array, str) else array.name
     if flatten_array:
@@ -172,15 +173,15 @@ def _compile_slice(ndim, pos, view):
 
 
 def _pow(a, b, *, flags_):  # TODO: make positional only
-    return f"pow({to_str(a)}, {to_str(b)})"
+    return f"pow({to_str(a)}, {to_str(b, flags_=flags_)})"
 
 
 def _binary_op(sign, a, b, *, flags_):
-    return f"({to_str(a)} {sign} {to_str(b)})"
+    return f"({to_str(a)} {sign} {to_str(b, flags_=flags_)})"
 
 
 def _unary_op(sign, a, *, flags_):
-    return f"({sign}{to_str(a)})"
+    return f"({sign} {to_str(a, flags_=flags_)})"
 
 
 def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
@@ -248,6 +249,7 @@ class Op2Str(UserDict):
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
         self[_Op_code.size] = _size
         self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
+        self[_Op_code.allequal] = partial(_global_constraint, "all_equal")
         self[_Op_code.circuit] = partial(_global_constraint, "circuit")
 
     def __missing__(self, key):  # pragma: no cover
