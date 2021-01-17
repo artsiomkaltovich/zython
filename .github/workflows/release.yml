@@ -49,5 +49,21 @@ jobs:
       run: |
         pip install nox
     - name: Test
-      run: |1
+      run: |
         nox
+  deploy:
+    needs: test
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Install requirements
+        run: |
+          pip install twine
+      - name: deploy
+        run: |
+          python setup.py bdist_wheel &&
+          python -m twine upload dist/* -u __token__ -p ${{ secrets.DEPLOY_ZYTHON }} --verbose
