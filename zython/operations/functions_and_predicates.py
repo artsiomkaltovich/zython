@@ -1,6 +1,8 @@
 from typing import Union, Callable, Optional
 
 from zython.operations import _iternal
+from zython.operations import constraint as constraint_module
+from zython.operations import operation as operation_module
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
@@ -34,7 +36,7 @@ def exists(seq: ZnSequence,
     [0, 0, 1]
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return Constraint.exists(seq, iter_var, operation)
+    return constraint_module._exists(seq, iter_var, operation)
 
 
 def forall(seq: ZnSequence,
@@ -69,7 +71,7 @@ def forall(seq: ZnSequence,
     Solution(a=[1, 1, 1])
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return Constraint.forall(seq, iter_var, operation)
+    return constraint_module._forall(seq, iter_var, operation)
 
 
 def sum(seq: ZnSequence,
@@ -125,7 +127,7 @@ def sum(seq: ZnSequence,
         type_ = operation.type
     if type_ is None:
         raise ValueError("Can't derive the type of {} expression".format(func))
-    return Operation.sum(seq, iter_var, operation, type_=type_)
+    return operation_module._sum(seq, iter_var, operation, type_=type_)
 
 
 def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], Operation]]) -> Operation:
@@ -174,7 +176,7 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     Counter({3: 1, 2: 1, 1: 1, 0: 1})
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, value)
-    return Operation.count(seq, iter_var, operation, type_=int)
+    return operation_module._count(seq, iter_var, operation, type_=int)
 
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
@@ -209,7 +211,7 @@ def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Solution(m=-3)
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
-    return Operation.min(seq, iter_var, operation, type_=int)
+    return operation_module._min(seq, iter_var, operation, type_=int)
 
 
 def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
@@ -244,7 +246,7 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Solution(m=3)
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
-    return Operation.max(seq, iter_var, operation, type_=int)
+    return operation_module._max(seq, iter_var, operation, type_=int)
 
 
 class alldifferent(Constraint):
@@ -253,7 +255,7 @@ class alldifferent(Constraint):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
     except0: bool, optional
         if set - ``seq`` can contain any amount of 0.
 
@@ -303,7 +305,7 @@ class allequal(Constraint):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
 
     See Also
     --------
@@ -332,7 +334,7 @@ class ndistinct(Operation):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
 
     See Also
     --------
@@ -378,3 +380,71 @@ class circuit(Constraint):
     """
     def __init__(self, seq: ZnSequence):
         super().__init__(_Op_code.circuit, seq)
+
+
+def increasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Constraint:
+    """ Requires that the sequence `seq` is in increasing order
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence elements of which should be increasing
+    allow_duplicate: bool, optional
+        If `True` duplicates in the array are allowed
+
+    See Also
+    --------
+    decreasing
+    arg_sort
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.b = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.constraints = [zn.increasing(self.a), zn.increasing(self.b, allow_duplicate=False)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[0, 0, 0], b=[0, 1, 2])
+    """
+    if allow_duplicate:
+        return Constraint(_Op_code.increasing, seq)
+    else:
+        return Constraint(_Op_code.strictly_increasing, seq)
+
+
+def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Constraint:
+    """ Requires that the sequence `seq` is in decreasing order
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence elements of which should be decreasing
+    allow_duplicate: bool, optional
+        If `True` duplicates in the array are allowed
+
+    See Also
+    --------
+    increasing
+    arg_sort
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.b = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.constraints = [zn.decreasing(self.a), zn.decreasing(self.b, allow_duplicate=False)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[0, 0, 0], b=[2, 1, 0])
+    """
+    if allow_duplicate:
+        return Constraint(_Op_code.decreasing, seq)
+    else:
+        return Constraint(_Op_code.strictly_decreasing, seq)

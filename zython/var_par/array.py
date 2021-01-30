@@ -41,7 +41,7 @@ class ArrayMixin(operation.Operation):
         size: Operation
             Operation which is evaluated as number of the items in specified dimension by the model
         """
-        return operation.Operation.size(self, dim)
+        return operation._size(self, dim)
 
 
 class ArrayView(ArrayMixin):
