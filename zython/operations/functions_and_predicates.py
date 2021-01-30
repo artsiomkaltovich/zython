@@ -255,7 +255,7 @@ class alldifferent(Constraint):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
     except0: bool, optional
         if set - ``seq`` can contain any amount of 0.
 
@@ -305,7 +305,7 @@ class allequal(Constraint):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
 
     See Also
     --------
@@ -334,7 +334,7 @@ class ndistinct(Operation):
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        sequence which elements of which should be distinct
+        sequence elements of which should be distinct
 
     See Also
     --------
@@ -380,3 +380,71 @@ class circuit(Constraint):
     """
     def __init__(self, seq: ZnSequence):
         super().__init__(_Op_code.circuit, seq)
+
+
+def increasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Constraint:
+    """ Requires that the sequence `seq` is in increasing order
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence elements of which should be increasing
+    allow_duplicate: bool, optional
+        If `True` duplicates in the array are allowed
+
+    See Also
+    --------
+    decreasing
+    arg_sort
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.b = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.constraints = [zn.increasing(self.a), zn.increasing(self.b, allow_duplicate=False)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[0, 0, 0], b=[0, 1, 2])
+    """
+    if allow_duplicate:
+        return Constraint(_Op_code.increasing, seq)
+    else:
+        return Constraint(_Op_code.strictly_increasing, seq)
+
+
+def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Constraint:
+    """ Requires that the sequence `seq` is in decreasing order
+
+    Parameters
+    ----------
+    seq: range, array of var, or sequence (list or tuple) of var
+        sequence elements of which should be decreasing
+    allow_duplicate: bool, optional
+        If `True` duplicates in the array are allowed
+
+    See Also
+    --------
+    increasing
+    arg_sort
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.b = zn.Array(zn.var(range(3)), shape=3)
+    ...         self.constraints = [zn.decreasing(self.a), zn.decreasing(self.b, allow_duplicate=False)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=[0, 0, 0], b=[2, 1, 0])
+    """
+    if allow_duplicate:
+        return Constraint(_Op_code.decreasing, seq)
+    else:
+        return Constraint(_Op_code.strictly_decreasing, seq)

@@ -31,3 +31,7 @@ class _Op_code(enum.Enum):
     allequal = enum.auto()
     ndistinct = enum.auto()
     circuit = enum.auto()
+    increasing = enum.auto()
+    strictly_increasing = enum.auto()
+    decreasing = enum.auto()
+    strictly_decreasing = enum.auto()
