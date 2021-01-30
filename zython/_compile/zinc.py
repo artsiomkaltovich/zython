@@ -21,6 +21,10 @@ class Flags(enum.Enum):
     all_equal = enum.auto()
     nvalue = enum.auto()
     circuit = enum.auto()
+    increasing = enum.auto()
+    strictly_increasing = enum.auto()
+    decreasing = enum.auto()
+    strictly_decreasing = enum.auto()
 
 
 def to_zinc(ir: IR):
@@ -98,11 +102,11 @@ def _process_how_to_solve(ir, result):
 
 
 @singledispatch
-def to_str(stmt, *, flatten_array=False, flags_=None):
+def to_str(stmt, *, flatten_arg=False, flags_=None):
     # order is important
     if isinstance(stmt, ArrayMixin):
         stmt = _compile_array_view(stmt) if isinstance(stmt, ArrayView) else stmt
-        return _array_to_str(stmt, flatten_array=flatten_array)
+        return _array_to_str(stmt, flatten=flatten_arg)
     elif isinstance(stmt, var):
         return stmt.name
     elif isinstance(stmt, Constraint):
@@ -115,7 +119,7 @@ def to_str(stmt, *, flatten_array=False, flags_=None):
 @to_str.register(tuple)
 @to_str.register(list)
 @to_str.register(types.GeneratorType)
-def _(stmt, *, flatten_array=False, flags_=None):
+def _(stmt, *, flatten_arg=False, flags_=None):
     return f"[{', '.join(to_str(s) for s in stmt)}]"
 
 
@@ -160,10 +164,10 @@ def _flatt_array(array):
     return _call_func("array1d", array, flags_=None)
 
 
-def _array_to_str(array, *, flatten_array=False):
+def _array_to_str(array, *, flatten=False):
     assert isinstance(array, (ArrayMixin, str))
     name = array if isinstance(array, str) else array.name
-    if flatten_array:
+    if flatten:
         return _call_func("array1d", name, flags_=None)
     else:
         return name
@@ -194,15 +198,15 @@ def _two_brackets_op(op, seq, iter_var, operation, *, flags_):
     return f"{op}({indexes})({func_str})"
 
 
-def _one_or_two_brackets(op, seq, iter_var, operation, *, flatten_array=False, flags_):
+def _one_or_two_brackets(op, seq, iter_var, operation, *, flatten_args=False, flags_):
     if iter_var is None:
-        return _call_func(op, seq, operation, flatten_array=flatten_array, flags_=flags_)
+        return _call_func(op, seq, operation, flatten_args=flatten_args, flags_=flags_)
     else:
         return _two_brackets_op(op, seq, iter_var, operation, flags_=flags_)
 
 
-def _call_func(func, *params, flatten_array=False, flags_):
-    t = partial(to_str, flatten_array=flatten_array, flags_=flags_)
+def _call_func(func, *params, flatten_args=False, flags_):
+    t = partial(to_str, flatten_arg=flatten_args, flags_=flags_)
     return f"{func}({', '.join(t(p) for p in params if p is not None)})"
 
 
@@ -214,9 +218,9 @@ def _size(array: ArrayMixin, dim: int, *, flags_):
         return f"(max(index_set({array.name})) + 1)"
 
 
-def _global_constraint(constraint, *params, flags_, flatten_array=True):
+def _global_constraint(constraint, *params, flags_, flatten_args=True):
     flags_.add(getattr(Flags, constraint))
-    return _call_func(constraint, *params, flags_=flags_, flatten_array=flatten_array)
+    return _call_func(constraint, *params, flatten_args=flatten_args, flags_=flags_)
 
 
 def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
@@ -249,7 +253,7 @@ class Op2Str(UserDict):
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
         # minizinc 2.5.0 doesn't support 2d array counting
-        self[_Op_code.count] = partial(_one_or_two_brackets, "count", flatten_array=True)
+        self[_Op_code.count] = partial(_one_or_two_brackets, "count", flatten_args=True)
         self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
         self[_Op_code.min_] = partial(_array_comprehension_call, "min")
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
@@ -258,7 +262,11 @@ class Op2Str(UserDict):
         self[_Op_code.alldifferent_except_0] = partial(_global_constraint, "alldifferent_except_0")
         self[_Op_code.allequal] = partial(_global_constraint, "all_equal")
         self[_Op_code.ndistinct] = partial(_global_constraint, "nvalue")
-        self[_Op_code.circuit] = partial(_global_constraint, "circuit", flatten_array=False)
+        self[_Op_code.circuit] = partial(_global_constraint, "circuit", flatten_args=False)
+        self[_Op_code.increasing] = partial(_global_constraint, "increasing")
+        self[_Op_code.strictly_increasing] = partial(_global_constraint, "strictly_increasing")
+        self[_Op_code.decreasing] = partial(_global_constraint, "decreasing")
+        self[_Op_code.strictly_decreasing] = partial(_global_constraint, "strictly_decreasing")
 
     def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")
