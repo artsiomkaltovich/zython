@@ -4,7 +4,7 @@
 name: On release
 
 on:
-  pull_request:
+  push:
     branches: [ release ]
 
 jobs:
