@@ -1,6 +1,8 @@
 from typing import Union, Callable, Optional
 
 from zython.operations import _iternal
+from zython.operations import constraint as constraint_module
+from zython.operations import operation as operation_module
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
@@ -34,7 +36,7 @@ def exists(seq: ZnSequence,
     [0, 0, 1]
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return Constraint.exists(seq, iter_var, operation)
+    return constraint_module._exists(seq, iter_var, operation)
 
 
 def forall(seq: ZnSequence,
@@ -69,7 +71,7 @@ def forall(seq: ZnSequence,
     Solution(a=[1, 1, 1])
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
-    return Constraint.forall(seq, iter_var, operation)
+    return constraint_module._forall(seq, iter_var, operation)
 
 
 def sum(seq: ZnSequence,
@@ -125,7 +127,7 @@ def sum(seq: ZnSequence,
         type_ = operation.type
     if type_ is None:
         raise ValueError("Can't derive the type of {} expression".format(func))
-    return Operation.sum(seq, iter_var, operation, type_=type_)
+    return operation_module._sum(seq, iter_var, operation, type_=type_)
 
 
 def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], Operation]]) -> Operation:
@@ -174,7 +176,7 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     Counter({3: 1, 2: 1, 1: 1, 0: 1})
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, value)
-    return Operation.count(seq, iter_var, operation, type_=int)
+    return operation_module._count(seq, iter_var, operation, type_=int)
 
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
@@ -209,7 +211,7 @@ def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Solution(m=-3)
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
-    return Operation.min(seq, iter_var, operation, type_=int)
+    return operation_module._min(seq, iter_var, operation, type_=int)
 
 
 def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
@@ -244,7 +246,7 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Solution(m=3)
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, key)
-    return Operation.max(seq, iter_var, operation, type_=int)
+    return operation_module._max(seq, iter_var, operation, type_=int)
 
 
 class alldifferent(Constraint):
