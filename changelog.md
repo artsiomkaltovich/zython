@@ -1,3 +1,8 @@
+### 0.1.4
+#### Changed
+- An error about minizinc wasn't found in $PATH was changed to warning
+
+
 ### 0.1.3
 #### Added
 - check for minizinc in $PATH for startup

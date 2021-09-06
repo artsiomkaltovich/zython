@@ -1,7 +1,9 @@
+import warnings
+
 from minizinc import find_driver
 
 if not find_driver():
-    raise RuntimeError("Solver wasn't found, are you sure you specify minizinc folder to $PATH environment variable")
+    warnings.warn("Solver wasn't found, are you sure you specify minizinc folder to $PATH environment variable")
 
 
 import zython.var_par.types
