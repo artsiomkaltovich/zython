@@ -62,7 +62,7 @@ jobs:
           python-version: "3.6"
       - name: Install requirements
         run: |
-          pip install twine
+          pip install twine wheel
       - name: deploy
         run: |
           python setup.py bdist_wheel &&
