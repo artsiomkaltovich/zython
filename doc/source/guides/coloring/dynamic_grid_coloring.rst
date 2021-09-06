@@ -4,8 +4,7 @@ Dynamically Generated Grid Coloring
 Let's solve the following problem:
 
 * there is a 2d grid (NxM)
-* is there a way to paint every vertex in the grid with such a manner that for every possible rectangle 4 corners
-won't be the same color.
+* is there a way to paint every vertex in the grid with such a manner that for every possible rectangle 4 corners won't be the same color.
 
 .. image:: ../../_static/img/grid_small_uncolored.png
   :width: 300
