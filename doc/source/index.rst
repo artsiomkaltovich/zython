@@ -8,14 +8,12 @@ Welcome to zython's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Examples:
+   :caption: Tutorial and Guides:
    :glob:
 
-   guides/getting_started
-   guides/array_basics
-   guides/array_advanced
-   guides/coloring
-   guides/max_min
+   tutorial/model_structure
+
+   guides
 
    api/modules
 

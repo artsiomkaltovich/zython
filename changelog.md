@@ -1,3 +1,11 @@
+### 0.1.3
+#### Added
+- check for minizinc in $PATH for startup
+- documentation page about model parts
+#### Changed
+- Use minizinc 2.5.5 in CI.
+
+
 ### 0.1.2
 #### Fixed
 - some method of Operation and Constraint classes which were
