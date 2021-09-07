@@ -1,4 +1,6 @@
 import minizinc
+import pytest
+
 import zython as zn
 
 
@@ -20,13 +22,12 @@ def test_select_solver():
         class Model(zn.Model):
             def __init__(self, a):
                 self.a = zn.par(a)
-                self.x = zn.var(int)
+                self.x = zn.var(float)
                 self.constraints = [self.x == self.a + 1]
 
-        m = Model(2)
+        m = Model(2.0)
         return m.solve_satisfy(solver="cbc")
 
     expected_result = minizinc_model()
     actual_result = model()
-    print()
-    print(expected_result, actual_result)
+    assert pytest.approx(expected_result["x"]) == actual_result["x"]

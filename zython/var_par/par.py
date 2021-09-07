@@ -10,6 +10,9 @@ class par(var):
         if isinstance(value, int):
             self._type = int
             self._value = value
+        if isinstance(value, float):
+            self._type = float
+            self._value = value
         elif isinstance(value, Constraint):
             self._type = value.type
             self._value = value

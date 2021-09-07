@@ -1,3 +1,9 @@
+### 0.1.5
+#### Added
+- Possibility to choose solver
+- Float fields support
+- Float ranges support
+
 ### 0.1.4
 #### Changed
 - An error about minizinc wasn't found in $PATH was changed to warning

@@ -21,6 +21,8 @@ class var(Operation):
             elif inspect.isclass(type_):
                 if issubclass(type_, int):
                     self._type = int
+                if issubclass(type_, float):
+                    self._type = float
         if self._type is None:
             raise ValueError(f"{type_} is a variable of unsupported type")
 
