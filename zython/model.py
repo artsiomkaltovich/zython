@@ -1,4 +1,5 @@
 from abc import ABC
+from typing import List
 
 import minizinc
 
@@ -12,8 +13,9 @@ from zython.var_par.var import var
 
 class Model(ABC):
     """ Base class for user-defined models to solve """
+    constraint: List[Constraint]
 
-    def solve_satisfy(self, *, all_solutions=False, result_as=None, verbose=False):
+    def solve_satisfy(self, *, all_solutions=False, result_as=None, verbose=False, solver="gecode"):
         """ Finds solution that satisfied constraints, or the error message if the model can't be solved
 
         Parameters
@@ -25,22 +27,54 @@ class Model(ABC):
             calculation hard
         verbose: bool
             If True the source code of the model will be print to stdout
+        solver: str
+            Name of the solver, that will look for solution
 
         Returns
         -------
         Result: Result
             result of the model solution, value of variables can be reached by dict syntax.
         """
-        return self._solve("satisfy", all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+        return self._solve("satisfy", all_solutions=all_solutions, result_as=result_as, verbose=verbose, solver=solver)
 
-    def solve_maximize(self, eq, *, all_solutions=False, result_as=None, verbose=False):  # TODO: position only
-        return self._solve("maximize", eq, all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+    def solve_maximize(
+            self,
+            eq,
+            *,
+            all_solutions=False,
+            result_as=None,
+            verbose=False,
+            solver="gecode",
+    ):  # TODO: position only
+        return self._solve(
+            "maximize",
+            eq,
+            all_solutions=all_solutions,
+            result_as=result_as,
+            verbose=verbose,
+            solver="gecode",
+        )
 
-    def solve_minimize(self, eq, *, all_solutions=False, result_as=None, verbose=False):  # TODO: position only
-        return self._solve("minimize", eq, all_solutions=all_solutions, result_as=result_as, verbose=verbose)
+    def solve_minimize(
+            self,
+            eq,
+            *,
+            all_solutions=False,
+            result_as=None,
+            verbose=False,
+            solver="gecode",
+    ):  # TODO: position only
+        return self._solve(
+            "minimize",
+            eq,
+            all_solutions=all_solutions,
+            result_as=result_as,
+            verbose=verbose,
+            solver=solver,
+        )
 
-    def _solve(self, *how_to_solve, all_solutions, result_as, verbose):
-        solver = minizinc.Solver.lookup("gecode")
+    def _solve(self, *how_to_solve, all_solutions, result_as, verbose, solver):
+        solver = minizinc.Solver.lookup(solver)
         model = minizinc.Model()
         src = self.compile(how_to_solve)
         if verbose:
