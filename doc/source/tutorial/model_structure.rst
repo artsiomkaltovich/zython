@@ -1,6 +1,8 @@
 Model Structure
 ===============
 
+.. _model-structure:
+
 In minizinc every model is a collection of variables,
 parameters and constraints.
 

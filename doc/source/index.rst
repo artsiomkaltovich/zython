@@ -11,7 +11,7 @@ Welcome to zython's documentation!
    :caption: Tutorial and Guides:
    :glob:
 
-   tutorial/model_structure
+   tutorial
 
    guides
 
