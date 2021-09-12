@@ -42,8 +42,9 @@ stupid: just find
 
 .. warning::
 
-    Not every solver fully supports integer variables,
-    to learn more about solvers, please see special page for them.
+    Not every solver fully supports float variables,
+    to learn more about solvers, please see
+    :ref:`documentation <solvers>` for them.
 
 Ranges
 ------

@@ -8,3 +8,4 @@ Tutorial
 
    tutorial/model_structure
    tutorial/supported_types
+   tutorial/solvers
