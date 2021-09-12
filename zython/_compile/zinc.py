@@ -57,7 +57,7 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
             declaration += f"{decl_prefix} int: {v.name};"
-        if v.type is float:
+        elif v.type is float:
             flags.add(Flags.float_used)
             declaration += f"{decl_prefix} float: {v.name};"
         elif is_range(v.type):

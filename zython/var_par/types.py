@@ -6,10 +6,6 @@ from zython.operations.operation import Operation
 orig_range = range
 
 
-def is_range(obj):
-    return isinstance(obj, range) or isinstance(obj, orig_range)
-
-
 class _range:
     def __new__(cls, start, stop=None, step=1):
         if stop is None:
@@ -25,6 +21,10 @@ class _range:
             return self
         else:
             return orig_range(start, stop, step)
+
+
+def is_range(obj):
+    return isinstance(obj, orig_range) or isinstance(obj, _range)
 
 
 ZnSequence = Union[_range, orig_range, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]
