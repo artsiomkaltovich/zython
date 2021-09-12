@@ -15,7 +15,9 @@ class _range:
         if stop is None:
             stop = start
             start = 0
-        if isinstance(start, Operation) or isinstance(stop, Operation) or isinstance(step, Operation):
+        if (isinstance(start, (Operation, float))
+                or isinstance(stop, (Operation, float))
+                or isinstance(step, (Operation, float))):
             self = super().__new__(cls)
             self.start = start
             self.stop = stop
