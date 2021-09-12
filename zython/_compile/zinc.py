@@ -25,11 +25,12 @@ class Flags(enum.Enum):
     strictly_increasing = enum.auto()
     decreasing = enum.auto()
     strictly_decreasing = enum.auto()
+    float_used = enum.auto()
 
 
 def to_zinc(ir: IR):
     result = deque()
-    flags = set()
+    flags = set()  # TODO: Use enum flags
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
@@ -40,7 +41,9 @@ def to_zinc(ir: IR):
 
 def _process_flags(flags, result):
     for flag in flags:
-        if flag is Flags.nvalue:
+        if flag is Flags.float_used:
+            ...
+        elif flag is Flags.nvalue:
             result.appendleft('include "nvalue_fn.mzn";')
         else:
             result.appendleft(f'include "{flag.name}.mzn";')
@@ -54,6 +57,9 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
         if v.type is int:
             declaration += f"{decl_prefix} int: {v.name};"
+        elif v.type is float:
+            flags.add(Flags.float_used)
+            declaration += f"{decl_prefix} float: {v.name};"
         elif is_range(v.type):
             declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
         else:
