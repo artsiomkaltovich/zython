@@ -115,7 +115,6 @@ class ArrayPar(par, ArrayMixin):
         shape = []
         queue = deque()
         level = 0
-        old_length = 0
         length = 0
         while _can_create_array_from(arg):
             old_length = length

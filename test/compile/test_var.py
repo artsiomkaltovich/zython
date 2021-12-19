@@ -3,7 +3,7 @@ import re
 import pytest
 
 import zython as zn
-from zython._compile.zinc import to_str
+from zython._compile.zinc.to_str import to_str
 
 
 def test_range_one_arg():

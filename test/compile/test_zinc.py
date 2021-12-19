@@ -1,6 +1,6 @@
 import pytest
 
-from zython._compile.zinc import _get_array_shape_decl
+from zython._compile.zinc.to_str import _get_array_shape_decl
 
 
 @pytest.mark.parametrize("shape, expected", [((4,), "0..3"), ((3, 3), "0..2, 0..2"),
