@@ -1,6 +1,7 @@
 import enum
 import itertools
 import types
+import zython as zn
 from collections import UserDict, deque
 from functools import singledispatch, partial
 
@@ -182,7 +183,7 @@ def _array_to_str(array, *, flatten=False):
 def _compile_slice(ndim, pos, view):
     slices = [_fill_the_slice(p) for p in pos]
     slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
-    new_index_set = [_range_or_slice_to_str(range(s.stop - s.start)) for s in slices]
+    new_index_set = [_range_or_slice_to_str(zn.range(s.stop - s.start)) for s in slices]
     new_index_set_str = ", ".join(new_index_set)
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 

@@ -15,7 +15,4 @@ from zython.operations.functions_and_predicates import exists, forall, sum, alld
 from zython.model import Model
 from zython.result import as_original
 
-import builtins
-
-builtins.range = zython.var_par.types._range  # TODO: remove builtins rewrite
 range = zython.var_par.types._range
