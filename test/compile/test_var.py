@@ -77,7 +77,7 @@ class TestTypeToStr:
     def test_range_with_expr(self):
         v = create_var("a")
         p = create_par("b")
-        assert "(a - 1)..((b + 1) - 1)" == to_str(range(v - 1, p + 1))
+        assert "(a - 1)..((b + 1) - 1)" == to_str(zn.range(v - 1, p + 1))
 
     @pytest.mark.parametrize("array, pos, expected", [(create_array("z", 3), (1, 2, 3), "z[1, 2, 3]"),
                                                       (create_array("g", 1), 2, "g[2]")])
