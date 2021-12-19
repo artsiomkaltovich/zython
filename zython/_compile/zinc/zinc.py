@@ -39,18 +39,7 @@ def _process_flags(flag_processors: FlagProcessors, flags, result: SourceCode):
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
     for v in vars_or_pars.values():
         # TODO: check reserved word are not used as variable name
-        declaration = ""
-        if isinstance(v, ArrayMixin):
-            declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
-        if v.type is int:
-            declaration += f"{decl_prefix} int: {v.name};"
-        elif v.type is float:
-            flags.add(Flags.float_used)
-            declaration += f"{decl_prefix} float: {v.name};"
-        elif is_range(v.type):
-            declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
-        else:
-            raise TypeError(f"Type {v.type} are not supported, please specify int or range")
+        declaration = _get_variable_decl(v, decl_prefix, flags)
         src.append(declaration)
         if isinstance(v.value, Constraint):
             _set_value_as_constraint(ir, v, flags)
@@ -64,14 +53,38 @@ def _process_vars(ir, src, flags):
     _process_pars_and_vars(ir, ir.vars, src, "var", flags)
 
 
-def _set_value_as_constraint(ir, variable, flags):
-    # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
-    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value), flags_=flags))
+@singledispatch
+def _get_variable_decl(v, decl_prefix, flags) -> str:
+    return _elementary_var_decl(v, decl_prefix, flags)
+
+
+@_get_variable_decl.register(ArrayMixin)
+def _(v, decl_prefix, flags):
+    return f"array[{_get_array_shape_decl(v._shape)}] of {_elementary_var_decl(v, decl_prefix, flags)}"
+
+
+def _elementary_var_decl(v, decl_prefix, flags):
+    declaration = ""
+    if v.type is int:
+        declaration += f"{decl_prefix} int: {v.name};"
+    elif v.type is float:
+        flags.add(Flags.float_used)
+        declaration += f"{decl_prefix} float: {v.name};"
+    elif is_range(v.type):
+        declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
+    else:
+        raise TypeError(f"Type {v.type} are not supported, please specify int or range")
+    return declaration
 
 
 def _get_array_shape_decl(shape):
     result = [f'0..{s - 1}' for s in shape]
     return f"{', '.join(result)}"
+
+
+def _set_value_as_constraint(ir, variable, flags):
+    # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
+    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value), flags_=flags))
 
 
 def _process_constraints(ir, src, flags_):
