@@ -1,12 +1,14 @@
-import enum
 import itertools
 import types
-import zython as zn
 from collections import UserDict, deque
 from functools import singledispatch, partial
+from typing import Set
 
+import zython as zn
 from zython import var
 from zython._compile.ir import IR
+from zython._compile.zinc.flags import Flags, FlagProcessors
+from zython._compile.zinc.types import SourceCode
 from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
@@ -15,39 +17,23 @@ from zython.var_par.array import ArrayView, ArrayMixin
 from zython.var_par.types import is_range
 
 
-class Flags(enum.Enum):
-    none = enum.auto()
-    alldifferent = enum.auto()
-    alldifferent_except_0 = enum.auto()
-    all_equal = enum.auto()
-    nvalue = enum.auto()
-    circuit = enum.auto()
-    increasing = enum.auto()
-    strictly_increasing = enum.auto()
-    decreasing = enum.auto()
-    strictly_decreasing = enum.auto()
-    float_used = enum.auto()
-
-
 def to_zinc(ir: IR):
-    result = deque()
-    flags = set()  # TODO: Use enum flags
+    result: SourceCode = deque()
+    flags: Set[Flags] = set()
+    flag_processors = FlagProcessors()
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
     _process_how_to_solve(ir, result)
-    _process_flags(flags, result)
+    _process_flags(flag_processors, flags, result)
     return "\n".join(result)
 
 
-def _process_flags(flags, result):
+def _process_flags(flag_processors: FlagProcessors, flags, result: SourceCode):
     for flag in flags:
-        if flag is Flags.float_used:
-            ...
-        elif flag is Flags.nvalue:
-            result.appendleft('include "nvalue_fn.mzn";')
-        else:
-            result.appendleft(f'include "{flag.name}.mzn";')
+        pr = flag_processors.get(flag)
+        if pr:
+            pr(result)
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
@@ -237,7 +223,7 @@ def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
         return _call_func(op, seq, flags_=flags_)
 
 
-class Op2Str(UserDict):
+class Op2StrType(UserDict):
     def __init__(self):
         self.data = {}
         self[_Op_code.add] = partial(_binary_op, "+")
@@ -279,7 +265,7 @@ class Op2Str(UserDict):
         raise ValueError(f"Function {key} is undefined")
 
 
-Op2Str = Op2Str()
+Op2Str = Op2StrType()
 
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
