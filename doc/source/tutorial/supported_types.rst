@@ -56,6 +56,12 @@ by both int and float variables, as well as zython expressions.
 
     ``zn.range`` doesn't support step argument for now.
 
+.. deprecated:: 0.2
+
+    ``zython`` doesn't redefine builtin range function,
+    so to create ranges with float or zython's par/var
+    types, use ``zn.range`` function.
+
 Lets look at the example of simple model, which calculates
 the center between two number.
 
