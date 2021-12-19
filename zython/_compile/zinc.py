@@ -10,7 +10,8 @@ from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
-from zython.var_par.array import ArrayView, ArrayMixin
+from zython.var_par.collections.array import ArrayView, ArrayMixin
+from zython.var_par.collections.set import SetMixin
 from zython.var_par.types import is_range
 
 
@@ -55,6 +56,8 @@ def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
         declaration = ""
         if isinstance(v, ArrayMixin):
             declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
+        elif isinstance(v, SetMixin):
+            declaration = "set of "  # TODO: add var set support
         if v.type is int:
             declaration += f"{decl_prefix} int: {v.name};"
         elif v.type is float:

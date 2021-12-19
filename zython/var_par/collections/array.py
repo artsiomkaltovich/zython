@@ -1,26 +1,19 @@
 import inspect
 import itertools
 from collections import deque
-from typing import Type
 
 from zython import var, par
 from zython._helpers.validate import _start_stop_step_validate
 from zython.operations import operation
+from .abstract import _AbstractCollection
 
 
 def _can_create_array_from(arg):
     return hasattr(arg, "__iter__") or hasattr(arg, "__getitem__") and (not isinstance(arg, str))
 
 
-class ArrayMixin(operation.Operation):
+class ArrayMixin(_AbstractCollection):
     _shape: tuple
-    _name: str
-    name: str  # remove pycharm warnings, this property is handled by var\par base class
-    _type: Type
-
-    @property
-    def type(self):
-        return self._type
 
     def __getitem__(self, item):
         return ArrayView(self, item)
@@ -115,7 +108,6 @@ class ArrayPar(par, ArrayMixin):
         shape = []
         queue = deque()
         level = 0
-        old_length = 0
         length = 0
         while _can_create_array_from(arg):
             old_length = length

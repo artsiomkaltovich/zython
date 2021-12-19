@@ -41,7 +41,6 @@ class Model(ABC):
             self,
             eq,
             *,
-            all_solutions=False,
             result_as=None,
             verbose=False,
             solver="gecode",
@@ -49,7 +48,7 @@ class Model(ABC):
         return self._solve(
             "maximize",
             eq,
-            all_solutions=all_solutions,
+            all_solutions=False,
             result_as=result_as,
             verbose=verbose,
             solver="gecode",
@@ -59,7 +58,6 @@ class Model(ABC):
             self,
             eq,
             *,
-            all_solutions=False,
             result_as=None,
             verbose=False,
             solver="gecode",
@@ -67,7 +65,7 @@ class Model(ABC):
         return self._solve(
             "minimize",
             eq,
-            all_solutions=all_solutions,
+            all_solutions=False,
             result_as=result_as,
             verbose=verbose,
             solver=solver,
