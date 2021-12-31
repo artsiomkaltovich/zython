@@ -66,7 +66,7 @@ def _array_to_str(array, *, flatten=False):
     assert isinstance(array, (ArrayMixin, str))
     name = array if isinstance(array, str) else array.name
     if flatten:
-        return _call_func("array1d", name, flags_=None)
+        return _flatt_array(array)
     else:
         return name
 
