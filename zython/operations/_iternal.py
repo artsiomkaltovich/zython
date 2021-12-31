@@ -3,7 +3,6 @@ from functools import singledispatch
 from typing import Union, Callable, Tuple, Optional
 
 from zython import var
-from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.types import is_range, ZnSequence, get_type
@@ -33,7 +32,7 @@ def _(seq: Union[list, tuple]):
 
 
 def _extract_func_var_and_op(seq: ZnSequence,
-                             func: Union[Constraint, Callable]) -> Tuple[Optional[var], Operation]:
+                             func: Callable) -> Tuple[Optional[var], Operation]:
     variable = None
     parameters = inspect.signature(func).parameters
     if len(parameters) > 1:

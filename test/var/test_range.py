@@ -34,7 +34,7 @@ def test_float_stop():
 
 def test_float_start_and_stop():
     v = var(range(3.14, 10.5))
-    assert v.type.start ==  pytest.approx(3.14)
+    assert v.type.start == pytest.approx(3.14)
     assert v.type.stop == pytest.approx(10.5)
 
 

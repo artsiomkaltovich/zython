@@ -1,3 +1,15 @@
+### 0.2.1
+#### Changed
+- Refactor some code
+
+## 0.2
+#### Changed
+- zython doesn't redefine builtin range function, 
+  use ``zn.range`` for float, zython's var/par types.
+#### Python interpreters support
+- drop 3.6 CPython
+- add 3.10 CPython
+
 ### 0.1.5
 #### Added
 - Possibility to choose solver

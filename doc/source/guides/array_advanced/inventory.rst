@@ -12,6 +12,7 @@ This is similar to how inventory works in some old-fashioned RPG.
 In our model we define field as ``M*N`` matrix `A`, where:
 
 * `A[i, j] == -1` means the cell is empty (contains no tile)
+* `A[i, j] == 0` just means, that cell's value isn't calculated yet.
 * `A[i, j] == K` - means the cell is occupied by tile with the number of `K`.
 
 We will use ``zn.exists`` function for the model definition, basically we will say that for every object(tile) the
@@ -28,18 +29,21 @@ Python Model
     class MyModel(zn.Model):
         def __init__(self, objects, inventory_shape):
             self.objects = zn.Array(objects)
-            self.inventory = zn.Array(zn.var(range(-1, self.objects.size(0))), shape=inventory_shape)
-            self.constraints = [zn.forall(range(self.objects.size(0)), self.obj_exists())]
+            self.inventory = zn.Array(zn.var(zn.range(-1, self.objects.size(0))), shape=inventory_shape)
+            self.constraints = [zn.forall(zn.range(self.objects.size(0)), self.obj_exists())]
 
         def obj_exists(self):
+            """ constraints every object exists in the field """
+            # Just iterate through every possible position and constraint there should be object in the field
             inventory = self.inventory
-            return lambda obj: zn.exists(range(inventory.size(0) - self.objects[obj, 0] + 1),
-                                         lambda i: zn.exists(range(inventory.size(1) - self.objects[obj, 1] + 1),
+            return lambda obj: zn.exists(zn.range(inventory.size(0) - self.objects[obj, 0] + 1),
+                                         lambda i: zn.exists(zn.range(inventory.size(1) - self.objects[obj, 1] + 1),
                                                              lambda j: self.iter_obj(i, j, obj)))
 
         def iter_obj(self, i, j, obj_idx):
-            return zn.forall(range(self.objects[obj_idx, 0]),
-                             lambda k1: zn.forall(range(self.objects[obj_idx, 1]),
+            """ constraints every cell of object is filled with the same number """
+            return zn.forall(zn.range(self.objects[obj_idx, 0]),
+                             lambda k1: zn.forall(zn.range(self.objects[obj_idx, 1]),
                                                   lambda k2: self.inventory[i + k1, j + k2] == obj_idx))
 
 

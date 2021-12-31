@@ -17,7 +17,7 @@ Python Model
     class NSPModel(zn.Model):
         def __init__(self, n_nurses):
             self.n_nurses = zn.par(n_nurses)
-            self.shifts = zn.Array(zn.var(range(self.n_nurses)), shape=(2, 7))
+            self.shifts = zn.Array(zn.var(zn.range(self.n_nurses)), shape=(2, 7))
             self.constraints = [self.only_1_shift_in_day(), self.no_morning_shift_after_night(),
                                 self.no_2_shifts_on_weekend()]
 
@@ -31,8 +31,8 @@ Python Model
             return zn.alldifferent(self.shifts[:, 5:])
 
         def shifts_diff(self):
-            return (zn.max(range(self.n_nurses), lambda nurse: zn.count(self.shifts, nurse))
-                    - zn.min(range(self.n_nurses), lambda nurse: zn.count(self.shifts, nurse)))
+            return (zn.max(zn.range(self.n_nurses), lambda nurse: zn.count(self.shifts, nurse))
+                    - zn.min(zn.range(self.n_nurses), lambda nurse: zn.count(self.shifts, nurse)))
 
     n_nurses = 4
     model = NSPModel(n_nurses)

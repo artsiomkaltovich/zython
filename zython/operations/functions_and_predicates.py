@@ -168,7 +168,7 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
     ...         self.a = zn.Array(zn.var(range(10)), shape=4)
-    ...         self.constraints = [zn.forall(range(self.a.size(0)),
+    ...         self.constraints = [zn.forall(zn.range(self.a.size(0)),
     ...                                       lambda i: zn.count(self.a, lambda elem: elem == self.a[i]) == 1)]
     >>> model = MyModel()
     >>> result = model.solve_satisfy()
@@ -240,7 +240,8 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
     ...         self.a = zn.Array([[1, 2, 3], [-1, -2, -3]])
-    ...         self.m = zn.max(range(self.a.size(0)), lambda row: zn.count(self.a[row, :], lambda elem: elem < 0))
+    ...         self.m = zn.max(zn.range(self.a.size(0)),
+    ...                         lambda row: zn.count(self.a[row, :], lambda elem: elem < 0))
     >>> model = MyModel()
     >>> model.solve_satisfy()
     Solution(m=3)

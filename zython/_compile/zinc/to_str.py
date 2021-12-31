@@ -1,113 +1,19 @@
-import enum
 import itertools
 import types
-from collections import UserDict, deque
+from collections import UserDict
 from functools import singledispatch, partial
 
+import zython as zn
 from zython import var
-from zython._compile.ir import IR
+from zython._compile.zinc.flags import Flags
 from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
+from zython.var_par.array import ArrayMixin, ArrayView
 from zython.var_par.collections.array import ArrayView, ArrayMixin
 from zython.var_par.collections.set import SetMixin
 from zython.var_par.types import is_range
-
-
-class Flags(enum.Enum):
-    none = enum.auto()
-    alldifferent = enum.auto()
-    alldifferent_except_0 = enum.auto()
-    all_equal = enum.auto()
-    nvalue = enum.auto()
-    circuit = enum.auto()
-    increasing = enum.auto()
-    strictly_increasing = enum.auto()
-    decreasing = enum.auto()
-    strictly_decreasing = enum.auto()
-    float_used = enum.auto()
-
-
-def to_zinc(ir: IR):
-    result = deque()
-    flags = set()  # TODO: Use enum flags
-    _process_pars(ir, result, flags)
-    _process_vars(ir, result, flags)
-    _process_constraints(ir, result, flags)
-    _process_how_to_solve(ir, result)
-    _process_flags(flags, result)
-    return "\n".join(result)
-
-
-def _process_flags(flags, result):
-    for flag in flags:
-        if flag is Flags.float_used:
-            ...
-        elif flag is Flags.nvalue:
-            result.appendleft('include "nvalue_fn.mzn";')
-        else:
-            result.appendleft(f'include "{flag.name}.mzn";')
-
-
-def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
-    for v in vars_or_pars.values():
-        # TODO: check reserved word are not used as variable name
-        declaration = ""
-        if isinstance(v, ArrayMixin):
-            declaration = f"array[{_get_array_shape_decl(v._shape)}] of "  # TODO: refactor var vs par
-        elif isinstance(v, SetMixin):
-            declaration = "set of "  # TODO: add var set support
-        if v.type is int:
-            declaration += f"{decl_prefix} int: {v.name};"
-        elif v.type is float:
-            flags.add(Flags.float_used)
-            declaration += f"{decl_prefix} float: {v.name};"
-        elif is_range(v.type):
-            declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
-        else:
-            raise TypeError(f"Type {v.type} are not supported, please specify int or range")
-        src.append(declaration)
-        if isinstance(v.value, Constraint):
-            _set_value_as_constraint(ir, v, flags)
-
-
-def _process_pars(ir, src, flags):
-    _process_pars_and_vars(ir, ir.pars, src, "", flags)
-
-
-def _process_vars(ir, src, flags):
-    _process_pars_and_vars(ir, ir.vars, src, "var", flags)
-
-
-def _set_value_as_constraint(ir, variable, flags):
-    # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
-    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value), flags_=flags))
-
-
-def _get_array_shape_decl(shape):
-    result = [f'0..{s - 1}' for s in shape]
-    return f"{', '.join(result)}"
-
-
-def _process_constraints(ir, src, flags_):
-    for c in ir.constraints:
-        # some constraints, e.g. set value are directly added as strings
-        src.append(f"constraint {to_str(c, flags_=flags_)};")
-
-
-def _process_how_to_solve(ir, result):
-    how_to_solve = ir.how_to_solve
-    if isinstance(how_to_solve, tuple):
-        if len(how_to_solve) == 2:
-            result.append(f"solve {how_to_solve[0]} {to_str(how_to_solve[1])};")
-            return
-        assert len(how_to_solve) == 1
-        how_to_solve = how_to_solve[0]
-    if isinstance(how_to_solve, str):
-        result.append(f"solve {how_to_solve};")
-        return
-    assert False, "{} how to solve is unknown".format(ir.how_to_solve)  # pragma: no cover
 
 
 @singledispatch
@@ -137,17 +43,6 @@ def _range_or_slice_to_str(stmt):
     return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
 
 
-@singledispatch
-def _fill_the_slice(stmt):
-    assert isinstance(stmt, (Operation, int))
-    return slice(stmt, stmt + 1, 1)
-
-
-@_fill_the_slice.register(slice)
-def _(obj):
-    return obj
-
-
 def _compile_array_view(view):
     pos = view.pos
     ndim = len(view.pos)
@@ -169,15 +64,11 @@ def _compile_array_view(view):
         return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
 
 
-def _flatt_array(array):
-    return _call_func("array1d", array, flags_=None)
-
-
 def _array_to_str(array, *, flatten=False):
     assert isinstance(array, (ArrayMixin, str))
     name = array if isinstance(array, str) else array.name
     if flatten:
-        return _call_func("array1d", name, flags_=None)
+        return _flatt_array(array)
     else:
         return name
 
@@ -185,7 +76,7 @@ def _array_to_str(array, *, flatten=False):
 def _compile_slice(ndim, pos, view):
     slices = [_fill_the_slice(p) for p in pos]
     slices_str = f"[{', '.join(_range_or_slice_to_str(s) for s in slices)}]"
-    new_index_set = [_range_or_slice_to_str(range(s.stop - s.start)) for s in slices]
+    new_index_set = [_range_or_slice_to_str(zn.range(s.stop - s.start)) for s in slices]
     new_index_set_str = ", ".join(new_index_set)
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
@@ -219,6 +110,42 @@ def _call_func(func, *params, flatten_args=False, flags_):
     return f"{func}({', '.join(t(p) for p in params if p is not None)})"
 
 
+def _get_array_shape_decl(shape):
+    result = [f'0..{s - 1}' for s in shape]
+    return f"{', '.join(result)}"
+
+
+@singledispatch
+def _fill_the_slice(stmt):
+    assert isinstance(stmt, (Operation, int))
+    return slice(stmt, stmt + 1, 1)
+
+
+@_fill_the_slice.register(slice)
+def _(obj):
+    return obj
+
+
+def _flatt_array(array):
+    return _call_func("array1d", array, flags_=None)
+
+
+def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
+    if iter_var is not None:
+        return _call_func(op, _compile_array_comprehension(seq, iter_var, operation, flags_), flags_=flags_)
+    else:
+        return _call_func(op, seq, flags_=flags_)
+
+
+def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
+    return f"{iter_var.name} in {to_str(seq, flags_=flags_)}", to_str(func, flags_=flags_)
+
+
+def _compile_array_comprehension(seq, iter_var, func, flags_):
+    indexes, func_str = _get_indexes_and_cycle_body(seq, iter_var, func, flags_=flags_)
+    return f"[{func_str} | {indexes}]"
+
+
 def _size(array: ArrayMixin, dim: int, *, flags_):
     ndims = array.ndims()
     if ndims > 1:
@@ -232,15 +159,9 @@ def _global_constraint(constraint, *params, flags_, flatten_args=True):
     return _call_func(constraint, *params, flatten_args=flatten_args, flags_=flags_)
 
 
-def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
-    if iter_var is not None:
-        return _call_func(op, _compile_array_comprehension(seq, iter_var, operation, flags_), flags_=flags_)
-    else:
-        return _call_func(op, seq, flags_=flags_)
-
-
-class Op2Str(UserDict):
+class Op2StrType(UserDict):
     def __init__(self):
+        super(Op2StrType, self).__init__()
         self.data = {}
         self[_Op_code.add] = partial(_binary_op, "+")
         self[_Op_code.sub] = partial(_binary_op, "-")
@@ -281,13 +202,4 @@ class Op2Str(UserDict):
         raise ValueError(f"Function {key} is undefined")
 
 
-Op2Str = Op2Str()
-
-
-def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
-    return f"{iter_var.name} in {to_str(seq, flags_=flags_)}", to_str(func, flags_=flags_)
-
-
-def _compile_array_comprehension(seq, iter_var, func, flags_):
-    indexes, func_str = _get_indexes_and_cycle_body(seq, iter_var, func, flags_=flags_)
-    return f"[{func_str} | {indexes}]"
+Op2Str = Op2StrType()
