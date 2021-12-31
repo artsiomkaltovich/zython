@@ -1,6 +1,6 @@
 ### 0.2.1
 #### Changed
-- Refactore some code
+- Refactor some code
 
 ## 0.2
 #### Changed
