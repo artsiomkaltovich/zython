@@ -10,9 +10,7 @@ from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
-from zython.var_par.array import ArrayMixin, ArrayView
 from zython.var_par.collections.array import ArrayView, ArrayMixin
-from zython.var_par.collections.set import SetMixin
 from zython.var_par.types import is_range
 
 

@@ -109,26 +109,27 @@ class ArrayPar(par, ArrayMixin):
         queue = deque()
         level = 0
         length = 0
-        while _can_create_array_from(arg):
+        current_arg = arg
+        while _can_create_array_from(current_arg):
             old_length = length
             length = 0
-            for a in arg:
+            for a in current_arg:
                 queue.append((a, level + 1))
                 length += 1
             if not length:
                 raise ValueError("Empty array was specified")
-            arg, new_level = queue.popleft()
+            current_arg, new_level = queue.popleft()
             if len(shape) <= level:
                 shape.append(length)
             elif old_length != length:
                 raise ValueError("Subarrays of different length are not supported, length of all subarrays "
                                  f"at level {level} should be {old_length}, but one has {length}")
             level = new_level
-        if not isinstance(arg, int):
+        if not isinstance(current_arg, int):
             raise ValueError("Only array with dtype int are supported")
-        self._type = type(arg)
+        self._type = type(current_arg)
         self._shape = tuple(shape)
-        self._check_and_set_values(arg, is_generator, level, queue)
+        self._check_and_set_values(current_arg, is_generator, level, queue)
 
     def _check_and_set_values(self, arg, is_generator, level, queue):
         flatten_values = [arg]

@@ -16,10 +16,11 @@ class SetVar(var, SetMixin):
 
 class SetPar(par, SetMixin):
     def __init__(self, arg):
-        print(type(arg))
-        self._type = None
-        self._name = None
+        if len(arg) < 1:
+            raise ValueError("Set should be initialized with not empty collection")
         self._value = arg
+        self._type = arg
+        self._name = None
 
 
 class Set(_AbstractCollection):
