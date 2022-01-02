@@ -3,9 +3,9 @@ from typing import List
 
 import minizinc
 
+from zython._compile.zinc.zinc import to_zinc
 from zython.result import Result
 from zython._compile.ir import IR
-from zython._compile.zinc import to_zinc
 from zython.operations.constraint import Constraint
 from zython.var_par.par import par
 from zython.var_par.var import var
@@ -41,7 +41,6 @@ class Model(ABC):
             self,
             eq,
             *,
-            all_solutions=False,
             result_as=None,
             verbose=False,
             solver="gecode",
@@ -49,7 +48,7 @@ class Model(ABC):
         return self._solve(
             "maximize",
             eq,
-            all_solutions=all_solutions,
+            all_solutions=False,
             result_as=result_as,
             verbose=verbose,
             solver="gecode",
@@ -59,7 +58,6 @@ class Model(ABC):
             self,
             eq,
             *,
-            all_solutions=False,
             result_as=None,
             verbose=False,
             solver="gecode",
@@ -67,7 +65,7 @@ class Model(ABC):
         return self._solve(
             "minimize",
             eq,
-            all_solutions=all_solutions,
+            all_solutions=False,
             result_as=result_as,
             verbose=verbose,
             solver=solver,

@@ -3,8 +3,6 @@ from typing import Union, Sequence
 
 from zython.operations.operation import Operation
 
-orig_range = range
-
 
 class _range:
     def __new__(cls, start, stop=None, step=1):
@@ -20,14 +18,16 @@ class _range:
             self.step = step
             return self
         else:
-            return orig_range(start, stop, step)
+            return range(start, stop, step)
+
+
+Ranges = range, _range
+RangesType = Union[range, _range]
+ZnSequence = Union[RangesType, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]
 
 
 def is_range(obj):
-    return isinstance(obj, orig_range) or isinstance(obj, _range)
-
-
-ZnSequence = Union[_range, orig_range, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]
+    return isinstance(obj, Ranges)
 
 
 def get_type(arg):

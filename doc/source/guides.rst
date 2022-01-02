@@ -7,7 +7,8 @@ Guides
    :glob:
 
    guides/getting_started
-   guides/array_basics
-   guides/array_advanced
    guides/coloring
    guides/max_min
+   guides/array_basics
+   guides/array_advanced
+   guides/sets

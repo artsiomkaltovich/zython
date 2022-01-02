@@ -23,7 +23,7 @@ master_doc = 'index'
 # -- Project information -----------------------------------------------------
 
 project = 'zython'
-copyright = '2020, Artyom Kaltovich'
+copyright = '2022, Artyom Kaltovich'
 author = 'Artyom Kaltovich'
 
 
