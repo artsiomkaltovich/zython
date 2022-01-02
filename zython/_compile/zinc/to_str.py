@@ -10,7 +10,7 @@ from zython._helpers.validate import _start_stop_step_validate
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
-from zython.var_par.array import ArrayMixin, ArrayView
+from zython.var_par.collections.array import ArrayView, ArrayMixin
 from zython.var_par.types import is_range
 
 
@@ -66,7 +66,7 @@ def _array_to_str(array, *, flatten=False):
     assert isinstance(array, (ArrayMixin, str))
     name = array if isinstance(array, str) else array.name
     if flatten:
-        return _call_func("array1d", name, flags_=None)
+        return _flatt_array(array)
     else:
         return name
 

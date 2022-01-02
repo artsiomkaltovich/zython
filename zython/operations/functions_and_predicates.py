@@ -6,7 +6,7 @@ from zython.operations import operation as operation_module
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
-from zython.var_par.array import ArrayMixin
+from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.types import ZnSequence
 
 

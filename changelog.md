@@ -1,6 +1,8 @@
 ### 0.2.1
+#### Added
+- Integer sets
 #### Changed
-- Refactore some code
+- Refactor some code
 
 ## 0.2
 #### Changed

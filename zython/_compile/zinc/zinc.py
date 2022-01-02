@@ -7,7 +7,8 @@ from zython._compile.zinc.flags import Flags, FlagProcessors
 from zython._compile.zinc.to_str import to_str, _binary_op, _get_array_shape_decl
 from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
-from zython.var_par.array import ArrayMixin
+from zython.var_par.collections.array import ArrayMixin
+from zython.var_par.collections.set import SetVar, SetPar
 from zython.var_par.types import is_range
 
 
@@ -55,6 +56,16 @@ def _get_variable_decl(v, decl_prefix, flags) -> str:
 @_get_variable_decl.register(ArrayMixin)
 def _(v, decl_prefix, flags):
     return f"array[{_get_array_shape_decl(v._shape)}] of {_elementary_var_decl(v, decl_prefix, flags)}"
+
+
+@_get_variable_decl.register(SetVar)
+def _(v, decl_prefix, flags):
+    return f"var set of {_elementary_var_decl(v, '', flags)}"
+
+
+@_get_variable_decl.register(SetPar)
+def _(v, decl_prefix, flags):
+    return f"set of {_elementary_var_decl(v, '', flags)}"
 
 
 def _elementary_var_decl(v, decl_prefix, flags):

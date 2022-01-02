@@ -4,8 +4,9 @@ from typing import Union, Callable, Tuple, Optional
 
 from zython import var
 from zython.operations.operation import Operation
-from zython.var_par.array import ArrayMixin
+from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.types import is_range, ZnSequence, get_type
+from ..var_par.collections.array import _AbstractCollection
 
 
 @singledispatch
@@ -15,7 +16,7 @@ def _get_variable(seq) -> var:
     assert False, f"{type(seq)} isn't supported, please use Sequence or Array here"
 
 
-@_get_variable.register(ArrayMixin)  # TODO: newer versions of python support type evaluation from hints
+@_get_variable.register(_AbstractCollection)  # TODO: newer versions of python support type evaluation from hints
 def _(seq: ArrayMixin):
     return var(seq.type)
 
