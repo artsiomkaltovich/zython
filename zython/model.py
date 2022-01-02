@@ -3,9 +3,9 @@ from typing import List
 
 import minizinc
 
+from zython._compile.zinc.zinc import to_zinc
 from zython.result import Result
 from zython._compile.ir import IR
-from zython._compile.zinc import to_zinc
 from zython.operations.constraint import Constraint
 from zython.var_par.par import par
 from zython.var_par.var import var

@@ -1,3 +1,7 @@
+### 0.2.1
+#### Changed
+- Refactore some code
+
 ## 0.2
 #### Changed
 - zython doesn't redefine builtin range function, 
