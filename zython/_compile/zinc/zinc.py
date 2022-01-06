@@ -9,7 +9,7 @@ from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar, SetPar
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, is_enum
 
 
 def to_zinc(ir: IR):
@@ -77,6 +77,8 @@ def _elementary_var_decl(v, decl_prefix, flags):
         declaration += f"{decl_prefix} float: {v.name};"
     elif is_range(v.type):
         declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
+    elif is_enum(v.type):
+        declaration += f"{decl_prefix} {v.type.__name__}: {v.name};"
     else:
         raise TypeError(f"Type {v.type} are not supported, please specify int or range")
     return declaration
