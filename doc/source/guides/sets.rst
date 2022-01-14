@@ -11,4 +11,5 @@ some of items according constraints, see examples below.
    :caption: Examples:
    :glob:
 
-   sets/*
+   sets/boxing_moves_int
+   sets/boxing_moves_enum

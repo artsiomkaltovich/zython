@@ -1,6 +1,8 @@
 Boxing Moves (Integer)
 ======================
 
+.. _boxing-moves-int:
+
 Let's imagine you've should to fight against Mike Tyson (don't worry, you have a week to prepare). You should learn
 several boxing moves, each of them has strength, but you should invest some time to learn it and some money to hire
 a coach.
@@ -63,8 +65,9 @@ Python Model
 
     model = Model(5, 10, [1, 2, 1, 2, 3], [1, 2, 1, 3, 1], [3, 4, 3, 2, 1])
     result = model.solve_maximize(zn.sum(model.to_learn, lambda move: model.power[move]))
-    print(f"Moves to learn: {result['to_learn']}, power: {result['objective']}")
+    moves = sorted(result['to_learn'])
+    print(f"Moves to learn: {moves}, power: {result['objective']}")
 
 .. testoutput::
 
-    Moves to learn: {0, 1, 4}, power: 6
+     Moves to learn: [0, 1, 4], power: 6
