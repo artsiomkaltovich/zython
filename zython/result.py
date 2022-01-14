@@ -1,6 +1,4 @@
-import enum
 from collections import namedtuple
-from typing import Type
 
 import minizinc
 
@@ -60,4 +58,4 @@ class Result:
 
 def as_original(mzn_result: minizinc.Result):
     """ returns original result, returned by minizinc-python """
-    return mnz_result
+    return mzn_result
