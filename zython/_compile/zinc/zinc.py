@@ -9,13 +9,14 @@ from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar, SetPar
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, is_enum
 
 
 def to_zinc(ir: IR):
     result: SourceCode = deque()
     flags: Set[Flags] = set()
     flag_processors = FlagProcessors()
+    _process_enums(ir, result, flags)
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
@@ -29,6 +30,11 @@ def _process_flags(flag_processors: FlagProcessors, flags, result: SourceCode):
         pr = flag_processors.get(flag)
         if pr:
             pr(result)
+
+
+def _process_enums(ir: IR, result: SourceCode, flags: Set[Flags]) -> None:
+    for e in ir.enums:
+        result.append(f"enum {e.__name__};")
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):
@@ -77,6 +83,8 @@ def _elementary_var_decl(v, decl_prefix, flags):
         declaration += f"{decl_prefix} float: {v.name};"
     elif is_range(v.type):
         declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
+    elif is_enum(v.type):
+        declaration += f"{decl_prefix} {v.type.__name__}: {v.name};"
     else:
         raise TypeError(f"Type {v.type} are not supported, please specify int or range")
     return declaration
