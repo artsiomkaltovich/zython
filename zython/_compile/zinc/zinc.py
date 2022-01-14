@@ -16,6 +16,7 @@ def to_zinc(ir: IR):
     result: SourceCode = deque()
     flags: Set[Flags] = set()
     flag_processors = FlagProcessors()
+    _process_enums(ir, result, flags)
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
@@ -29,6 +30,11 @@ def _process_flags(flag_processors: FlagProcessors, flags, result: SourceCode):
         pr = flag_processors.get(flag)
         if pr:
             pr(result)
+
+
+def _process_enums(ir: IR, result: SourceCode, flags: Set[Flags]) -> None:
+    for e in ir.enums:
+        result.append(f"enum {e.__name__};")
 
 
 def _process_pars_and_vars(ir, vars_or_pars, src, decl_prefix, flags):

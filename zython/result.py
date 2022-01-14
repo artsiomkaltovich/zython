@@ -1,4 +1,8 @@
+import enum
 from collections import namedtuple
+from typing import Type
+
+import minizinc
 
 
 class Result:
@@ -10,7 +14,7 @@ class Result:
     but they can use this class as base class for their extensions.
 
     """
-    def __init__(self, mzn_result):
+    def __init__(self, mzn_result: minizinc.Result):
         self._original = mzn_result
         if mzn_result.solution is not None:
             if isinstance(mzn_result.solution, list):
@@ -54,6 +58,6 @@ class Result:
             return 1
 
 
-def as_original(mnz_result):
+def as_original(mzn_result: minizinc.Result):
     """ returns original result, returned by minizinc-python """
     return mnz_result
