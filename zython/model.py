@@ -81,7 +81,9 @@ class Model(ABC):
         inst = minizinc.Instance(solver, model)
         for name, param in self._ir.pars.items():
             inst[name] = param.value
-        result = inst.solve(all_solutions=all_solutions)
+        for e in self._ir.enums:
+            inst[e.__name__] = e
+        result: minizinc.Result = inst.solve(all_solutions=all_solutions)
         if result_as is None:
             return Result(result)
         else:

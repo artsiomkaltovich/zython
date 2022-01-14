@@ -1,3 +1,7 @@
+### 0.2.2
+#### Added
+- Sets support enums
+
 ### 0.2.1
 #### Added
 - Integer sets

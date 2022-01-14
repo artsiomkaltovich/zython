@@ -2,7 +2,7 @@ import inspect
 
 from zython.operations.operation import Operation
 from zython.operations.constraint import Constraint
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, is_enum
 
 
 class var(Operation):
@@ -17,6 +17,8 @@ class var(Operation):
             if is_range(type_):
                 if type_.step != 1:
                     raise ValueError("Step values other than 1 are not supported")
+                self._type = type_
+            elif is_enum(type_):
                 self._type = type_
             elif inspect.isclass(type_):
                 if issubclass(type_, int):

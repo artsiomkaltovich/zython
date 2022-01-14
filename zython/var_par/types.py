@@ -1,3 +1,5 @@
+import enum
+
 import zython  # for type hints
 from typing import Union, Sequence
 
@@ -12,7 +14,7 @@ class _range:
         if (isinstance(start, (Operation, float))
                 or isinstance(stop, (Operation, float))
                 or isinstance(step, (Operation, float))):
-            self = super().__new__(cls)
+            self = object.__new__(cls)
             self.start = start
             self.stop = stop
             self.step = step
@@ -28,6 +30,10 @@ ZnSequence = Union[RangesType, "zython.var_par.array.ArrayMixin", Sequence["zyth
 
 def is_range(obj):
     return isinstance(obj, Ranges)
+
+
+def is_enum(arg):
+    return isinstance(arg, enum.EnumMeta)
 
 
 def get_type(arg):
