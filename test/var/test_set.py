@@ -10,20 +10,17 @@ class TestCreate:
         a = zn.Set((1, 2, 3))
         assert isinstance(a, SetPar)
         assert a.value == (1, 2, 3)
-        assert a.type is int
 
     @pytest.mark.parametrize("collection", [zn.range(1, 4), range(1, 4)])
     def test_int_range(self, collection):
         a = zn.Set(collection)
         assert isinstance(a, SetPar)
         assert a.value == collection
-        assert a.type == range(1, 4)
 
     def test_int_generator(self):
         a = zn.Set((a + 1 for a in range(4)))
         assert isinstance(a, SetPar)
         assert a.value == (1, 2, 3, 4)
-        assert a.type is int
 
     @pytest.mark.parametrize("arg", ["aaa", zn.var(float), (a for a in "aaa"), (1.2, 2.5)])
     def test_wrong_type(self, arg):

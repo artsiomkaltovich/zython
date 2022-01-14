@@ -11,5 +11,4 @@ Guides
    guides/max_min
    guides/array_basics
    guides/array_advanced
-   guides/knapsack
    guides/sets
