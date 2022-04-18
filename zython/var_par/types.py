@@ -3,7 +3,13 @@ import enum
 import zython  # for type hints
 from typing import Union, Sequence
 
-from zython.operations.operation import Operation
+
+def _create_range(cls, start, stop, step):
+    obj = object.__new__(cls)
+    obj.start = start
+    obj.stop = stop
+    obj.step = step
+    return obj
 
 
 class _range:
@@ -11,16 +17,11 @@ class _range:
         if stop is None:
             stop = start
             start = 0
-        if (isinstance(start, (Operation, float))
-                or isinstance(stop, (Operation, float))
-                or isinstance(step, (Operation, float))):
-            self = object.__new__(cls)
-            self.start = start
-            self.stop = stop
-            self.step = step
-            return self
-        else:
+        if isinstance(start, int) and isinstance(stop, int) and isinstance(step, int):
             return range(start, stop, step)
+        if isinstance(start, (int, float)) and isinstance(stop, (int, float)) and isinstance(step, (int, float)):
+            return _create_range(cls, float(start), float(stop), float(step))
+        return _create_range(cls, start, stop, step)
 
 
 Ranges = range, _range

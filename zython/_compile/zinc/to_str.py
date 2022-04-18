@@ -11,7 +11,7 @@ from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range
+from zython.var_par.types import is_range, get_type
 
 
 @singledispatch
@@ -38,7 +38,10 @@ def _(stmt, *, flatten_arg=False, flags_=None):
 
 def _range_or_slice_to_str(stmt):
     _start_stop_step_validate(stmt)
-    return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
+    if all(get_type(s) is int for s in (stmt.start, stmt.stop, stmt.step)):
+        return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
+    else:
+        return f"{to_str(stmt.start)}..{to_str(stmt.stop)}"
 
 
 def _compile_array_view(view):
