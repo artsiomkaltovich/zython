@@ -11,7 +11,7 @@ from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range, get_type
+from zython.var_par.types import is_range, is_int_range
 
 
 @singledispatch
@@ -25,7 +25,7 @@ def to_str(stmt, *, flatten_arg=False, flags_=None):
     elif isinstance(stmt, Constraint):
         return Op2Str[stmt.op](*stmt.params, flags_=flags_)
     elif is_range(stmt):
-        return _range_or_slice_to_str(stmt)
+        return _range_or_slice_to_str(stmt, flags_=flags_)
     return str(stmt)
 
 
@@ -36,11 +36,12 @@ def _(stmt, *, flatten_arg=False, flags_=None):
     return f"[{', '.join(to_str(s) for s in stmt)}]"
 
 
-def _range_or_slice_to_str(stmt):
+def _range_or_slice_to_str(stmt, flags_=set()):
     _start_stop_step_validate(stmt)
-    if all(get_type(s) is int for s in (stmt.start, stmt.stop, stmt.step)):
+    if is_int_range(stmt):
         return f"{to_str(stmt.start)}..{to_str(stmt.stop - 1)}"
     else:
+        flags_.add(Flags.float_used)
         return f"{to_str(stmt.start)}..{to_str(stmt.stop)}"
 
 

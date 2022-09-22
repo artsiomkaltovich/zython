@@ -1,11 +1,3 @@
-import warnings
-
-from minizinc import find_driver
-
-if not find_driver():
-    warnings.warn("Solver wasn't found, are you sure you specify minizinc folder to $PATH environment variable")
-
-
 import zython.var_par.types
 from zython.var_par.var import var
 from zython.var_par.par import par

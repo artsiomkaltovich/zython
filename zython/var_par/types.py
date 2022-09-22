@@ -33,6 +33,10 @@ def is_range(obj):
     return isinstance(obj, Ranges)
 
 
+def is_int_range(r: RangesType):
+    return all(get_type(s) is int for s in (r.start, r.stop, r.step))
+
+
 def is_enum(arg):
     return isinstance(arg, enum.EnumMeta)
 

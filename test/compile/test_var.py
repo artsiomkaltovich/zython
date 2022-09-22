@@ -3,6 +3,7 @@ import re
 import pytest
 
 import zython as zn
+from zython._compile.zinc.flags import Flags
 from zython._compile.zinc.to_str import to_str
 
 
@@ -112,8 +113,10 @@ class TestRange:
         assert "(a - 1)..((b + 1) - 1)" == to_str(zn.range(v - 1, p + 1))
 
     def test_float(self):
-        a = to_str(zn.range(1, 10.0))
+        flags = set()
+        a = to_str(zn.range(1, 10.0), flags_=flags)
         assert a == "1.0..10.0"
+        assert Flags.float_used in flags
 
     def test_int_op(self):
         v = create_var("a", int)
@@ -121,11 +124,15 @@ class TestRange:
         assert a == "a..((a + 1) - 1)"
 
     def test_float_op(self):
+        flags = set()
         v = create_var("a", float)
-        a = to_str(zn.range(v, v + 2))
+        a = to_str(zn.range(v, v + 2), flags_=flags)
         assert a == "a..(a + 2)"
+        assert Flags.float_used in flags
 
     def test_float_int_par_float_op(self):
+        flags = set()
         v = create_var("a", int)
-        a = to_str(zn.range(v, v + 2.4))
+        a = to_str(zn.range(v, v + 2.4), flags_=flags)
         assert a == "a..(a + 2.4)"
+        assert Flags.float_used in flags
