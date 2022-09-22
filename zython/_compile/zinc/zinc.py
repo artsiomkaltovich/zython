@@ -9,7 +9,7 @@ from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar, SetPar
-from zython.var_par.types import is_range, is_enum
+from zython.var_par.types import is_range, is_enum, is_int_range
 
 
 def to_zinc(ir: IR):
@@ -82,7 +82,9 @@ def _elementary_var_decl(v, decl_prefix, flags):
         flags.add(Flags.float_used)
         declaration += f"{decl_prefix} float: {v.name};"
     elif is_range(v.type):
-        declaration += f"{decl_prefix} {to_str(v.type)}: {v.name};"
+        if not is_int_range(v.type):
+            flags.add(Flags.float_used)
+        declaration += f"{decl_prefix} {to_str(v.type, flags_=flags)}: {v.name};"
     elif is_enum(v.type):
         declaration += f"{decl_prefix} {v.type.__name__}: {v.name};"
     else:
@@ -90,9 +92,9 @@ def _elementary_var_decl(v, decl_prefix, flags):
     return declaration
 
 
-def _set_value_as_constraint(ir, variable, flags):
+def _set_value_as_constraint(ir, variable, flags_):
     # values like `var int: s = sum(a);` should be set as constraint or it won't be returned in result
-    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value), flags_=flags))
+    ir.constraints.append(_binary_op("==", variable.name, to_str(variable.value, flags_=flags_), flags_=flags_))
 
 
 def _process_constraints(ir, src, flags_):

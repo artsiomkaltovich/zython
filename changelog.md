@@ -1,3 +1,12 @@
+### 0.2.3
+#### Added
+- validation for float ranges in some constraints, e.g. forall
+#### Fixed
+- ranges with float values correctly set bigger limit
+#### Deleted
+- check for minizinc executable is available, 
+as it seems, python-minizinc implement it by itself. 
+
 ### 0.2.2
 #### Added
 - Sets support enums

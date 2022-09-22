@@ -5,14 +5,16 @@ from typing import Union, Callable, Tuple, Optional
 from zython import var
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
-from zython.var_par.types import is_range, ZnSequence, get_type
+from zython.var_par.types import is_range, ZnSequence, get_type, is_int_range
 from ..var_par.collections.array import _AbstractCollection
 
 
 @singledispatch
 def _get_variable(seq) -> var:
     if is_range(seq):
-        return var(int)
+        if is_int_range(seq):
+            return var(int)
+        raise ValueError("float ranges are not supported as argument")
     assert False, f"{type(seq)} isn't supported, please use Sequence or Array here"
 
 
