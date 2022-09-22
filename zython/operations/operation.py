@@ -4,10 +4,17 @@ from typing import Optional, Callable, Union, Type
 import zython
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
+from zython.var_par.types import get_type
 
 
 def _get_wider_type(left, right):
-    return int
+    t_types = get_type(left), get_type(right)
+    types = set(t_types)
+    if types == {int}:
+        return int
+    elif types == {int, float}:
+        return float
+    return int  # TODO: fix types, do not forget about int/int => float
 
 
 class Operation(Constraint):
