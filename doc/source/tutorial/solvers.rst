@@ -6,7 +6,7 @@ Solvers
 Solvers are programs which are find actual solutions for your
 models. Solvers differs by supported types, features and performance.
 You can find more info in
-`minzinc cmd options doc <https://www.minizinc.org/doc-2.5.0/en/command_line.html?#cmdoption-solver>`_
+`minizinc cmd options doc <https://www.minizinc.org/doc-2.5.0/en/command_line.html?#cmdoption-solver>`_
 
 Solvers can be specified in solve methods. Default solver of
 minizinc is `gecode <https://www.gecode.org/>`_ it is fast and
