@@ -23,6 +23,6 @@ You can get available solvers on your system by calling `available_solver_tags`.
 
 ::
 
-    >>> import zython as zn
-    >>> zn.available_solver_tags()
+    > import zython as zn
+    > zn.available_solver_tags()
     ('cp', 'lcg', 'gecode', ...)
