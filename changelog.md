@@ -1,3 +1,7 @@
+### 0.2.4
+#### Added
+- available_solver_tags function to get available solvers
+
 ### 0.2.3
 #### Added
 - validation for float ranges in some constraints, e.g. forall
