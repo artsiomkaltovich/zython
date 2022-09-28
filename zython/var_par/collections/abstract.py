@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Optional
 
 from zython.operations import operation
 
@@ -6,7 +6,7 @@ from zython.operations import operation
 class _AbstractCollection(operation.Operation):
     # TODO: _AbstractCollection subclass Operation and Constraint
     # so invert of collection is possible, restrict it
-    _name: str
+    _name: Optional[str]
     name: str  # remove pycharm warnings, this property is handled by var\par base class
     _type: Type
 

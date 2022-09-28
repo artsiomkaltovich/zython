@@ -36,7 +36,7 @@ def create_var(name, type=int):
 
 
 def create_par(name, value=5):
-    p = zn.par(5)
+    p = zn.par(value)
     p._name = name
     return p
 
