@@ -1,9 +1,11 @@
 ### 0.2.4
 #### Added
 - available_solver_tags function to get available solvers
-- optimization_level arg to solve
+- optimization_level, n_processes, timeout and random_seed arg to solve
 #### fixed
-- 
+- solve_maximize now correctly use solver arg
+#### changed
+- add some type hints
 
 ### 0.2.3
 #### Added

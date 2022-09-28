@@ -70,6 +70,9 @@ class Model(ABC):
             verbose=verbose,
             solver=solver,
             optimisation_level=optimisation_level,
+            n_processes=n_processes,
+            timeout=timeout,
+            random_seed=random_seed,
         )
 
     def solve_maximize(
@@ -80,6 +83,9 @@ class Model(ABC):
             verbose=False,
             solver="gecode",
             optimisation_level: Optional[int] = None,
+            n_processes: Optional[int] = None,
+            timeout: Optional[timedelta] = None,
+            random_seed: Optional[int] = None,
     ):  # TODO: position only
         return self._solve(
             "maximize",
@@ -89,6 +95,9 @@ class Model(ABC):
             verbose=verbose,
             solver=solver,
             optimisation_level=optimisation_level,
+            n_processes=n_processes,
+            timeout=timeout,
+            random_seed=random_seed,
         )
 
     def solve_minimize(
@@ -99,6 +108,9 @@ class Model(ABC):
             verbose=False,
             solver="gecode",
             optimisation_level: Optional[int] = None,
+            n_processes: Optional[int] = None,
+            timeout: Optional[timedelta] = None,
+            random_seed: Optional[int] = None,
     ):  # TODO: position only
         return self._solve(
             "minimize",
@@ -108,9 +120,23 @@ class Model(ABC):
             verbose=verbose,
             solver=solver,
             optimisation_level=optimisation_level,
+            n_processes=n_processes,
+            timeout=timeout,
+            random_seed=random_seed,
         )
 
-    def _solve(self, *how_to_solve, all_solutions, result_as, verbose, solver, optimisation_level):
+    def _solve(
+            self,
+            *how_to_solve,
+            all_solutions,
+            result_as,
+            verbose,
+            solver,
+            optimisation_level,
+            n_processes,
+            timeout,
+            random_seed,
+    ):
         solver = minizinc.Solver.lookup(solver)
         model = minizinc.Model()
         src = self.compile(how_to_solve)
@@ -125,6 +151,9 @@ class Model(ABC):
         result: minizinc.Result = inst.solve(
             all_solutions=all_solutions,
             optimisation_level=optimisation_level,
+            processes=n_processes,
+            timeout=timeout,
+            random_seed=random_seed,
         )
         if result_as is None:
             return Result(result)
