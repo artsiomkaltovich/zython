@@ -1,5 +1,6 @@
 from abc import ABC
-from typing import List
+from datetime import timedelta
+from typing import List, Optional
 
 import minizinc
 
@@ -15,7 +16,18 @@ class Model(ABC):
     """ Base class for user-defined models to solve """
     constraint: List[Constraint]
 
-    def solve_satisfy(self, *, all_solutions=False, result_as=None, verbose=False, solver="gecode"):
+    def solve_satisfy(
+            self,
+            *,
+            all_solutions=False,
+            result_as=None,
+            verbose=False,
+            solver="gecode",
+            optimisation_level: Optional[int] = None,
+            n_processes: Optional[int] = None,
+            timeout: Optional[timedelta] = None,
+            random_seed: Optional[int] = None,
+    ):
         """ Finds solution that satisfied constraints, or the error message if the model can't be solved
 
         Parameters
@@ -29,13 +41,36 @@ class Model(ABC):
             If True the source code of the model will be print to stdout
         solver: str
             Name of the solver, that will look for solution
+        optimisation_level: Optional[int] = None
+            Optimisation level for minizinc compiler
+                - 0: Disable optimisation
+                - 1: Single pass optimisation (default)
+                - 2: Flatten twice to improve flattening decisions
+                - 3: Perform root-node-propagation
+                - 4: Probe bounds of all variables at the root node
+                - 5: Probe values of all variables at the root node
+        n_processes: Optional[int] = None
+            Number of processes the solver can use.
+            (Only available when the ``-p`` flag is supported by the solver).
+        timeout: Optional[timedelta] = None
+            Set the time limit for the process of solving the instance.
+        random_seed: Optional[int] = None
+            Set the random seed for solver.
+            (Only available when the ``-r`` flag is supported by the solver).
 
         Returns
         -------
         Result: Result
             result of the model solution, value of variables can be reached by dict syntax.
         """
-        return self._solve("satisfy", all_solutions=all_solutions, result_as=result_as, verbose=verbose, solver=solver)
+        return self._solve(
+            "satisfy",
+            all_solutions=all_solutions,
+            result_as=result_as,
+            verbose=verbose,
+            solver=solver,
+            optimisation_level=optimisation_level,
+        )
 
     def solve_maximize(
             self,
@@ -44,6 +79,7 @@ class Model(ABC):
             result_as=None,
             verbose=False,
             solver="gecode",
+            optimisation_level: Optional[int] = None,
     ):  # TODO: position only
         return self._solve(
             "maximize",
@@ -51,7 +87,8 @@ class Model(ABC):
             all_solutions=False,
             result_as=result_as,
             verbose=verbose,
-            solver="gecode",
+            solver=solver,
+            optimisation_level=optimisation_level,
         )
 
     def solve_minimize(
@@ -61,6 +98,7 @@ class Model(ABC):
             result_as=None,
             verbose=False,
             solver="gecode",
+            optimisation_level: Optional[int] = None,
     ):  # TODO: position only
         return self._solve(
             "minimize",
@@ -69,9 +107,10 @@ class Model(ABC):
             result_as=result_as,
             verbose=verbose,
             solver=solver,
+            optimisation_level=optimisation_level,
         )
 
-    def _solve(self, *how_to_solve, all_solutions, result_as, verbose, solver):
+    def _solve(self, *how_to_solve, all_solutions, result_as, verbose, solver, optimisation_level):
         solver = minizinc.Solver.lookup(solver)
         model = minizinc.Model()
         src = self.compile(how_to_solve)
@@ -83,7 +122,10 @@ class Model(ABC):
             inst[name] = param.value
         for e in self._ir.enums:
             inst[e.__name__] = e
-        result: minizinc.Result = inst.solve(all_solutions=all_solutions)
+        result: minizinc.Result = inst.solve(
+            all_solutions=all_solutions,
+            optimisation_level=optimisation_level,
+        )
         if result_as is None:
             return Result(result)
         else:

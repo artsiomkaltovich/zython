@@ -1,6 +1,9 @@
 ### 0.2.4
 #### Added
 - available_solver_tags function to get available solvers
+- optimization_level arg to solve
+#### fixed
+- 
 
 ### 0.2.3
 #### Added

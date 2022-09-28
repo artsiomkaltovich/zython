@@ -117,7 +117,7 @@ def _mod(left, right):
     return Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
 
 
-def _size(array: "zython.var_par.array.ArrayMixin", dim: int):
+def _size(array: "zython.var_par.collections.array.ArrayMixin", dim: int):
     if 0 <= dim < array.ndims():
         return Operation(_Op_code.size, array, dim, type_=int)
     raise ValueError(f"Array has 0..{array.ndims()} dimensions, but {dim} were specified")
