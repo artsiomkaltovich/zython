@@ -13,6 +13,10 @@ def _create_range(cls, start, stop, step):
 
 
 class _range:
+    start: Union[int, float, "zython.operations.operation.Operation"]
+    stop: Union[int, float, "zython.operations.operation.Operation"]
+    step: Union[int, float, "zython.operations.operation.Operation"]  # only 1 supported for now
+
     def __new__(cls, start, stop=None, step=1):
         if stop is None:
             stop = start
@@ -26,7 +30,11 @@ class _range:
 
 Ranges = range, _range
 RangesType = Union[range, _range]
-ZnSequence = Union[RangesType, "zython.var_par.array.ArrayMixin", Sequence["zython.var_par.var.var"]]
+ZnSequence = Union[
+    RangesType,
+    "zython.var_par.collections.array.ArrayMixin",
+    Sequence["zython.var_par.var.var"],
+]
 
 
 def is_range(obj):

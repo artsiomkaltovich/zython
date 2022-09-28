@@ -23,7 +23,7 @@ Python Model
             self.cakes = zn.Array(zn.var(int), shape=len(recipes))
             self.constraints = [sum(recipe[i] * cake for recipe, cake in zip(recipes, self.cakes)) <= available[i]
                                 for i in range(len(available))]
-            self.constraints += [cake > 0 for cake in self.cakes]
+            self.constraints += [cake >= 0 for cake in self.cakes]
 
 
     recipe = namedtuple("recipe", ("flour", "banana", "sugar", "butter", "cocoa"))
@@ -42,4 +42,4 @@ Python Model
 .. testoutput::
 
     Solution(objective=1700, cakes=[2, 2])
-    Solution(objective=199850, cakes=[286, 141, 1])
+    Solution(objective=200000, cakes=[288, 140, 0])

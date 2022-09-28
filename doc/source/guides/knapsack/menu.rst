@@ -41,8 +41,8 @@ Naive Model
 Trying to find better solution
 ------------------------------
 
-This problem as two possible solutions: ``[7, 0, 0, 0, 0, 0]`` and ``[1, 0, 0, 2, 0, 1]``.
-In most cases group of friend will choose the second variant, because the can taste more dishes.
+This problem has two possible solutions: ``[7, 0, 0, 0, 0, 0]`` and ``[1, 0, 0, 2, 0, 1]``.
+In most cases group of friends will choose the second variant, because they can taste more dishes.
 But by default minizinc stops execution if it finds any solution, so you can receive pretty boring
 ``[7, 0, 0, 0, 0, 0]`` one. You can change it by specifying
 

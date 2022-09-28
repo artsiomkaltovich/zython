@@ -1,3 +1,4 @@
+from datetime import timedelta
 
 import minizinc
 import zython
@@ -78,3 +79,26 @@ def test_range_cmp():
     expected_result = minizinc_model()
     actual_result = model()
     assert str(expected_result) == str(actual_result)
+
+
+def test_extra_solve_args():
+    def model():
+        class MyModel(zython.Model):
+            def __init__(self, a: int, b: int):
+                super().__init__()
+                self.a = par(a)
+                self.b = par(b)
+                self.x = var(range(-100, 101))
+                self.constraints = [self.a < self.x, self.x < self.b]
+
+        model = MyModel(1, 4, )
+        result = model.solve_satisfy(
+            optimisation_level=2,
+            n_processes=3,
+            timeout=timedelta(seconds=4),
+            random_seed=5,
+        )
+        return result
+
+    actual_result = model()
+    assert actual_result
