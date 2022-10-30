@@ -6,6 +6,11 @@ but it is not the most readable and useful way to represent available decisions.
 
 Zython also support python's enums, lets rewrite the model.
 
+.. note::
+
+    In Minizinc 2.6.x there were changes with enums
+    so it recommended to use 2.5.x version
+
 Python Model
 ------------
 

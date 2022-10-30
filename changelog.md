@@ -1,3 +1,7 @@
+### 0.2.5
+#### Python interpreters support
+- add 3.11 CPython
+ 
 ### 0.2.4
 #### Added
 - available_solver_tags function to get available solvers
