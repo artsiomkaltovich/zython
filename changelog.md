@@ -5,6 +5,7 @@
 #### Python interpreters support
 - add 3.11 CPython
 - drop 3.7 CPython
+- drop pypy
  
 ### 0.2.4
 #### Added
