@@ -2,11 +2,11 @@ import inspect
 
 from zython.operations.operation import Operation
 from zython.operations.constraint import Constraint
-from zython.var_par.types import is_range, is_enum
+from zython.var_par.get_type import is_range, is_enum
 
 
 class var(Operation):
-    def __init__(self, type_):  # TODO: make positional only
+    def __init__(self, /, type_):
         self._name = None
         self._value = None
         self._type = None

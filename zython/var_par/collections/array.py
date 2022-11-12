@@ -161,7 +161,7 @@ class ArrayPar(par, ArrayMixin):
 
 
 class Array:
-    def __new__(cls, arg, shape=None):  # TODO: make positional only
+    def __new__(cls, arg, /, shape=None):
         if isinstance(arg, var):
             return ArrayVar(arg, shape=shape)
         else:

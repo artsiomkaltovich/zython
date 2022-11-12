@@ -13,9 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "pypy3"]
-        minizinc_image: [ "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.5/MiniZincIDE-2.5.5-x86_64.AppImage",
-                          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage" ]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "pypy3"]
+        minizinc_image: [
+          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.6.4/MiniZincIDE-2.6.4-x86_64.AppImage",
+          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage",
+        ]
 
     env:
       MINIZINC_URL: ${{ matrix.minizinc_image }}

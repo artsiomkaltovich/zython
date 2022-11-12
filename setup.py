@@ -10,7 +10,7 @@ from read_version import read_version
 setup(
     name="zython",
     version=read_version(),
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     author="Artsiom Kaltovich",
     author_email="kaltovichartyom@gmail.com",
     description="Express constraint programming problem with python and solve it with minizinc",
@@ -26,10 +26,10 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
@@ -40,6 +40,6 @@ setup(
     ],
     install_requires=[
         "wheel",
-        "minizinc >= 0.4.2",
+        "minizinc >= 0.7",
     ]
 )
