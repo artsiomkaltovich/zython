@@ -11,7 +11,7 @@ from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range, is_int_range
+from zython.var_par.get_type import is_range, is_int_range
 
 
 @singledispatch
@@ -59,11 +59,11 @@ def _compile_array_view(view):
         elif slices_count == 1:
             return _flatt_array(slice_def)
         else:
-            decrised_index_set = [i for i in itertools.compress(slices, slices_pos)]
-            return _call_func(f"array{len(decrised_index_set)}d", *decrised_index_set, slice_def, flags_=None)
+            decreased_index_set = [i for i in itertools.compress(slices, slices_pos)]
+            return _call_func(f"array{len(decreased_index_set)}d", *decreased_index_set, slice_def, flags_=None)
     else:
         assert all(isinstance(p, (Operation, int)) for p in pos)
-        return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
+        return f"{view.array.name}[{', '.join(to_str(p) for p in pos)}]"
 
 
 def _array_to_str(array, *, flatten=False):

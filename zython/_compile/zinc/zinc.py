@@ -9,7 +9,7 @@ from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar, SetPar
-from zython.var_par.types import is_range, is_enum, is_int_range
+from zython.var_par.get_type import is_range, is_int_range, is_enum
 
 
 def to_zinc(ir: IR):

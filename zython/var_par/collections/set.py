@@ -2,7 +2,7 @@ import inspect
 
 from .abstract import _AbstractCollection
 from ..par import par
-from ..types import is_range, is_enum
+from ..get_type import is_range, is_enum
 from ..var import var
 
 

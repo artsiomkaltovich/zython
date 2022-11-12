@@ -5,7 +5,8 @@ from typing import Union, Callable, Tuple, Optional
 from zython import var
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
-from zython.var_par.types import is_range, ZnSequence, get_type, is_int_range
+from zython.var_par.types import ZnSequence
+from ..var_par.get_type import is_range, is_int_range, get_type
 from ..var_par.collections.array import _AbstractCollection
 
 

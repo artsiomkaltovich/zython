@@ -1,19 +1,21 @@
+import warnings
 from numbers import Number
 from typing import Optional, Callable, Union, Type
 
 import zython
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
-from zython.var_par.types import get_type
+from zython.var_par.get_type import get_base_type
 
 
 def _get_wider_type(left, right):
-    t_types = get_type(left), get_type(right)
+    t_types = get_base_type(left), get_base_type(right)
     types = set(t_types)
     if types == {int}:
         return int
     elif types == {int, float}:
         return float
+    warnings.warn("_get_wider_type returns int as fallback")
     return int  # TODO: fix types, do not forget about int/int => float
 
 
