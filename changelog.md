@@ -1,6 +1,10 @@
-### 0.2.5
+## 0.3
+#### fixes
+- fix enum doc example
+- some minor fixes for internal code
 #### Python interpreters support
 - add 3.11 CPython
+- drop 3.7 CPython
  
 ### 0.2.4
 #### Added

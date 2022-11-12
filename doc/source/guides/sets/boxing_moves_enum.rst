@@ -37,16 +37,18 @@ Python Model
             self.money = zn.Array(money)
             self.to_learn = zn.Set(zn.var(moves))
             self.constraints = [
-                zn.sum(self.to_learn, lambda move: self.time[move]) < self.time_available,
-                zn.sum(self.to_learn, lambda move: self.money[move]) < self.money_available,
+                zn.sum(self.to_learn, lambda move: self.time[move - 1]) < self.time_available,
+                zn.sum(self.to_learn, lambda move: self.money[move - 1]) < self.money_available,
             ]
 
 
     model = Model(Moves, 5, 10, [1, 2, 1, 2, 3], [1, 2, 1, 3, 1], [3, 4, 3, 2, 1])
-    result = model.solve_maximize(zn.sum(model.to_learn, lambda move: model.power[move]))
+    result = model.solve_maximize(
+        zn.sum(model.to_learn, lambda move: model.power[move - 1])
+    )
     moves = sorted(result['to_learn'], key=lambda x: x.value)
     print(f"Moves to learn: {moves}, power: {result['objective']}")
 
 .. testoutput::
 
-    Moves to learn: [<Moves.jab: 1>, <Moves.cross: 2>, <Moves.uppercut: 4>], power: 6
+    Moves to learn: [<Moves.jab: 1>, <Moves.cross: 2>, <Moves.slip: 5>], power: 6

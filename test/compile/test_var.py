@@ -1,3 +1,4 @@
+import enum
 import re
 
 import pytest

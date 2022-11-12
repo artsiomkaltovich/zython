@@ -11,7 +11,7 @@ from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayView, ArrayMixin
-from zython.var_par.types import is_range, is_int_range
+from zython.var_par.get_type import is_range, is_int_range
 
 
 @singledispatch
@@ -59,11 +59,11 @@ def _compile_array_view(view):
         elif slices_count == 1:
             return _flatt_array(slice_def)
         else:
-            decrised_index_set = [i for i in itertools.compress(slices, slices_pos)]
-            return _call_func(f"array{len(decrised_index_set)}d", *decrised_index_set, slice_def, flags_=None)
+            decreased_index_set = [i for i in itertools.compress(slices, slices_pos)]
+            return _call_func(f"array{len(decreased_index_set)}d", *decreased_index_set, slice_def, flags_=None)
     else:
         assert all(isinstance(p, (Operation, int)) for p in pos)
-        return f"{view.array.name}[{', '.join(to_str(p) for p in view.pos)}]"
+        return f"{view.array.name}[{', '.join(to_str(p) for p in pos)}]"
 
 
 def _array_to_str(array, *, flatten=False):
@@ -83,15 +83,15 @@ def _compile_slice(ndim, pos, view):
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
 
-def _pow(a, b, *, flags_):  # TODO: make positional only
+def _pow(a, b, /, *, flags_):
     return f"pow({to_str(a, flags_=flags_)}, {to_str(b, flags_=flags_)})"
 
 
-def _binary_op(sign, a, b, *, flags_):
+def _binary_op(sign, a, b, /, *, flags_):
     return f"({to_str(a, flags_=flags_)} {sign} {to_str(b, flags_=flags_)})"
 
 
-def _unary_op(sign, a, *, flags_):
+def _unary_op(sign, a, /, *, flags_):
     return f"({sign} {to_str(a, flags_=flags_)})"
 
 

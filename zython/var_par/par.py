@@ -3,7 +3,7 @@ from zython.operations.constraint import Constraint
 
 
 class par(var):
-    def __init__(self, value):  # TODO: make positional onlyif isinstance(type_or_value, int):
+    def __init__(self, /, value):
         self._name = None
         self._value = None
         self._type = None

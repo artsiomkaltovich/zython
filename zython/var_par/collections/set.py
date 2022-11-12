@@ -2,7 +2,7 @@ import inspect
 
 from .abstract import _AbstractCollection
 from ..par import par
-from ..types import is_range, is_enum
+from ..get_type import is_range, is_enum
 from ..var import var
 
 
@@ -44,7 +44,7 @@ class SetPar(par, SetMixin):
 
 
 class Set(SetMixin):
-    def __new__(cls, arg):  # TODO: make positional only
+    def __new__(cls, arg, /):
         if isinstance(arg, var):
             return SetVar(arg)
         else:

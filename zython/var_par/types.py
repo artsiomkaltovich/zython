@@ -1,7 +1,6 @@
-import enum
+from typing import Union, Sequence
 
 import zython  # for type hints
-from typing import Union, Sequence
 
 
 def _create_range(cls, start, stop, step):
@@ -35,19 +34,3 @@ ZnSequence = Union[
     "zython.var_par.collections.array.ArrayMixin",
     Sequence["zython.var_par.var.var"],
 ]
-
-
-def is_range(obj):
-    return isinstance(obj, Ranges)
-
-
-def is_int_range(r: RangesType):
-    return all(get_type(s) is int for s in (r.start, r.stop, r.step))
-
-
-def is_enum(arg):
-    return isinstance(arg, enum.EnumMeta)
-
-
-def get_type(arg):
-    return getattr(arg, "type", type(arg))
