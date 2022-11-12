@@ -44,7 +44,7 @@ class SetPar(par, SetMixin):
 
 
 class Set(SetMixin):
-    def __new__(cls, arg):  # TODO: make positional only
+    def __new__(cls, arg, /):
         if isinstance(arg, var):
             return SetVar(arg)
         else:

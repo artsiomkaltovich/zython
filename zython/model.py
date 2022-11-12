@@ -78,6 +78,7 @@ class Model(ABC):
     def solve_maximize(
             self,
             eq,
+            /,
             *,
             result_as=None,
             verbose=False,
@@ -86,7 +87,7 @@ class Model(ABC):
             n_processes: Optional[int] = None,
             timeout: Optional[timedelta] = None,
             random_seed: Optional[int] = None,
-    ):  # TODO: position only
+    ):
         return self._solve(
             "maximize",
             eq,
@@ -103,6 +104,7 @@ class Model(ABC):
     def solve_minimize(
             self,
             eq,
+            /,
             *,
             result_as=None,
             verbose=False,
@@ -111,7 +113,7 @@ class Model(ABC):
             n_processes: Optional[int] = None,
             timeout: Optional[timedelta] = None,
             random_seed: Optional[int] = None,
-    ):  # TODO: position only
+    ):
         return self._solve(
             "minimize",
             eq,

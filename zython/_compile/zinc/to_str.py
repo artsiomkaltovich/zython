@@ -83,15 +83,15 @@ def _compile_slice(ndim, pos, view):
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
 
-def _pow(a, b, *, flags_):  # TODO: make positional only
+def _pow(a, b, /, *, flags_):
     return f"pow({to_str(a, flags_=flags_)}, {to_str(b, flags_=flags_)})"
 
 
-def _binary_op(sign, a, b, *, flags_):
+def _binary_op(sign, a, b, /, *, flags_):
     return f"({to_str(a, flags_=flags_)} {sign} {to_str(b, flags_=flags_)})"
 
 
-def _unary_op(sign, a, *, flags_):
+def _unary_op(sign, a, /, *, flags_):
     return f"({sign} {to_str(a, flags_=flags_)})"
 
 
