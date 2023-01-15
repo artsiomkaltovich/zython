@@ -23,12 +23,9 @@ programs.
 
 ### Prerequisites
 
-- You should have minizinc 2.5.x install and have it executable in ``$PATH``.
+- You should have minizinc 2.5+ install and have it executable in ``$PATH``.
 You can download it from [official site](https://www.minizinc.org/).
-- Python 3.7+
-
-> **_NOTE:_**  In Minizinc 2.6.x there were changes with enums
-> so it recommended to use 2.5.x version
+- Python 3.8+
 
 ### Installation
 

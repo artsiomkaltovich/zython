@@ -1,5 +1,7 @@
 ## 0.3
-#### fixes
+#### Syntax and compatibility
+- some arguments are made positional only
+#### Fixes
 - fix enum doc example
 - some minor fixes for internal code
 #### Python interpreters support
@@ -11,7 +13,7 @@
 #### Added
 - available_solver_tags function to get available solvers
 - optimization_level, n_processes, timeout and random_seed arg to solve
-#### fixed
+#### Fixed
 - solve_maximize now correctly use solver arg
 #### changed
 - add some type hints
