@@ -58,7 +58,7 @@ jobs:
     - name: Install nox
       run: |
         pip install nox
-    - name: Lint with flake8
+    - name: Lint
       run: |
         nox -s lint
     - name: Test with tox and pytest

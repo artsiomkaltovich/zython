@@ -1,3 +1,5 @@
+### 0.3.1
+
 ## 0.3
 #### Syntax and compatibility
 - some arguments are made positional only
