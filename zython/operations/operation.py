@@ -13,7 +13,7 @@ def _get_wider_type(left, right):
     types = set(t_types)
     if types == {int}:
         return int
-    elif types == {int, float}:
+    elif types == {int, float} or types == {float}:
         return float
     warnings.warn("_get_wider_type returns int as fallback")
     return int  # TODO: fix types, do not forget about int/int => float
