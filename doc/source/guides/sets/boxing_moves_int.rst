@@ -1,6 +1,8 @@
 Boxing Moves (Integer)
 ======================
 
+.. _boxing-moves-int:
+
 Let's imagine you've should to fight against Mike Tyson (don't worry, you have a week to prepare). You should learn
 several boxing moves, each of them has strength, but you should invest some time to learn it and some money to hire
 a coach.

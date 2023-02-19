@@ -1,4 +1,8 @@
 ### 0.3.1
+#### Added
+- var can be parametrized (you can assign values to them)
+#### CI changes
+- use ruff for style checks
 
 ## 0.3
 #### Syntax and compatibility
@@ -17,7 +21,7 @@
 - optimization_level, n_processes, timeout and random_seed arg to solve
 #### Fixed
 - solve_maximize now correctly use solver arg
-#### changed
+#### Changed
 - add some type hints
 
 ### 0.2.3
@@ -31,13 +35,13 @@ as it seems, python-minizinc implement it by itself.
 
 ### 0.2.2
 #### Added
-- Sets support enums
+- sets support enums
 
 ### 0.2.1
 #### Added
-- Integer sets
+- integer sets
 #### Changed
-- Refactor some code
+- refactor some code
 
 ## 0.2
 #### Changed
@@ -49,20 +53,19 @@ as it seems, python-minizinc implement it by itself.
 
 ### 0.1.5
 #### Added
-- Possibility to choose solver
-- Float fields support
-- Float ranges support
+- possibility to choose solver
+- float fields support
+- float ranges support
 
 ### 0.1.4
 #### Changed
-- An error about minizinc wasn't found in $PATH was changed to warning
-
+- an error about minizinc wasn't found in $PATH was changed to warning
 
 ### 0.1.3
 #### Added
 - check for minizinc in $PATH for startup
 - documentation page about model parts
-#### Changed
+#### CI Changes
 - Use minizinc 2.5.5 in CI.
 
 
