@@ -22,7 +22,7 @@ jobs:
     env:
       MINIZINC_URL: ${{ matrix.minizinc_image }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Add bin/ to PATH
       run: |
         mkdir -p ${{ github.workspace }}/bin
@@ -33,7 +33,7 @@ jobs:
         sudo apt-get install libfuse2
     - name: Cache MiniZinc
       id: cache-minizinc
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       with:
         path: ${{ github.workspace }}/bin/minizinc
         key: ${{ env.MINIZINC_URL }}
@@ -44,7 +44,7 @@ jobs:
         sudo chmod +x ${{ github.workspace }}/bin/minizinc
         minizinc --version
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
     - name: Check minizinc version
@@ -60,11 +60,11 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: "3.6"
+          python-version: "3.8"
       - name: Install requirements
         run: |
           pip install twine wheel
