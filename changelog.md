@@ -1,3 +1,6 @@
+### 0.3.2
+
+
 ### 0.3.1
 #### Added
 - var can be parametrized (you can assign values to them)
