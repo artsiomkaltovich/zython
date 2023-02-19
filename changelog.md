@@ -1,6 +1,8 @@
 ### 0.3.1
 #### Added
 - var can be parametrized (you can assign values to them)
+#### Fixed
+- int fallback as a result of operation where both operands are float
 #### CI changes
 - use ruff for style checks
 
