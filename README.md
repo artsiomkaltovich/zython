@@ -23,12 +23,9 @@ programs.
 
 ### Prerequisites
 
-- You should have minizinc 2.5.x install and have it executable in ``$PATH``.
+- You should have minizinc 2.5+ install and have it executable in ``$PATH``.
 You can download it from [official site](https://www.minizinc.org/).
-- Python 3.7+
-
-> **_NOTE:_**  In Minizinc 2.6.x there were changes with enums
-> so it recommended to use 2.5.x version
+- Python 3.8+
 
 ### Installation
 
@@ -90,11 +87,11 @@ Zython uses the following libraries:
  
 - Test is created with [pytest](https://docs.pytest.org/en/stable/) library
 - [nox](https://nox.thea.codes/en/stable/index.html) for test execution
-- [flake8](https://flake8.pycqa.org/en/latest/) for coding style checking
+- [ruff](https://github.com/charliermarsh/ruff) for coding style checking
 - [sphinx](https://www.sphinx-doc.org/en/master/) for documentation
 
 Requirements necessary for zython run specified in *requirements.txt* file,
-while testing, development requirements are specified in
+while testing and development requirements are specified in
 *requirements_dev.txt*, and documentation requirements are in *requirements_doc.txt*.
 For example, if you decided to fix bug, and you need no documentation fixes, you shouldn't
 install *requirements_doc.txt*.
@@ -105,15 +102,9 @@ Project can be cloned from github and all dependencies can be installed via pip.
     pip install -r requirements.txt
     pip install -r requirements_dev.txt
 
-Note: flake8 isn't specified as dependency in any file, this is made for
-avoiding it installation for every python version tested in CI. You should
-install it manually if you want to check your code before submitting PR.
-You can do it with the following commands:
-
-    pip install flake8
-    nox -s lint
-
-You can also run all checks locally:
+The project has CI pipeline which check code stile and run some tests.
+Before submitting PR it is recommended to run all the checks locally by
+executing the following command:
 
     nox --reuse-existing-virtualenvs
 
