@@ -6,13 +6,15 @@ from zython.var_par.get_type import is_range, is_enum
 
 
 class var(Operation):
-    def __init__(self, /, type_):
+    def __init__(self, /, type_, value=None):
         self._name = None
-        self._value = None
+        self._value = value
         self._type = None
         if isinstance(type_, Constraint):
             self._type = type_.type
             self._value = type_
+            if value is not None:
+                raise ValueError("Can not pass value to constraint")
         else:
             if is_range(type_):
                 if type_.step != 1:

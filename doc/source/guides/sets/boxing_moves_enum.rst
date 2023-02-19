@@ -8,8 +8,9 @@ Zython also support python's enums, lets rewrite the model.
 
 .. note::
 
-    In Minizinc 2.6.x there were changes with enums
-    so it recommended to use 2.5.x version
+    Please take in mind, integer values of enums are starting with 1,
+    so you should add ``- 1`` if you use enum value as index of array.
+    E.g. ``self.time[move - 1]`` like in example below.
 
 Python Model
 ------------

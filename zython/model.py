@@ -145,9 +145,7 @@ class Model(ABC):
         if verbose:
             print(src)
         model.add_string(src)
-        inst = minizinc.Instance(solver, model)
-        for name, param in self._ir.pars.items():
-            inst[name] = param.value
+        inst = self._create_inst(model, solver)
         for e in self._ir.enums:
             inst[e.__name__] = e
         result: minizinc.Result = inst.solve(
@@ -157,10 +155,7 @@ class Model(ABC):
             timeout=timeout,
             random_seed=random_seed,
         )
-        if result_as is None:
-            return Result(result)
-        else:
-            return result_as(result)
+        return result_as(result) if result_as else Result(result)
 
     @property
     def constraints(self):
@@ -189,3 +184,15 @@ class Model(ABC):
                 return attr
             if isinstance(attr, Constraint):
                 return var(attr)
+
+    def _create_inst(self, model, solver):
+        inst = minizinc.Instance(solver, model)
+        for name, param in self._ir.pars.items():
+            inst[name] = param.value
+        for name, param in self._ir.vars.items():
+            # minizinc support values passing in data files
+            # https://www.minizinc.org/doc-2.6.4/en/modelling.html#real-number-solving
+            # so there is need to assign such variables
+            if param.value is not None and not isinstance(param.value, Constraint):
+                inst[name] = param.value
+        return inst
