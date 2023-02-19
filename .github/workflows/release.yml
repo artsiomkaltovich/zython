@@ -36,10 +36,11 @@ jobs:
     - name: Download MiniZinc
       if: steps.cache-minizinc.outputs.cache-hit != 'true'
       run: |
+        sudo apt-get update
+        sudo apt-get install libfuse2
         sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
         sudo chmod +x ${{ github.workspace }}/bin/minizinc
         minizinc --version
-
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
