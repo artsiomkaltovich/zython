@@ -25,7 +25,7 @@ jobs:
         mkdir -p ${{ github.workspace }}/bin
         mkdir -p ${{ github.workspace }}/lib
         echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
-        echo ${{ github.workspace }}/lib:$LD_LIBRARY_PATH >> $LD_LIBRARY_PATH
+        echo "${{ github.workspace }}/lib" >> $LD_LIBRARY_PATH
     - name: Install libfuse (AppImage dependency)
       run: |
         sudo apt-get update
