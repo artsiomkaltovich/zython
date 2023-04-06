@@ -14,13 +14,10 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8"]
-        minizinc_image: [
-          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.6.4/MiniZincIDE-2.6.4-x86_64.AppImage",
-          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage",
-        ]
+        minizinc-version: ["2.7.2", "2.5.4"]
 
     env:
-      MINIZINC_URL: ${{ matrix.minizinc_image }}
+      MINIZINC_URL: https://github.com/MiniZinc/MiniZincIDE/releases/download/${{ matrix.minizinc-version }}/MiniZincIDE-${{ matrix.minizinc-version }}-x86_64.AppImage
     steps:
     - uses: actions/checkout@v3
     - name: Add bin/ to PATH
@@ -31,6 +28,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libfuse2
+        sudo apt-get install libegl1
     - name: Cache MiniZinc
       id: cache-minizinc
       uses: actions/cache@v3
@@ -52,12 +50,9 @@ jobs:
           ${{ runner.os }}-pip-dev
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Check minizinc version
-      run: |
-        minizinc --version
     - name: Install nox
       run: |
         pip install nox
