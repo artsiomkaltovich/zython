@@ -14,13 +14,10 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
-        minizinc_image: [
-          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.7.2/MiniZincIDE-2.7.2-x86_64.AppImage",
-          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.4/MiniZincIDE-2.5.4-x86_64.AppImage",
-        ]
+        minizinc-version: ["2.7.2", "2.5.4"]
 
     env:
-      MINIZINC_URL: ${{ matrix.minizinc_image }}
+      MINIZINC_URL: https://github.com/MiniZinc/MiniZincIDE/releases/download/${{ matrix.minizinc-version }}/MiniZincIDE-${{ matrix.minizinc-version }}-x86_64.AppImage
     steps:
     - uses: actions/checkout@v3
     - name: Add bin/ to PATH
