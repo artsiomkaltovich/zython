@@ -1,5 +1,6 @@
 ### 0.3.2
-
+#### CI changes
+- use minizinc 2.7.2 in CI
 
 ### 0.3.1
 #### Added
