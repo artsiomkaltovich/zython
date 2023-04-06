@@ -23,13 +23,12 @@ jobs:
     - name: Add bin/ to PATH
       run: |
         mkdir -p ${{ github.workspace }}/bin
-        mkdir -p ${{ github.workspace }}/lib
         echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
-        echo "${{ github.workspace }}/lib" >> $LD_LIBRARY_PATH
     - name: Install libfuse (AppImage dependency)
       run: |
         sudo apt-get update
         sudo apt-get install libfuse2
+        sudo apt-get install libegl1
     - name: Cache MiniZinc
       id: cache-minizinc
       uses: actions/cache@v3
