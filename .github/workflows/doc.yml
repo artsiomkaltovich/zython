@@ -24,6 +24,7 @@ jobs:
       run: |
         mkdir -p ${{ github.workspace }}/bin
         mkdir -p ${{ github.workspace }}/lib
+        env
         echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
         echo "${{ github.workspace }}/lib" >> $LD_LIBRARY_PATH
     - name: Install libfuse (AppImage dependency)
