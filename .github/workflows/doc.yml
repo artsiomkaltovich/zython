@@ -23,7 +23,9 @@ jobs:
     - name: Add bin/ to PATH
       run: |
         mkdir -p ${{ github.workspace }}/bin
+        mkdir -p ${{ github.workspace }}/lib
         echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+        echo ${{ github.workspace }}/lib:$LD_LIBRARY_PATH >> $LD_LIBRARY_PATH
     - name: Install libfuse (AppImage dependency)
       run: |
         sudo apt-get update
@@ -52,9 +54,6 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Check minizinc version
-      run: |
-        minizinc --version
     - name: Install nox
       run: |
         pip install nox
