@@ -28,6 +28,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install libfuse2
+        sudo apt-get install libegl1
     - name: Cache MiniZinc
       id: cache-minizinc
       uses: actions/cache@v3
@@ -57,4 +58,4 @@ jobs:
         pip install nox
     - name: Doc tests
       run: |
-        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/lib nox -s doc --reuse-existing-virtualenvs
+        nox -s doc --reuse-existing-virtualenvs
