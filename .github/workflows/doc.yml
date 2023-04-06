@@ -23,9 +23,7 @@ jobs:
     - name: Add bin/ to PATH
       run: |
         mkdir -p ${{ github.workspace }}/bin
-        mkdir -p ${{ github.workspace }}/lib
         echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
-        env LD_LIBRARY_PATH=${{ github.workspace }}/lib
     - name: Install libfuse (AppImage dependency)
       run: |
         sudo apt-get update
@@ -59,4 +57,4 @@ jobs:
         pip install nox
     - name: Doc tests
       run: |
-        nox -s doc --reuse-existing-virtualenvs
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${{ github.workspace }}/lib nox -s doc --reuse-existing-virtualenvs
