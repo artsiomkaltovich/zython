@@ -16,7 +16,7 @@ jobs:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         minizinc_image: [
           "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.7.2/MiniZincIDE-2.7.2-x86_64.AppImage",
-          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.0/MiniZincIDE-2.5.0-x86_64.AppImage",
+          "https://github.com/MiniZinc/MiniZincIDE/releases/download/2.5.4/MiniZincIDE-2.5.4-x86_64.AppImage",
         ]
 
     env:
