@@ -113,3 +113,12 @@ before submitting PR. While implementing new feature or fixing bug it is
 necessary to add tests to cover it.
 
 Good Luck and thank you for improvements. :)
+
+### Coverage metric
+
+To check coverage for all tests (both doc and unit tests) you should
+run the following command:
+
+```shell
+pytest test zython doc --doctest-glob="*.rst" --doctest-modules --cov=zython --cov-branch --cov-report=term-missing
+```
