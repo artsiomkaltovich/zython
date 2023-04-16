@@ -16,6 +16,7 @@ class Flags(enum.Flag):
     strictly_increasing = enum.auto()
     decreasing = enum.auto()
     strictly_decreasing = enum.auto()
+    cumulative = enum.auto()
     float_used = enum.auto()
 
 
@@ -29,6 +30,7 @@ FLAG_TO_SRC_PREFIX = {
     Flags.strictly_increasing: 'include "strictly_increasing.mzn";',
     Flags.decreasing: 'include "decreasing.mzn";',
     Flags.strictly_decreasing: 'include "strictly_decreasing.mzn";',
+    Flags.cumulative: 'include "cumulative.mzn";',
 }
 
 

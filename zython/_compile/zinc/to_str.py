@@ -199,6 +199,7 @@ class Op2StrType(UserDict):
         self[_Op_code.strictly_increasing] = partial(_global_constraint, "strictly_increasing")
         self[_Op_code.decreasing] = partial(_global_constraint, "decreasing")
         self[_Op_code.strictly_decreasing] = partial(_global_constraint, "strictly_decreasing")
+        self[_Op_code.cumulative] = partial(_global_constraint, "cumulative")
 
     def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")
