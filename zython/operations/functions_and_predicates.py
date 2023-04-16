@@ -8,6 +8,7 @@ from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.types import ZnSequence
+from zython.var_par.var import var
 
 
 def exists(seq: ZnSequence,
@@ -177,6 +178,59 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     """
     iter_var, operation = _iternal.get_iter_var_and_op(seq, value)
     return operation_module._count(seq, iter_var, operation, type_=int)
+
+
+def cumulative(
+        start_times: ZnSequence,
+        durations: ZnSequence,
+        requirements: ZnSequence,
+        limit: Union[int, var],
+) -> Constraint:
+    """ The cumulative constraint is used for describing cumulative resource usage.
+
+    It requires that a set of tasks given by start times, durations, and resource requirements,
+    never require more than a global resource limit at any one time.
+
+    Parameters
+    ----------
+    start_times: range, array of var, or sequence (list or tuple) of var
+        Sequence with start time of the tasks
+    durations: range, array of var, or sequence (list or tuple) of var
+        Sequence with durations of the tasks
+    requirements: range, array of var, or sequence (list or tuple) of var
+        Sequence with resource requirements of the tasks
+    limit: int
+        Resource limit, which shouldn't be exceeded
+
+    Returns
+    -------
+    result: Constraint
+
+    Notes
+    -----
+    It is suggested to use ranges and sequences of ranges instead of int,
+    because minizinc can return strange result when type of any arg is int
+
+    Examples
+    --------
+
+    How many waiters is necessary to serve all table without delays.
+    It is expected, only one waiter will serve any table.
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.limit = zn.var(range(0, 10))
+    ...         self.constraints = [
+    ...             zn.cumulative(start_times=[1, 2, 4], durations=[3, 2, 1], requirements=[1, 1, 1], limit=self.limit),
+    ...         ]
+    ...
+    >>> model = MyModel()
+    >>> result = model.solve_minimize(model.limit)
+    >>> result["limit"]
+    2
+    """
+    return constraint_module.cumulative(start_times, durations, requirements, limit)
 
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
