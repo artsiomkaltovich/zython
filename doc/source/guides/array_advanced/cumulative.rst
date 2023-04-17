@@ -80,12 +80,12 @@ Below you can find histograms of handlers and trolleys usages.
 
 * Handlers Usage:
 
-.. image:: doc/source/_static/img/guides/array_advanced/cumulative/handlers_usage.png
+.. image:: ../../_static/img/guides/array_advanced/cumulative/handlers_usage.png
   :width: 600
   :alt: handlers usage
 
 * Trolleys Usage:
 
-.. image:: doc/source/_static/img/guides/array_advanced/cumulative/trolleys_usage.png
+.. image:: ../../_static/img/guides/array_advanced/cumulative/trolleys_usage.png
   :width: 600
   :alt: trolleys usage

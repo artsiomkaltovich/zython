@@ -6,7 +6,7 @@ Let's solve the following problem:
 * there is a 2d grid (NxM)
 * is there a way to paint every vertex in the grid with such a manner that for every possible rectangle 4 corners won't be the same color.
 
-.. image:: ../../_static/img/grid_small_uncolored.png
+.. image:: ../../_static/img/guides/coloring/dynamic_grid_coloring/grid_small_uncolored.png
   :width: 300
   :alt: Grid
 
@@ -82,6 +82,6 @@ Solution
 
 The solution can differ from version to version, we've got the following:
 
-.. image:: ../../_static/img/grid_colored.png
+.. image:: ../../_static/img/guides/coloring/dynamic_grid_coloring/grid_colored.png
   :width: 400
   :alt: Grid Coloring Solution

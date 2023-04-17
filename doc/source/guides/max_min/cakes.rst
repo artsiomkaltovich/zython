@@ -5,7 +5,7 @@ Let's imagine you've decided host charity event and you will sold cakes to raise
 ingredients and your goal is to maximize profit. So you should find such combination of different cakes, which you can
 make with your amount of supplies and raise maximum amount of money to donate it to charity organization.
 
-.. image:: ../../_static/img/cupcakes.jpg
+.. image:: ../../_static/img/guides/max_min/cakes/cupcakes.jpg
   :width: 600
   :alt: Cupcakes (Source: https://www.freepik.com/lifeforstock )
 

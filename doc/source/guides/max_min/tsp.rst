@@ -7,7 +7,7 @@ example of minimization problem. It tries to find the answer on the following qu
 "Given a list of cities and the distances between each pair of cities,
 what is the shortest possible route that visits each city exactly once and returns to the origin city?"
 
-.. image:: ../../_static/img/TSP_Deutschland.png
+.. image:: ../../_static/img/guides/max_min/tsp/TSP_Deutschland.png
   :width: 300
   :alt: TSP solution for the 15 biggest cities of Germany
     (Source: https://www.cia.gov/cia/publications/factbook/maps/gm-map.gif )

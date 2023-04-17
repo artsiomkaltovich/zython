@@ -10,7 +10,7 @@ Let find such coloring for `Belarus <https://en.wikipedia.org/wiki/Belarus>`_.
 Belarus Map Python Model
 ------------------------
 
-.. image:: ../../_static/img/Belarus.png
+.. image:: ../../_static/img/guides/getting_started/color_map/Belarus.png
   :width: 600
   :alt: Belarus map
 
@@ -48,7 +48,7 @@ Solution
 
 So we can paint map of Belarus, e.g. in the following way (red is 0, green is 1, blue is 2, yellow is 3):
 
-.. image:: ../../_static/img/Belarus_colored.png
+.. image:: ../../_static/img/guides/getting_started/color_map/Belarus_colored.png
   :width: 600
   :alt: Australia map
 
@@ -56,7 +56,7 @@ So we can paint map of Belarus, e.g. in the following way (red is 0, green is 1,
 But in some cases just 3 colours are enough. Let's look at two example and try to find such coloring on the map of
 `Australia <https://en.wikipedia.org/wiki/Australia>`_.
 
-.. image:: ../../_static/img/Australia.svg
+.. image:: ../../_static/img/guides/getting_started/color_map/Australia.svg
   :width: 600
   :alt: Australia map
 

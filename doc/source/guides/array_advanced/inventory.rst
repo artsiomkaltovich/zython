@@ -91,12 +91,12 @@ We run the model for 2 cases: and it returns the following fields:
 
 * (5x4) field with 4 objects:
 
-.. image:: ../../_static/img/inventory1.png
+.. image:: ../../_static/img/guides/array_advanced/inventory/inventory1.png
   :width: 300
   :alt: Inventory 1
 
 * (3x3) field with 3 objects:
 
-.. image:: ../../_static/img/inventory2.png
+.. image:: ../../_static/img/guides/array_advanced/inventory/inventory2.png
   :width: 225
   :alt: Inventory 2
