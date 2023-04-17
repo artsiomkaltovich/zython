@@ -55,7 +55,7 @@ Solutions
 
 The actual solution can depend on solver version, this is what we got (blue - night shift, orange - morning shift):
 
-.. image:: ../../_static/img/nurses_scheduling.png
+.. image:: ../../_static/img/guides/array_advanced/nurses_scheduling/nurses_scheduling.png
   :width: 600
   :alt: Nurses schedule
 

@@ -1,3 +1,4 @@
+import enum
 import itertools
 import types
 from collections import UserDict
@@ -34,6 +35,11 @@ def to_str(stmt, *, flatten_arg=False, flags_=None):
 @to_str.register(types.GeneratorType)
 def _(stmt, *, flatten_arg=False, flags_=None):
     return f"[{', '.join(to_str(s) for s in stmt)}]"
+
+
+@to_str.register
+def _(stmt: enum.EnumMeta, *, flatten_arg=False, flags_=None):
+    return stmt.__name__
 
 
 def _range_or_slice_to_str(stmt, flags_=set()):
@@ -199,6 +205,7 @@ class Op2StrType(UserDict):
         self[_Op_code.strictly_increasing] = partial(_global_constraint, "strictly_increasing")
         self[_Op_code.decreasing] = partial(_global_constraint, "decreasing")
         self[_Op_code.strictly_decreasing] = partial(_global_constraint, "strictly_decreasing")
+        self[_Op_code.cumulative] = partial(_global_constraint, "cumulative")
 
     def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")

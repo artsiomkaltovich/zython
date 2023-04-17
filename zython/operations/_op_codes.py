@@ -35,3 +35,4 @@ class _Op_code(enum.Enum):
     strictly_increasing = enum.auto()
     decreasing = enum.auto()
     strictly_decreasing = enum.auto()
+    cumulative = enum.auto()

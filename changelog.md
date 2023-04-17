@@ -1,3 +1,11 @@
+### 0.4.0
+#### Added
+- ``cumulative`` constraint
+- ``forall`` constraint now supports enums which is not model's field
+#### CI changes
+- use minizinc 2.7.2 as maximum version in CI
+- use minizinc 2.5.4 as minimum version in CI (as in minizinc-python)
+
 ### 0.3.1
 #### Added
 - var can be parametrized (you can assign values to them)

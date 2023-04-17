@@ -84,6 +84,7 @@ so after last instalment the debt will be zero.
 
 
 .. testoutput::
+
     275.49
 
 How much you can take as a loan with 4% interest and 4 instalments
@@ -97,4 +98,5 @@ if you pay 250 as every instalment.
 
 
 .. testoutput::
+
     907.47
