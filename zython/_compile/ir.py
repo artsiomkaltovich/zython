@@ -53,8 +53,16 @@ class IR:
 
     def _add_types(self, attr: var):
         if isinstance(attr.type, enum.EnumMeta):
-            self._enums.add(attr.type)
+            self._add_enum(attr.type)
+
+    def _add_enum(self, e: enum.EnumMeta):
+        self._enums.add(e)
 
     def _process_constraints(self, model):
         if not hasattr(model, "_constraints"):
             model._constraints = []
+        for c in model._constraints:
+            for p in c.params:
+                pass
+                if isinstance(p, enum.EnumMeta):
+                    self._add_enum(p)

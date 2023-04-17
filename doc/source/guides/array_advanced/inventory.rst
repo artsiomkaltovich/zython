@@ -100,4 +100,3 @@ We run the model for 2 cases: and it returns the following fields:
 .. image:: ../../_static/img/inventory2.png
   :width: 225
   :alt: Inventory 2
-

@@ -1,3 +1,4 @@
+import enum
 import inspect
 from functools import singledispatch
 from typing import Union, Callable, Tuple, Optional
@@ -23,6 +24,11 @@ def _(seq: _AbstractCollection):
     return var(seq.type)
 
 
+@_get_variable.register
+def _(seq: enum.EnumMeta):
+    return var(seq)
+
+
 @_get_variable.register(list)
 @_get_variable.register(tuple)
 def _(seq: Union[list, tuple]):
@@ -33,8 +39,10 @@ def _(seq: Union[list, tuple]):
     return v
 
 
-def _extract_func_var_and_op(seq: ZnSequence,
-                             func: Callable) -> Tuple[Optional[var], Operation]:
+def _extract_func_var_and_op(
+        seq: ZnSequence,
+        func: Callable,
+) -> Tuple[Optional[var], Operation]:
     variable = None
     parameters = inspect.signature(func).parameters
     if len(parameters) > 1:

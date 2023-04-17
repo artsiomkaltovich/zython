@@ -1,4 +1,7 @@
-### 0.3.2
+### 0.4.0
+#### Added
+- ``cumulative`` constraint
+- ``forall`` constraint now supports enums as iter object
 #### CI changes
 - use minizinc 2.7.2 as maximum version in CI
 - use minizinc 2.5.4 as minimum version in CI (as in minizinc-python)
