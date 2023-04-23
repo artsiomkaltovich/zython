@@ -1,4 +1,12 @@
-### 0.4.0
+## 0.5.0
+#### Added
+- ``table`` constraint
+- ``contains`` method for arrays and sets, to check if elem presented
+  in collection
+- ``except_`` argument to ``all_different`` constraint
+#### Changed
+
+## 0.4.0
 #### Added
 - ``cumulative`` constraint
 - ``forall`` constraint now supports enums which is not model's field

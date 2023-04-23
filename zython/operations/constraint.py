@@ -44,3 +44,8 @@ def cumulative(start_times: "zython.var_par.types.ZnSequence",
                requirements: "zython.var_par.types.ZnSequence",
                limit: int) -> "Constraint":
     return Constraint(_Op_code.cumulative, start_times, durations, requirements, limit)
+
+
+def table(x: "zython.var_par.types.ZnSequence",
+          t: "zython.var_par.types.ZnSequence") -> "Constraint":
+    return Constraint(_Op_code.table, x, t)
