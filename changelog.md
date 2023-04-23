@@ -1,4 +1,4 @@
-## 0.5.0
+## 0.4.1
 #### Added
 - ``table`` constraint
 - ``contains`` method for arrays and sets, to check if elem presented
