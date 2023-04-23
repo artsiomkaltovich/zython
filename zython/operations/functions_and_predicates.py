@@ -233,6 +233,13 @@ def cumulative(
     return constraint_module.cumulative(start_times, durations, requirements, limit)
 
 
+def table(
+        x: ZnSequence,
+        t: ZnSequence,
+) -> Constraint:
+    return constraint_module.table(x, t)
+
+
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
     """ Finds the smallest object in ``seq``, according to ``key``
 

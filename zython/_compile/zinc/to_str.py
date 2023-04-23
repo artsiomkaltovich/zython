@@ -42,6 +42,11 @@ def _(stmt: enum.EnumMeta, *, flatten_arg=False, flags_=None):
     return stmt.__name__
 
 
+@to_str.register
+def _(stmt: enum.Enum, *, flatten_arg=False, flags_=None):
+    return str(stmt.value)
+
+
 def _range_or_slice_to_str(stmt, flags_=set()):
     _start_stop_step_validate(stmt)
     if is_int_range(stmt):
@@ -186,6 +191,7 @@ class Op2StrType(UserDict):
         self[_Op_code.truediv] = partial(_binary_op, "/")
         self[_Op_code.floordiv] = partial(_binary_op, "div")
         self[_Op_code.mod] = partial(_binary_op, "mod")
+        self[_Op_code.in_] = partial(_binary_op, "in")
         self[_Op_code.pow] = _pow
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
@@ -206,6 +212,7 @@ class Op2StrType(UserDict):
         self[_Op_code.decreasing] = partial(_global_constraint, "decreasing")
         self[_Op_code.strictly_decreasing] = partial(_global_constraint, "strictly_decreasing")
         self[_Op_code.cumulative] = partial(_global_constraint, "cumulative")
+        self[_Op_code.table] = partial(_global_constraint, "table", flatten_args=False)
 
     def __missing__(self, key):  # pragma: no cover
         raise ValueError(f"Function {key} is undefined")

@@ -26,6 +26,7 @@ class _Op_code(enum.Enum):
     min_ = enum.auto()
     max_ = enum.auto()
     size = enum.auto()
+    in_ = enum.auto()
     alldifferent = enum.auto()
     alldifferent_except_0 = enum.auto()
     allequal = enum.auto()
@@ -36,3 +37,4 @@ class _Op_code(enum.Enum):
     decreasing = enum.auto()
     strictly_decreasing = enum.auto()
     cumulative = enum.auto()
+    table = enum.auto()

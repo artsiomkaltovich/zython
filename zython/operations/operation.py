@@ -125,6 +125,10 @@ def _size(array: "zython.var_par.collections.array.ArrayMixin", dim: int):
     raise ValueError(f"Array has 0..{array.ndims()} dimensions, but {dim} were specified")
 
 
+def _in(item: int, array: "zython.var_par.collections.abstract._AbstractCollection"):
+    return Operation(_Op_code.in_, item, array, type_=bool)
+
+
 def _sum(seq: "zython.var_par.types.ZnSequence",
          iter_var: Optional["zython.var_par.var.var"] = None,
          func: Optional[Union["Operation", Callable]] = None,
