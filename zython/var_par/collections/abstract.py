@@ -13,3 +13,6 @@ class _AbstractCollection(operation.Operation):
     @property
     def type(self):
         return self._type
+
+    def contains(self, item):
+        return operation._in(item, self)

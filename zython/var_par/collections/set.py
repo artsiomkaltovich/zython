@@ -26,20 +26,21 @@ class SetPar(par, SetMixin):
     def __init__(self, arg):
         if inspect.isgenerator(arg):
             arg = tuple(arg)
+        if len(arg) < 1:
+            raise ValueError("Set should be initialized with not empty collection")
+        # TODO: single dispatch
         if isinstance(arg, (tuple, list)):
             if len(arg) < 1:
                 raise ValueError("Set should be initialized with not empty collection")
             type_ = type(arg[0])
+        elif isinstance(arg, set):
+            elem = next(iter(arg))  # get set item without removing it
+            type_ = type(elem)
         else:
             type_ = arg
         self._validate_type(type_)
         self._type = type_
         self._value = arg
-        if len(arg) < 1:
-            raise ValueError("Set should be initialized with not empty collection")
-        self._validate_type(type(arg[0]))
-        self._value = arg
-        self._type = arg
         self._name = None
 
 
