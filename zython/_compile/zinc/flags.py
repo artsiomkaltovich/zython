@@ -9,6 +9,7 @@ class Flags(enum.Flag):
     none = enum.auto()
     alldifferent = enum.auto()
     alldifferent_except_0 = enum.auto()
+    alldifferent_except = enum.auto()
     all_equal = enum.auto()
     nvalue = enum.auto()
     circuit = enum.auto()
@@ -24,6 +25,7 @@ class Flags(enum.Flag):
 FLAG_TO_SRC_PREFIX = {
     Flags.alldifferent: 'include "alldifferent.mzn";',
     Flags.alldifferent_except_0: 'include "alldifferent_except_0.mzn";',
+    Flags.alldifferent_except: 'include "alldifferent_except.mzn";',
     Flags.all_equal: 'include "all_equal.mzn";',
     Flags.nvalue: 'include "nvalue_fn.mzn";',
     Flags.circuit: 'include "circuit.mzn";',

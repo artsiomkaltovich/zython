@@ -204,6 +204,7 @@ class Op2StrType(UserDict):
         self[_Op_code.size] = _size
         self[_Op_code.alldifferent] = partial(_global_constraint, "alldifferent")
         self[_Op_code.alldifferent_except_0] = partial(_global_constraint, "alldifferent_except_0")
+        self[_Op_code.alldifferent_except] = partial(_global_constraint, "alldifferent_except")
         self[_Op_code.allequal] = partial(_global_constraint, "all_equal")
         self[_Op_code.ndistinct] = partial(_global_constraint, "nvalue")
         self[_Op_code.circuit] = partial(_global_constraint, "circuit", flatten_args=False)

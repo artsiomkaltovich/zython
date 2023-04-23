@@ -1,5 +1,6 @@
 from typing import Union, Callable, Optional
 
+import zython
 from zython.operations import _iternal
 from zython.operations import constraint as constraint_module
 from zython.operations import operation as operation_module
@@ -7,6 +8,7 @@ from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
+from zython.var_par.collections.set import SetVar
 from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
@@ -320,6 +322,8 @@ class alldifferent(Constraint):
         sequence elements of which should be distinct
     except0: bool, optional
         if set - ``seq`` can contain any amount of 0.
+    except_: set, zn.Set
+        if set - ``seq`` can contain any amount of provided values.
 
     See Also
     --------
@@ -353,10 +357,34 @@ class alldifferent(Constraint):
     >>> result = model.solve_satisfy()
     >>> Counter(result["a"]) == {0: 2, 4: 1, 3: 1, 2: 1, 1: 1}
     True
+
+    If ``except_`` flag is set, any amounts of values, specified can be presented in the collection
+
+    >>> from collections import Counter
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(range(1, 4)), shape=4)
+    ...         self.constraints = [zn.alldifferent(self.a, except_={1,}), zn.sum(self.a) == 7]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> Counter(result["a"]) == {3: 1, 2: 1, 1: 2}
+    True
     """
-    def __init__(self, seq: ZnSequence, except0: Optional[bool] = None):
+    def __init__(
+            self,
+            seq: ZnSequence,
+            except0: Optional[bool] = None,
+            except_: Union[set, zython.var_par.collections.set.Set, None] = None,
+    ):
+        if all((except0, except_)):
+            raise ValueError("Arguments `except0` and `except_` can't be set at the same time")
         if except0:
             super().__init__(_Op_code.alldifferent_except_0, seq)
+        elif except_:
+            if isinstance(except_, SetVar):
+                raise ValueError("Minizinc doesn't support set of var as `except_` argument")
+            super().__init__(_Op_code.alldifferent_except, seq, except_)
         else:
             super().__init__(_Op_code.alldifferent, seq)
 

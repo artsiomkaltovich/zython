@@ -3,9 +3,8 @@
 - ``table`` constraint
 - ``contains`` method for arrays and sets, to check if elem presented
   in collection
+- ``except_`` argument to ``all_different`` constraint
 #### Changed
-- ``all_equal`` constraint ``except_0`` arg change to ``except`` args,
-  which supports any value
 
 ## 0.4.0
 #### Added
