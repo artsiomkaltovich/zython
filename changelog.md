@@ -4,7 +4,6 @@
 - ``contains`` method for arrays and sets, to check if elem presented
   in collection
 - ``except_`` argument to ``all_different`` constraint
-#### Changed
 
 ## 0.4.0
 #### Added
