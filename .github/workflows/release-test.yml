@@ -1,0 +1,53 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: On release
+
+on:
+  pull_request:
+    branches: [ release ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        minizinc-version: ["2.7.6", "2.6.0"]
+
+    env:
+      MINIZINC_URL: https://github.com/MiniZinc/MiniZincIDE/releases/download/${{ matrix.minizinc-version }}/MiniZincIDE-${{ matrix.minizinc-version }}-x86_64.AppImage
+    steps:
+    - uses: actions/checkout@v3
+    - name: Add bin/ to PATH
+      run: |
+        mkdir -p ${{ github.workspace }}/bin
+        echo "${{ github.workspace }}/bin" >> $GITHUB_PATH
+    - name: Install libfuse (AppImage dependency)
+      run: |
+        sudo apt-get update
+        sudo apt-get install libfuse2
+        sudo apt-get install libegl1
+    - name: Cache MiniZinc
+      id: cache-minizinc
+      uses: actions/cache@v3
+      with:
+        path: ${{ github.workspace }}/bin/minizinc
+        key: ${{ env.MINIZINC_URL }}
+    - name: Download MiniZinc
+      if: steps.cache-minizinc.outputs.cache-hit != 'true'
+      run: |
+        sudo curl -o ${{ github.workspace }}/bin/minizinc -L $MINIZINC_URL
+        sudo chmod +x ${{ github.workspace }}/bin/minizinc
+        minizinc --version
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install nox
+      run: |
+        pip install nox
+    - name: Test
+      run: |
+        nox
