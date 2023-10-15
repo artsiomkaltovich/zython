@@ -1,6 +1,6 @@
 import enum
-from collections import UserDict
 from functools import partial
+from typing import Callable, Dict
 
 from zython._compile.zinc.types import SourceCode
 
@@ -22,30 +22,22 @@ class Flags(enum.Flag):
     float_used = enum.auto()
 
 
-FLAG_TO_SRC_PREFIX = {
-    Flags.alldifferent: 'include "alldifferent.mzn";',
-    Flags.alldifferent_except_0: 'include "alldifferent_except_0.mzn";',
-    Flags.alldifferent_except: 'include "alldifferent_except.mzn";',
-    Flags.all_equal: 'include "all_equal.mzn";',
-    Flags.nvalue: 'include "nvalue_fn.mzn";',
-    Flags.circuit: 'include "circuit.mzn";',
-    Flags.increasing: 'include "increasing.mzn";',
-    Flags.strictly_increasing: 'include "strictly_increasing.mzn";',
-    Flags.decreasing: 'include "decreasing.mzn";',
-    Flags.strictly_decreasing: 'include "strictly_decreasing.mzn";',
-    Flags.cumulative: 'include "cumulative.mzn";',
-    Flags.table: 'include "table.mzn";',
-}
-
-
 def append(src: SourceCode, line: str):
     src.appendleft(line)
 
 
-class FlagProcessors(UserDict):
-    def __init__(self):
-        super().__init__()
-        self[Flags.float_used] = None
-
-    def __missing__(self, key):
-        return partial(append, line=FLAG_TO_SRC_PREFIX[key])
+FLAG_PROCESSORS: Dict[Flags, Callable[[SourceCode], None]] = {
+    Flags.alldifferent: partial(append, line='include "alldifferent.mzn";'),
+    Flags.alldifferent_except_0: partial(append, line='include "alldifferent_except_0.mzn";'),
+    Flags.alldifferent_except: partial(append, line='include "alldifferent_except.mzn";'),
+    Flags.all_equal: partial(append, line='include "all_equal.mzn";'),
+    Flags.nvalue: partial(append, line='include "nvalue_fn.mzn";'),
+    Flags.circuit: partial(append, line='include "circuit.mzn";'),
+    Flags.increasing: partial(append, line='include "increasing.mzn";'),
+    Flags.strictly_increasing: partial(append, line='include "strictly_increasing.mzn";'),
+    Flags.decreasing: partial(append, line='include "decreasing.mzn";'),
+    Flags.strictly_decreasing: partial(append, line='include "strictly_decreasing.mzn";'),
+    Flags.cumulative: partial(append, line='include "cumulative.mzn";'),
+    Flags.table: partial(append, line='include "table.mzn";'),
+    Flags.float_used: lambda x: x,
+}

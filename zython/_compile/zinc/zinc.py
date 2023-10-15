@@ -3,7 +3,7 @@ from functools import singledispatch
 from typing import Set
 
 from zython._compile.ir import IR
-from zython._compile.zinc.flags import Flags, FlagProcessors
+from zython._compile.zinc.flags import Flags, FLAG_PROCESSORS
 from zython._compile.zinc.to_str import to_str, _binary_op, _get_array_shape_decl
 from zython._compile.zinc.types import SourceCode
 from zython.operations.constraint import Constraint
@@ -15,21 +15,18 @@ from zython.var_par.get_type import is_range, is_int_range, is_enum
 def to_zinc(ir: IR):
     result: SourceCode = deque()
     flags: Set[Flags] = set()
-    flag_processors = FlagProcessors()
     _process_enums(ir, result, flags)
     _process_pars(ir, result, flags)
     _process_vars(ir, result, flags)
     _process_constraints(ir, result, flags)
     _process_how_to_solve(ir, result)
-    _process_flags(flag_processors, flags, result)
+    _process_flags(flags, result)
     return "\n".join(result)
 
 
-def _process_flags(flag_processors: FlagProcessors, flags, result: SourceCode):
+def _process_flags(flags, result: SourceCode):
     for flag in flags:
-        pr = flag_processors.get(flag)
-        if pr:
-            pr(result)
+        FLAG_PROCESSORS[flag](result)
 
 
 def _process_enums(ir: IR, result: SourceCode, flags: Set[Flags]) -> None:
