@@ -1,10 +1,16 @@
+## 0.4.2
+#### CI changes
+- use minizinc 2.7.6 as maximum version in CI (as in minizinc-python)
+- use minizinc 2.6.0 as minimum version in CI (as in minizinc-python)
+#### Python interpreters support
+- add 3.12 CPython
+
 ## 0.4.1
 #### Added
 - ``table`` constraint
 - ``contains`` method for arrays and sets, to check if elem presented
   in collection
 - ``except_`` argument to ``all_different`` constraint
-#### Changed
 
 ## 0.4.0
 #### Added
