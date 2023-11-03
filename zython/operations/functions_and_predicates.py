@@ -228,7 +228,11 @@ def cumulative(
     ...     def __init__(self):
     ...         self.limit = zn.var(range(0, 10))
     ...         self.constraints = [
-    ...             zn.cumulative(start_times=[1, 2, 4], durations=[3, 2, 1], requirements=[1, 1, 1], limit=self.limit),
+    ...             zn.cumulative(start_times=[1, 2, 4],
+    ...                           durations=[3, 2, 1],
+    ...                           requirements=[1, 1, 1],
+    ...                           limit=self.limit,
+    ...             ),
     ...         ]
     ...
     >>> model = MyModel()
@@ -287,7 +291,7 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        Sequence to find smallest element in
+        Sequence to find the biggest element in
     key: Operation or Callable, optional
         The parameter has the same semantic as in python: specify the operation which result will be latter compared.
 
@@ -303,10 +307,12 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Examples
     --------
 
+    Calculate the biggest number of negative numbers in a row of an array
+
     >>> import zython as zn
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
-    ...         self.a = zn.Array([[1, 2, 3], [-1, -2, -3]])
+    ...         self.a = zn.Array([[0, 0, 0, 0], [0, 0, -1, -1], [0, -1, -1, -1]])
     ...         self.m = zn.max(zn.range(self.a.size(0)),
     ...                         lambda row: zn.count(self.a[row, :], lambda elem: elem < 0))
     >>> model = MyModel()
