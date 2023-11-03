@@ -244,9 +244,38 @@ def cumulative(
 
 
 def table(
-        x: ZnSequence,
-        t: ZnSequence,
+    x: ZnSequence,
+    t: ZnSequence,
 ) -> Constraint:
+    """The table constraint is used to specify if one dimensional array
+        should be equal to any row of a two dimensional array.
+
+    Or, in more strict form:
+    the table constraint enforces that a tuple of variables takes a value from a set of tuples.
+    Since there are no tuples in MiniZinc this is encoded using arrays.
+    The constraint enforces x in t, where we consider x and each row in t to be a tuple,
+        and t to be a set of tuples.
+
+    Parameters
+    ----------
+    x: one-dimentional array
+    t: two-dimentional array, `x` should be one of the rows of `t`
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(zn.range(1, 5)), shape=4)
+    ...         self.choose_from = zn.Array([[1, 2, 3, 4], [0, 1, 2, 3]])
+    ...         self.constraints = [zn.table(self.a, self.choose_from)]
+    ...
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> result["a"]
+    [1, 2, 3, 4]
+    """
     return constraint_module.table(x, t)
 
 

@@ -1,6 +1,7 @@
 ### 0.4.3
 #### Documentation
-- simplify and fix layout of ``count``, ``cumulative`` and ``max`` examples
+- simplify and fix layout of ``count``, ``cumulative`` 
+  ``table`` and ``max`` examples
  
 ### 0.4.2
 #### CI changes
