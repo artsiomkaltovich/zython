@@ -167,12 +167,16 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     Counter({1: 4, 0: 3})
 
     ``zn.alldifferent`` could be emulated via ``zn.count``
+
     >>> import zython as zn
+    >>> def all_different(array):
+    ...     return zn.forall(array, lambda elem: zn.count(array, elem) == 1)
+    ...
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
-    ...         self.a = zn.Array(zn.var(range(10)), shape=4)
-    ...         self.constraints = [zn.forall(zn.range(self.a.size(0)),
-    ...                                       lambda i: zn.count(self.a, lambda elem: elem == self.a[i]) == 1)]
+    ...         self.a = zn.Array(zn.var(range(4)), shape=4)
+    ...         self.constraints = [all_different(self.a)]
+    ...
     >>> model = MyModel()
     >>> result = model.solve_satisfy()
     >>> Counter(result["a"])
