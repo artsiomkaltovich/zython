@@ -1,4 +1,6 @@
 ### 0.4.3
+#### Added
+- `disjunctive` constraint
 #### Documentation
 - simplify and fix layout of ``count``, ``cumulative`` 
   ``table`` and ``max`` examples

@@ -9,6 +9,7 @@ from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar
+from zython.var_par.get_type import is_range
 from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
@@ -243,12 +244,59 @@ def cumulative(
     return constraint_module.cumulative(start_times, durations, requirements, limit)
 
 
+def disjunctive(
+        start_times: ZnSequence,
+        durations: ZnSequence,
+) -> Constraint:
+    """ The disjunctive constraint takes an array of start times for each task and
+    an array of their durations and makes sure that only one task is active at any one time.
+
+    Parameters
+    ----------
+    start_times: range, array of var, or sequence (list or tuple) of var
+        Sequence with start time of the tasks
+    durations: range, array of var, or sequence (list or tuple) of var
+        Sequence with durations of the tasks
+
+    Returns
+    -------
+    result: Constraint
+
+    Notes
+    -----
+    It is suggested to use ranges and sequences of ranges instead of int,
+    because minizinc can return strange result when type of any arg is int
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.start = zn.Array(zn.var(zn.range(0, 10)), shape=3)
+    ...         self.constraints = [
+    ...             zn.disjunctive(start_times=self.start, durations=[3, 2, 1]),
+    ...         ]
+    ...
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> result["start"]
+    [3, 1, 0]
+    """
+    if not is_range(start_times.type):
+        raise ValueError(f"start_type should be range, but it is {start_times.type}")
+    if start_times.type.start < 0:
+        raise ValueError("start of range type of `start_times` arg should be non negative, "
+                         f"but it's {start_times.type.start}")
+    return Constraint(_Op_code.disjunctive, start_times, durations)
+
+
 def table(
     x: ZnSequence,
     t: ZnSequence,
 ) -> Constraint:
     """The table constraint is used to specify if one dimensional array
-        should be equal to any row of a two dimensional array.
+        should be equal to any row of a two-dimensional array.
 
     Or, in more strict form:
     the table constraint enforces that a tuple of variables takes a value from a set of tuples.
