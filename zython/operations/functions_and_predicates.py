@@ -167,12 +167,16 @@ def count(seq: ZnSequence, value: Union[int, Operation, Callable[[ZnSequence], O
     Counter({1: 4, 0: 3})
 
     ``zn.alldifferent`` could be emulated via ``zn.count``
+
     >>> import zython as zn
+    >>> def all_different(array):
+    ...     return zn.forall(array, lambda elem: zn.count(array, elem) == 1)
+    ...
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
-    ...         self.a = zn.Array(zn.var(range(10)), shape=4)
-    ...         self.constraints = [zn.forall(zn.range(self.a.size(0)),
-    ...                                       lambda i: zn.count(self.a, lambda elem: elem == self.a[i]) == 1)]
+    ...         self.a = zn.Array(zn.var(range(4)), shape=4)
+    ...         self.constraints = [all_different(self.a)]
+    ...
     >>> model = MyModel()
     >>> result = model.solve_satisfy()
     >>> Counter(result["a"])
@@ -224,7 +228,11 @@ def cumulative(
     ...     def __init__(self):
     ...         self.limit = zn.var(range(0, 10))
     ...         self.constraints = [
-    ...             zn.cumulative(start_times=[1, 2, 4], durations=[3, 2, 1], requirements=[1, 1, 1], limit=self.limit),
+    ...             zn.cumulative(start_times=[1, 2, 4],
+    ...                           durations=[3, 2, 1],
+    ...                           requirements=[1, 1, 1],
+    ...                           limit=self.limit,
+    ...             ),
     ...         ]
     ...
     >>> model = MyModel()
@@ -235,10 +243,81 @@ def cumulative(
     return constraint_module.cumulative(start_times, durations, requirements, limit)
 
 
-def table(
-        x: ZnSequence,
-        t: ZnSequence,
+def disjunctive(
+        start_times: ZnSequence,
+        durations: ZnSequence,
 ) -> Constraint:
+    """ The disjunctive constraint takes an array of start times for each task and
+    an array of their durations and makes sure that only one task is active at any one time.
+
+    Parameters
+    ----------
+    start_times: range, array of var, or sequence (list or tuple) of var
+        Sequence with start time of the tasks
+    durations: range, array of var, or sequence (list or tuple) of var
+        Sequence with durations of the tasks
+
+    Returns
+    -------
+    result: Constraint
+
+    Notes
+    -----
+    It is suggested to use ranges and sequences of ranges instead of int,
+    because minizinc can return strange result when type of any arg is int
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.start = zn.Array(zn.var(zn.range(0, 10)), shape=3)
+    ...         self.constraints = [
+    ...             zn.disjunctive(start_times=self.start, durations=[3, 2, 1]),
+    ...         ]
+    ...
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> result["start"]
+    [3, 1, 0]
+    """
+    return Constraint(_Op_code.disjunctive, start_times, durations)
+
+
+def table(
+    x: ZnSequence,
+    t: ZnSequence,
+) -> Constraint:
+    """The table constraint is used to specify if one dimensional array
+        should be equal to any row of a two-dimensional array.
+
+    Or, in more strict form:
+    the table constraint enforces that a tuple of variables takes a value from a set of tuples.
+    Since there are no tuples in MiniZinc this is encoded using arrays.
+    The constraint enforces x in t, where we consider x and each row in t to be a tuple,
+        and t to be a set of tuples.
+
+    Parameters
+    ----------
+    x: one-dimentional array
+    t: two-dimentional array, `x` should be one of the rows of `t`
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.Array(zn.var(zn.range(1, 5)), shape=4)
+    ...         self.choose_from = zn.Array([[1, 2, 3, 4], [0, 1, 2, 3]])
+    ...         self.constraints = [zn.table(self.a, self.choose_from)]
+    ...
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> result["a"]
+    [1, 2, 3, 4]
+    """
     return constraint_module.table(x, t)
 
 
@@ -283,7 +362,7 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Parameters
     ----------
     seq: range, array of var, or sequence (list or tuple) of var
-        Sequence to find smallest element in
+        Sequence to find the biggest element in
     key: Operation or Callable, optional
         The parameter has the same semantic as in python: specify the operation which result will be latter compared.
 
@@ -299,10 +378,12 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
     Examples
     --------
 
+    Calculate the biggest number of negative numbers in a row of an array
+
     >>> import zython as zn
     >>> class MyModel(zn.Model):
     ...     def __init__(self):
-    ...         self.a = zn.Array([[1, 2, 3], [-1, -2, -3]])
+    ...         self.a = zn.Array([[0, 0, 0, 0], [0, 0, -1, -1], [0, -1, -1, -1]])
     ...         self.m = zn.max(zn.range(self.a.size(0)),
     ...                         lambda row: zn.count(self.a[row, :], lambda elem: elem < 0))
     >>> model = MyModel()
