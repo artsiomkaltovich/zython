@@ -18,6 +18,7 @@ class Flags(enum.Flag):
     decreasing = enum.auto()
     strictly_decreasing = enum.auto()
     cumulative = enum.auto()
+    disjunctive = enum.auto()
     table = enum.auto()
     float_used = enum.auto()
 
@@ -38,6 +39,7 @@ FLAG_PROCESSORS: Dict[Flags, Callable[[SourceCode], None]] = {
     Flags.decreasing: partial(append, line='include "decreasing.mzn";'),
     Flags.strictly_decreasing: partial(append, line='include "strictly_decreasing.mzn";'),
     Flags.cumulative: partial(append, line='include "cumulative.mzn";'),
+    Flags.disjunctive: partial(append, line='include "disjunctive.mzn";'),
     Flags.table: partial(append, line='include "table.mzn";'),
     Flags.float_used: lambda x: x,
 }
