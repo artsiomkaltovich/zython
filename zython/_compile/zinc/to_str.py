@@ -124,7 +124,7 @@ def _call_func(func, *params, flatten_args=False, flags_):
 
 
 def _get_array_shape_decl(shape):
-    result = [f'0..{s - 1}' for s in shape]
+    result = [f'0..{to_str(s - 1)}' for s in shape]
     return f"{', '.join(result)}"
 
 

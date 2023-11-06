@@ -9,7 +9,6 @@ from zython.operations.constraint import Constraint
 from zython.operations.operation import Operation
 from zython.var_par.collections.array import ArrayMixin
 from zython.var_par.collections.set import SetVar
-from zython.var_par.get_type import is_range
 from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
@@ -283,11 +282,6 @@ def disjunctive(
     >>> result["start"]
     [3, 1, 0]
     """
-    if not is_range(start_times.type):
-        raise ValueError(f"start_type should be range, but it is {start_times.type}")
-    if start_times.type.start < 0:
-        raise ValueError("start of range type of `start_times` arg should be non negative, "
-                         f"but it's {start_times.type.start}")
     return Constraint(_Op_code.disjunctive, start_times, durations)
 
 

@@ -1,6 +1,8 @@
 ### 0.4.3
 #### Added
 - `disjunctive` constraint
+#### Fixed
+- array slices with upper slice as operations should compile correctly now
 #### Documentation
 - simplify and fix layout of ``count``, ``cumulative`` 
   ``table`` and ``max`` examples
