@@ -2,7 +2,7 @@ Table
 =====
 
 The table constraint is used to specify if one dimensional array
-should be equal to any row of two dimensional array.
+should be equal to any row of a two dimensional array.
 
 Model
 -----

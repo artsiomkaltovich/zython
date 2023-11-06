@@ -7,6 +7,11 @@ It requires that a set of tasks given by start times,
 durations, and resource requirements, never require more than
 a global resource limit at any one time.
 
+.. note::
+
+    It is suggested to use ranges and sequences of ranges instead of int,
+    because minizinc can return strange result when type of any arg is int
+
 Moving Furniture Model
 ----------------------
 

@@ -124,7 +124,7 @@ def _call_func(func, *params, flatten_args=False, flags_):
 
 
 def _get_array_shape_decl(shape):
-    result = [f'0..{s - 1}' for s in shape]
+    result = [f'0..{to_str(s - 1)}' for s in shape]
     return f"{', '.join(result)}"
 
 
@@ -213,6 +213,7 @@ class Op2StrType(UserDict):
         self[_Op_code.decreasing] = partial(_global_constraint, "decreasing")
         self[_Op_code.strictly_decreasing] = partial(_global_constraint, "strictly_decreasing")
         self[_Op_code.cumulative] = partial(_global_constraint, "cumulative")
+        self[_Op_code.disjunctive] = partial(_global_constraint, "disjunctive")
         self[_Op_code.table] = partial(_global_constraint, "table", flatten_args=False)
 
     def __missing__(self, key):  # pragma: no cover
