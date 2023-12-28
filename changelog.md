@@ -1,3 +1,7 @@
+### 0.4.4
+#### CI changes
+- use minizinc 2.8.2 as maximum version in CI
+
 ### 0.4.3
 #### Added
 - `disjunctive` constraint
