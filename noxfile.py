@@ -45,7 +45,7 @@ def gendoc(session):
         "-b",
         "html",
         "-d",
-        "_build/doctrees",
+        "docs/_build/doctrees",
         "-D",
         "language=en",
         "doc/source",

@@ -257,6 +257,9 @@ def disjunctive(
         Sequence with start time of the tasks
     durations: range, array of var, or sequence (list or tuple) of var
         Sequence with durations of the tasks
+    strict: bool
+        Run in strict mode, which add the following restriction:
+        Tasks with a duration of 0 CANNOT be scheduled at any time but only when no other task is running.
 
     Returns
     -------

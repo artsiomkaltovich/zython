@@ -2,37 +2,37 @@ Tasks Scheduling
 ================
 
 The disjunctive constraint takes an array of start times for each task and
-an array of their durations and makes sure that only one task is active at
-any one time.
+an array of their durations, ensuring that only one task is active at
+any given time.
 
 .. note::
 
-    It is suggested to use ranges and sequences of ranges instead of int,
-    because minizinc can return strange result when type of any arg is int
+    It is recommended to use ranges and sequences of ranges instead of integers,
+    because MiniZinc can return unexpected results when any argument is an integer.
 
 Model
 -----
 
-We will recreate the example of task sheduling problem from the
-`minizinc <https://www.minizinc.org/doc-2.7.6/en/predicates.html#ex-jobshop3>`_
+We will recreate the example of the task scheduling problem from the
+`MiniZinc <https://www.minizinc.org/doc-2.7.6/en/predicates.html#ex-jobshop3>`_
 documentation.
 
-The model consists of several jobs, which can be separated into several
-steps. There are following restrictions:
+The model consists of several jobs, which can be divided into several
+steps. The following restrictions apply:
 
-- to complete job, all steps should be executed
-- different steps are independent:
-    if there is a job on first step, other job can be processed on second step,
-    without necessity to wait.
-- if there is an active task on any step, not other job can be executed
-    on this step and should wait.
+- To complete a job, all steps must be executed.
+- Different steps are independent:
+    If there is a job on the first step, another job can be processed on the second step
+    without waiting.
+- If there is an active task on any step, no other job can be executed
+    on that step and must wait.
 
-You can think about this as a conveyor with `n_jobs` lines,
-one part on every line and
-`n_steps` independent machines which is shared between lines.
-Every machine can complete only one manipulation with any part
-and should work with a part processed by previous machine.
-We are searching for the fastest way to processed all the parts.
+You can think of this as a conveyor with `n_jobs` lines,
+one part on every line, and
+`n_steps` independent machines that are shared between lines.
+Each machine can complete only one operation with any part
+and must work with a part processed by the previous machine.
+We are searching for the fastest way to process all the parts.
 
 Python Model
 ------------
@@ -76,8 +76,8 @@ Python Model
             return zn.forall(
                 range(self.n_jobs),
                 lambda i: zn.forall(
-                    zn.range(self.n_tasks - 1),
-                    lambda j: self.start[i, j] + self.durations[i, j] <= self.start[i, j + 1],
+                        zn.range(self.n_tasks - 1),
+                        lambda j: self.start[i, j] + self.durations[i, j] <= self.start[i, j + 1],
                     ) & (
                         self.start[i, self.n_tasks - 1] + self.durations[i, self.n_tasks - 1] <= self.end
                     )
@@ -92,3 +92,76 @@ Python Model
 .. testoutput::
 
     Solution(objective=30, total=86, end=30, start=[[8, 9, 13, 18, 21], [5, 13, 18, 25, 27], [1, 5, 9, 13, 17], [0, 1, 2, 3, 9], [9, 16, 25, 27, 29]])
+
+
+Strict Mode
+-----------
+
+The strict mode is specified by setting the `strict` argument to True. In this mode, there is a significant difference:
+
+- Tasks with a duration of 0 CANNOT be scheduled at any time but only when no other task is running.
+
+You can see the difference in the following example. The model has two jobs with three subtasks each.
+Notice the difference in the start times of the second job. In the usual mode, the second subtask starts at 0, 
+at the same time as the first subtask. In strict mode, it starts at 1, after the first subtask of the other job is finished.
+
+Python Model
+------------
+
+.. testcode::
+
+    import zython as zn
+
+
+    durations = [
+        [1, 0, 5],
+        [0, 4, 2],
+    ]
+
+
+    class MyModel(zn.Model):
+        def __init__(self, durations, strict=False):
+            self.durations = zn.Array(durations)
+            self.n_jobs = len(durations)
+            self.n_tasks = len(durations[0])
+            self.total = zn.sum(self.durations)
+            self.start = zn.Array(
+                zn.var(zn.range(self.total + 1)), shape=(self.n_jobs, self.n_tasks)
+            )
+            self.end = zn.var(zn.range(self.total + 1))
+            self.strict = strict
+            self.constraints = [self.in_sequence(), self.no_overlap()]
+
+        def no_overlap(self):
+            return zn.forall(
+                zn.range(self.n_tasks),
+                lambda j: zn.disjunctive(
+                    [self.start[i, j] for i in range(self.n_jobs)],
+                    [self.durations[i, j] for i in range(self.n_jobs)],
+                    strict=self.strict,
+                )
+            )
+
+        def in_sequence(self):
+            return zn.forall(
+                range(self.n_jobs),
+                lambda i: zn.forall(
+                    zn.range(self.n_tasks - 1),
+                    lambda j: self.start[i, j] + self.durations[i, j] <= self.start[i, j + 1],
+                    ) & (
+                        self.start[i, self.n_tasks - 1] + self.durations[i, self.n_tasks - 1] <= self.end
+                    )
+            )
+
+
+    model = MyModel(durations, strict=False)
+    result = model.solve_minimize(model.end)
+    print(result)
+    model = MyModel(durations, strict=True)
+    result = model.solve_minimize(model.end)
+    print(result)
+
+.. testoutput::
+
+    Solution(objective=8, total=12, start=[[0, 1, 1], [0, 0, 6]], end=8)
+    Solution(objective=8, total=12, start=[[0, 1, 1], [0, 1, 6]], end=8)

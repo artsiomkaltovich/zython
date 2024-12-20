@@ -2,7 +2,7 @@
 #### Python interpreters support
 - Add 3.13 CPython.
 #### Added
-- Introduce the strict argument to the disjunctive constraint.
+- Introduce the ``strict`` argument to the ``disjunctive`` constraint.
 
 
 ### 0.4.3
