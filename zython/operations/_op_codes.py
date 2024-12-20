@@ -19,6 +19,7 @@ class _Op_code(enum.Enum):
     floordiv = enum.auto()
     mod = enum.auto()
     pow = enum.auto()
+    abs = enum.auto()
     forall = enum.auto()  # 3 params: (seq, iter_var=None, func=None)
     exists = enum.auto()
     sum_ = enum.auto()

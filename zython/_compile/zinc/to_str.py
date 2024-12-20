@@ -199,6 +199,7 @@ class Op2StrType(UserDict):
         # minizinc 2.5.0 doesn't support 2d array counting
         self[_Op_code.count] = partial(_one_or_two_brackets, "count", flatten_args=True)
         self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
+        self[_Op_code.abs] = partial(_call_func, "abs")
         self[_Op_code.min_] = partial(_array_comprehension_call, "min")
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
         self[_Op_code.size] = _size

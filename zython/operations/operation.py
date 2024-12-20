@@ -119,6 +119,10 @@ def _mod(left, right):
     return Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
 
 
+def _abs(x):
+    return Operation(_Op_code.abs, x, type_=get_base_type(x))
+
+
 def _size(array: "zython.var_par.collections.array.ArrayMixin", dim: int):
     if 0 <= dim < array.ndims():
         return Operation(_Op_code.size, array, dim, type_=int)

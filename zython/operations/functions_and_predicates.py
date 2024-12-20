@@ -327,6 +327,38 @@ def table(
     return constraint_module.table(x, t)
 
 
+def abs(x: float | var) -> Operation:
+    """ Return absolute value of x
+
+    Parameters
+    ----------
+    x: float, var or par
+        value to get absolute value of
+        
+    Returns
+    -------
+    result: Operation
+        Operation which will find the abs.
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.a = zn.abs(-1)
+    ...         self.p = zn.par(1)
+    ...         self.v = zn.var(float)
+    ...         self.b = zn.abs(self.p)
+    ...         self.c = zn.abs(self.v)
+    ...         self.constraints = [self.v == zn.abs(-3)]
+    >>> model = MyModel()
+    >>> model.solve_satisfy()
+    Solution(a=1, v=3.0, b=1, c=3.0)
+    """
+    return operation_module._abs(x)
+
+
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
     """ Finds the smallest object in ``seq``, according to ``key``
 

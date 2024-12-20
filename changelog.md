@@ -3,7 +3,7 @@
 - Add 3.13 CPython.
 #### Added
 - Introduce the ``strict`` argument to the ``disjunctive`` constraint.
-
+- Add ``abs`` function.
 
 ### 0.4.3
 #### Added
