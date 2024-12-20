@@ -1,6 +1,8 @@
-### 0.5.0
+## 0.5.0
 #### Python interpreters support
-- add 3.13 CPython
+- Add 3.13 CPython.
+#### Added
+- Introduce the strict argument to the disjunctive constraint.
 
 
 ### 0.4.3

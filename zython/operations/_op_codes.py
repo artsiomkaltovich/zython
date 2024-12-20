@@ -39,4 +39,5 @@ class _Op_code(enum.Enum):
     strictly_decreasing = enum.auto()
     cumulative = enum.auto()
     disjunctive = enum.auto()
+    disjunctive_strict = enum.auto()
     table = enum.auto()

@@ -58,4 +58,4 @@ jobs:
         pip install nox
     - name: Doc tests
       run: |
-        nox -s doc --reuse-existing-virtualenvs
+        nox -s doctest --reuse-existing-virtualenvs

@@ -246,6 +246,7 @@ def cumulative(
 def disjunctive(
         start_times: ZnSequence,
         durations: ZnSequence,
+        strict: bool = False,
 ) -> Constraint:
     """ The disjunctive constraint takes an array of start times for each task and
     an array of their durations and makes sure that only one task is active at any one time.
@@ -282,6 +283,8 @@ def disjunctive(
     >>> result["start"]
     [3, 1, 0]
     """
+    if strict:
+        return Constraint(_Op_code.disjunctive_strict, start_times, durations)
     return Constraint(_Op_code.disjunctive, start_times, durations)
 
 
