@@ -6,7 +6,7 @@ nox.options.stop_on_first_error = True
 @nox.session
 def lint(session):
     session.install("ruff")
-    session.run("ruff", "zython")
+    session.run("ruff", "check", "zython")
 
 
 @nox.session
