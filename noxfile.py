@@ -15,6 +15,7 @@ def test(session):
     session.install("-r", "requirements_dev.txt")
     session.run(
         "pytest",
+        "-s",
         "test",
         "zython",
         "--cov=zython",
