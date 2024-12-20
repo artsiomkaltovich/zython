@@ -1,6 +1,7 @@
-### 0.4.4
-#### CI changes
-- use minizinc 2.8.2 as maximum version in CI
+### 0.5.0
+#### Python interpreters support
+- add 3.13 CPython
+
 
 ### 0.4.3
 #### Added
