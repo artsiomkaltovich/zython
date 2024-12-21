@@ -366,7 +366,7 @@ def table(
     return Constraint(_Op_code.table, x, t)
 
 
-def abs(x: float | var) -> Operation:
+def abs(x: Union[float, var]) -> Operation:
     """Return absolute value of x
 
     Returns
@@ -392,7 +392,7 @@ def abs(x: float | var) -> Operation:
     """
     return Operation(_Op_code.abs, x, type_=get_base_type(x))
 
-def exp(x: float | var) -> Operation:
+def exp(x: Union[float, var]) -> Operation:
     """Return the exponential of x
 
     Returns
@@ -415,7 +415,7 @@ def exp(x: float | var) -> Operation:
     """
     return Operation(_Op_code.exp, x, type_=float)
 
-def ln(x: float | var) -> Operation:
+def ln(x: Union[float, var]) -> Operation:
     """Return the natural logarithm of x
 
     Returns
@@ -438,7 +438,7 @@ def ln(x: float | var) -> Operation:
     """
     return Operation(_Op_code.ln, x, type_=float)
 
-def log(x: float | var, base: float) -> Operation:
+def log(x: Union[float, var], base: float) -> Operation:
     """Return the logarithm of x to the given base
 
     Returns
@@ -461,7 +461,7 @@ def log(x: float | var, base: float) -> Operation:
     """
     return Operation(_Op_code.log, base, x, type_=float)
 
-def log10(x: float | var) -> Operation:
+def log10(x: Union[float, var]) -> Operation:
     """Return the base-10 logarithm of x
 
     Returns
@@ -484,7 +484,7 @@ def log10(x: float | var) -> Operation:
     """
     return Operation(_Op_code.log10, x, type_=float)
 
-def log2(x: float | var) -> Operation:
+def log2(x: Union[float, var]) -> Operation:
     """Return the base-2 logarithm of x
 
     Returns
@@ -507,7 +507,7 @@ def log2(x: float | var) -> Operation:
     """
     return Operation(_Op_code.log2, x, type_=float)
 
-def sqrt(x: float | var) -> Operation:
+def sqrt(x: Union[float, var]) -> Operation:
     """Return the square root of x
 
     Returns
