@@ -1,10 +1,13 @@
 from collections import namedtuple
+from functools import singledispatch
+from typing import Any
+import typing
 
 import minizinc
 
 
 class Result:
-    """ Represents model solution
+    """Represents model solution
 
     Warnings
     --------
@@ -12,25 +15,34 @@ class Result:
     but they can use this class as base class for their extensions.
 
     """
+
     def __init__(self, mzn_result: minizinc.Result):
         self._original = mzn_result
         if mzn_result.solution is not None:
             if isinstance(mzn_result.solution, list):
                 if mzn_result.solution:
                     # several solutions
-                    names = [name for name in vars(mzn_result.solution[0]) if not name.startswith("_")]
-                    Solution = namedtuple("Solution", names)
+                    names, Solution = _generate_solution_class_and_field_names(
+                        mzn_result.solution[0]
+                    )
                     solutions = []
                     for i in range(len(mzn_result.solution)):
-                        solutions.append(Solution(*(mzn_result[i, name] for name in names)))
+                        solutions.append(
+                            Solution(
+                                *convert_result_value(
+                                    (mzn_result[i, name]) for name in names
+                                )
+                            )
+                        )
                     self._solution = solutions
                 else:
                     # no solutions while all_solutions=True
                     self._solution = None
             else:
-                names = [name for name in vars(mzn_result.solution) if not name.startswith("_")]
-                Solution = namedtuple("Solution", names)
-                self._solution = Solution(*(mzn_result[name] for name in names))
+                names, Solution = _generate_solution_class_and_field_names(mzn_result.solution)
+                self._solution = Solution(
+                    *(convert_result_value(mzn_result[name]) for name in names)
+                )
         else:
             self._solution = None
 
@@ -57,5 +69,23 @@ class Result:
 
 
 def as_original(mzn_result: minizinc.Result):
-    """ returns original result, returned by minizinc-python """
+    """returns original result, returned by minizinc-python"""
     return mzn_result
+
+
+@singledispatch
+def convert_result_value(value: Any) -> Any:
+    return value
+
+
+@convert_result_value.register
+def _(value: float) -> float:
+    return -value if value == -0.0 else value
+
+
+def _generate_solution_class_and_field_names(
+    mzn_solution,
+) -> tuple[tuple[str, ...], typing.NamedTuple]:
+    names = [name for name in vars(mzn_solution) if not name.startswith("_")]
+    Solution = namedtuple("Solution", names)
+    return names, Solution
