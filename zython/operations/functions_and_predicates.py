@@ -661,10 +661,10 @@ def atanh(x: Union[float, var]) -> Operation:
     ...     def __init__(self):
     ...         self.a = zn.atanh(0)
     ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.atanh(0.5)]
+    ...         self.constraints = [self.b == zn.atanh(0.99)]
     >>> model = MyModel()
     >>> model.solve_satisfy()
-    Solution(a=0.0, b=0.5493061443340549)
+    Solution(a=0.0, b=2.646652412362246)
     """
     return Operation(_Op_code.atanh, x, type_=float)
 
