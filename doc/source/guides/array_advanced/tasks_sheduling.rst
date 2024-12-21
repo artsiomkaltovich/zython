@@ -114,8 +114,8 @@ Python Model
 
 
     durations = [
-        [1, 0, 5],
-        [0, 4, 2],
+        [0, 1, 0, 5, 0],
+        [1, 0, 4, 0, 6],
     ]
 
 
@@ -163,5 +163,5 @@ Python Model
 
 .. testoutput::
 
-    Solution(objective=8, total=12, start=[[0, 1, 1], [0, 0, 6]], end=8)
-    Solution(objective=8, total=12, start=[[0, 1, 1], [0, 1, 6]], end=8)
+    Solution(objective=11, total=17, start=[[0, 0, 1, 1, 6], [0, 1, 1, 5, 5]], end=11)
+    Solution(objective=11, total=17, start=[[0, 0, 1, 5, 11], [0, 1, 1, 5, 5]], end=11)
