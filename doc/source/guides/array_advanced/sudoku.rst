@@ -19,7 +19,7 @@ Python Model
         def __init__(self):
             self.a = zn.Array(zn.var(range(1, 10)), shape=(9, 9))
 
-            self.constraints = [zn.forall(range(9), lambda i: zn.alldifferent(self.a[i])),
+            self.constraints = [zn.forall(range(9), lambda i: zn.alldifferent(self.a[i, :])),
                                 zn.forall(range(9), lambda i: zn.alldifferent(self.a[:, i])),
                                 zn.forall(range(3),
                                     lambda i: zn.forall(range(3),

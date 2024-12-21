@@ -9,7 +9,7 @@ from ..var import var
 class SetMixin(_AbstractCollection):
     @staticmethod
     def _validate_type(type_):
-        if type_ != int and not is_range(type_) and not is_enum(type_):
+        if type_ is not int and not is_range(type_) and not is_enum(type_):
             raise ValueError(f"Unsupported type for set: {type(type_)}")
 
 

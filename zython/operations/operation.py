@@ -1,22 +1,9 @@
-import warnings
 from numbers import Number
-from typing import Optional, Callable, Union, Type
 
 import zython
 from zython.operations._op_codes import _Op_code
 from zython.operations.constraint import Constraint
-from zython.var_par.get_type import get_base_type
-
-
-def _get_wider_type(left, right):
-    t_types = get_base_type(left), get_base_type(right)
-    types = set(t_types)
-    if types == {int}:
-        return int
-    elif types == {int, float} or types == {float}:
-        return float
-    warnings.warn("_get_wider_type returns int as fallback")
-    return int  # TODO: fix types, do not forget about int/int => float
+from zython.var_par.get_type import get_wider_type
 
 
 class Operation(Constraint):
@@ -34,12 +21,12 @@ class Operation(Constraint):
 
     # def __truediv__(self, other):
     #     op = _Operation(_Op_code.truediv, self, other)
-    #     op._type = _get_wider_type(self, other)
+    #     op._type = get_wider_type(self, other)
     #     return op
     #
     # def __rtruediv__(self, other):
     #     op = _Operation(_Op_code.mul, other, self)
-    #     op._type = _get_wider_type(self, other)
+    #     op._type = get_wider_type(self, other)
     #     return op
 
     def __floordiv__(self, other):
@@ -92,69 +79,41 @@ class Operation(Constraint):
 
 
 def _add(left, right):
-    return Operation(_Op_code.add, left, right, type_=_get_wider_type(left, right))
+    return Operation(_Op_code.add, left, right, type_=get_wider_type(left, right))
 
 
 def _sub(left, right):
-    return Operation(_Op_code.sub, left, right, type_=_get_wider_type(left, right))
+    return Operation(_Op_code.sub, left, right, type_=get_wider_type(left, right))
 
 
 def _pow(base, power, modulo=None):
     if modulo is not None:
         raise ValueError("modulo is not supported")
-    return Operation(_Op_code.pow, base, power, type_=_get_wider_type(base, power))
+    return Operation(_Op_code.pow, base, power, type_=get_wider_type(base, power))
 
 
 def _mul(left, right):
-    return Operation(_Op_code.mul, left, right, type_=_get_wider_type(left, right))
+    return Operation(_Op_code.mul, left, right, type_=get_wider_type(left, right))
 
 
 def _floordiv(left, right):
     _validate_div(left, right)
-    return Operation(_Op_code.floordiv, left, right, type_=_get_wider_type(left, right))
+    return Operation(_Op_code.floordiv, left, right, type_=get_wider_type(left, right))
 
 
 def _mod(left, right):
     _validate_div(left, right)
-    return Operation(_Op_code.mod, left, right, type_=_get_wider_type(left, right))
+    return Operation(_Op_code.mod, left, right, type_=get_wider_type(left, right))
 
 
 def _size(array: "zython.var_par.collections.array.ArrayMixin", dim: int):
     if 0 <= dim < array.ndims():
         return Operation(_Op_code.size, array, dim, type_=int)
-    raise ValueError(f"Array has 0..{array.ndims()} dimensions, but {dim} were specified")
+    raise ValueError(f"The array has 0..{array.ndims()} dimensions, but {dim} were specified")
 
 
 def _in(item: int, array: "zython.var_par.collections.abstract._AbstractCollection"):
     return Operation(_Op_code.in_, item, array, type_=bool)
-
-
-def _sum(seq: "zython.var_par.types.ZnSequence",
-         iter_var: Optional["zython.var_par.var.var"] = None,
-         func: Optional[Union["Operation", Callable]] = None,
-         type_: Optional[Type] = None):
-    return Operation(_Op_code.sum_, seq, iter_var, func, type_=type_)
-
-
-def _count(seq: "zython.var_par.types.ZnSequence",
-           iter_var: Optional["zython.var_par.var.var"] = None,
-           func: Optional[Union["Operation", Callable]] = None,
-           type_: Optional[Type] = None):
-    return Operation(_Op_code.count, seq, iter_var, func, type_=type_)
-
-
-def _min(seq: "zython.var_par.types.ZnSequence",
-         iter_var: Optional["zython.var_par.var.var"] = None,
-         func: Optional[Union["Operation", Callable]] = None,
-         type_: Optional[Type] = None):
-    return Operation(_Op_code.min_, seq, iter_var, func, type_=type_)
-
-
-def _max(seq: "zython.var_par.types.ZnSequence",
-         iter_var: Optional["zython.var_par.var.var"] = None,
-         func: Optional[Union["Operation", Callable]] = None,
-         type_: Optional[Type] = None):
-    return Operation(_Op_code.max_, seq, iter_var, func, type_=type_)
 
 
 def _validate_div(left, right):

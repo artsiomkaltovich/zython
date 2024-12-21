@@ -1,5 +1,4 @@
 import inspect
-import itertools
 from collections import deque
 
 from zython import var, par
@@ -40,19 +39,19 @@ class ArrayMixin(_AbstractCollection):
 class ArrayView(ArrayMixin):
     def __init__(self, array, pos):
         self.array: ArrayMixin = array
-        # pos is a tuple with the same size as number of array dimensions, the user can specify less iterators,
-        # slice(None, None, 1) will be added to fit the number of dimensions, so compilers shouldn't worry about it
+        # pos is a tuple with the same size as number of array dimensions
         self.pos = self._get_pos(pos)
         self._type = array.type
 
     def _get_pos(self, pos):
         if not isinstance(pos, tuple):
-            pos = [pos]
+            pos = (pos,)
+        if len(pos) != self.array.ndims():
+            raise ValueError(
+                f"The array has {self.array.ndims()} dimensions, but {len(pos)} indexes were specified"
+            )
         self._check_for_index_error(pos)
-        repeat = itertools.repeat(slice(None, None, 1), self.array.ndims() - len(pos))
-        pos = tuple(self._process_pos_item(dim, p) for dim, p in enumerate(itertools.chain(pos, repeat)))
-        if len(pos) > self.array.ndims():
-            raise ValueError(f"Array has {self.array.ndims()} dimensions but {len(pos)} were specified")
+        pos = tuple(self._process_pos_item(dim, p) for dim, p in enumerate(pos))
         return pos
 
     def _check_for_index_error(self, pos):
