@@ -69,7 +69,7 @@ class Result:
 
 
 def as_original(mzn_result: minizinc.Result):
-    """returns original result, returned by minizinc-python"""
+    """Returns original result, returned by minizinc-python"""
     return mzn_result
 
 

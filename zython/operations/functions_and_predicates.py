@@ -882,7 +882,7 @@ def max(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation]
 
 
 class alldifferent(Constraint):
-    """requires all the variables appearing in its argument to be different
+    """Requires all the variables appearing in its argument to be different
 
     Parameters
     ----------
@@ -959,7 +959,7 @@ class alldifferent(Constraint):
 
 
 class allequal(Constraint):
-    """requires all the variables appearing in its argument to be equal
+    """Requires all the variables appearing in its argument to be equal
 
     Parameters
     ----------
@@ -989,7 +989,7 @@ class allequal(Constraint):
 
 
 class ndistinct(Operation):
-    """returns the number of distinct values in ``seq``.
+    """Returns the number of distinct values in ``seq``.
 
     Parameters
     ----------
