@@ -22,10 +22,10 @@ def test_3():
         def __init__(self, array):
             self.a = zn.Array(array)
             self.s = zn.sum(self.a)
-            self.s1 = zn.sum(self.a[:, 1:])
+            self.s1 = zn.sum(self.a[:, :, 1:])
 
     array = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
     model = MyModel(array)
     result = model.solve_satisfy()
     assert result["s"] == 36
-    assert result["s1"] == 22
+    assert result["s1"] == 20

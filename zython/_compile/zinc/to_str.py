@@ -193,13 +193,20 @@ class Op2StrType(UserDict):
         self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.in_] = partial(_binary_op, "in")
         self[_Op_code.pow] = _pow
+        self[_Op_code.sqrt] = partial(_call_func, "sqrt")
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
         self[_Op_code.exists] = partial(_two_brackets_op, "exists")
         # minizinc 2.5.0 doesn't support 2d array counting
         self[_Op_code.count] = partial(_one_or_two_brackets, "count", flatten_args=True)
         self[_Op_code.sum_] = partial(_one_or_two_brackets, "sum")
+        self[_Op_code.product] = partial(_one_or_two_brackets, "product")
         self[_Op_code.abs] = partial(_call_func, "abs")
+        self[_Op_code.exp] = partial(_call_func, "exp")
+        self[_Op_code.ln] = partial(_call_func, "ln")
+        self[_Op_code.log] = partial(_call_func, "log")
+        self[_Op_code.log10] = partial(_call_func, "log10")
+        self[_Op_code.log2] = partial(_call_func, "log2")
         self[_Op_code.min_] = partial(_array_comprehension_call, "min")
         self[_Op_code.max_] = partial(_array_comprehension_call, "max")
         self[_Op_code.size] = _size

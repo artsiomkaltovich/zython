@@ -21,7 +21,7 @@ def test_slice_and_func():
         return 2 - par
 
     array = zn.Array(zn.var(int), shape=(3, 4))
-    iter_var, op = get_iter_var_and_op(array[2:], fn)
+    iter_var, op = get_iter_var_and_op(array[2:, :], fn)
     assert iter_var.name == "par"
     assert iter_var.type is int
     assert op.op == _Op_code.sub

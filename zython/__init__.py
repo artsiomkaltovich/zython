@@ -6,9 +6,16 @@ from zython.var_par.collections.array import Array
 from zython.var_par.collections.set import Set
 from zython.operations.functions_and_predicates import (
     abs,
+    exp,
+    ln,
+    log,
+    log10,
+    log2,
+    sqrt,
     exists,
     forall,
     sum,
+    product,
     alldifferent,
     circuit,
     count,
