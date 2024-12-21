@@ -4,6 +4,7 @@
 name: Documentation and doctests
 
 on:
+  workflow_dispatch:
   pull_request:
     branches: [ master ]
 

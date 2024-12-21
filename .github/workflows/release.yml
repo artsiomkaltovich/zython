@@ -4,6 +4,7 @@
 name: On release
 
 on:
+  workflow_dispatch:
   push:
     branches: [ release ]
 
