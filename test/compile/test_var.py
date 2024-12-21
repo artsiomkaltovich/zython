@@ -26,7 +26,7 @@ def test_slice_model():
             self.b = zn.sum(self.a[:, self.start + 1:self.start * 3])
 
     model = MyModel()
-    result = model.solve_satisfy(verbose=True)
+    result = model.solve_satisfy()
     assert 9 == result["b"]
 
 
