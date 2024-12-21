@@ -9,7 +9,7 @@
 - Introduce the ``strict`` argument to the ``disjunctive`` constraint.
 - Add ``abs``, ``exp``, ``ln``, ``log``, ``log10``, ``log2``, and ``sqrt`` functions.
 - Add ``product`` function to calculate product of all elements in the array.
-- Add trigonometric functions :`acos`, `acosh`, `asin`, `asinh`, `atan`, `atanh`, `cos`, `cosh`, `sin`, `sinh`, `tan`, `tanh`.
+- Add trigonometric functions: `acos`, `asin`, `atan`, `cos`, `sin`, `tan`.
 
 #### Changed
 
