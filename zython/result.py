@@ -85,7 +85,7 @@ def _(value: float) -> float:
 
 def _generate_solution_class_and_field_names(
     mzn_solution,
-) -> tuple[tuple[str, ...], typing.NamedTuple]:
+) -> typing.Tuple[typing.Tuple[str, ...], typing.NamedTuple]:
     names = [name for name in vars(mzn_solution) if not name.startswith("_")]
     Solution = namedtuple("Solution", names)
     return names, Solution
