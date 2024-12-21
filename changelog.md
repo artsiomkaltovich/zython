@@ -15,6 +15,10 @@
 
 - Array indexing must now specify all indices.
 
+#### CI changes:
+
+- Use minizinc 2.8.7 instead of 2.8.2
+
 ### 0.4.3
 
 #### Added

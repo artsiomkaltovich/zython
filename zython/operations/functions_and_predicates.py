@@ -553,28 +553,28 @@ def acos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.acos, x, type_=float)
 
-def acosh(x: Union[float, var]) -> Operation:
-    """Return the inverse hyperbolic cosine of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the inverse hyperbolic cosine.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.acosh(1)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.acosh(2)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=0.0, b=1.316957896924817)
-    """
-    return Operation(_Op_code.acosh, x, type_=float)
+# def acosh(x: Union[float, var]) -> Operation:
+#     """Return the inverse hyperbolic cosine of x
+# 
+#     Returns
+#     -------
+#     result: Operation
+#         Operation which will calculate the inverse hyperbolic cosine.
+# 
+#     Examples
+#     --------
+# 
+#     >>> import zython as zn
+#     >>> class MyModel(zn.Model):
+#     ...     def __init__(self):
+#     ...         self.a = zn.acosh(1)
+#     ...         self.b = zn.var(float)
+#     ...         self.constraints = [self.b == zn.acosh(2)]
+#     >>> model = MyModel()
+#     >>> model.solve_satisfy()
+#     Solution(a=0.0, b=1.316957896924817)
+#     """
+#     return Operation(_Op_code.acosh, x, type_=float)
 
 def asin(x: Union[float, var]) -> Operation:
     """Return the arc sine of x
@@ -599,28 +599,28 @@ def asin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.asin, x, type_=float)
 
-def asinh(x: Union[float, var]) -> Operation:
-    """Return the inverse hyperbolic sine of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the inverse hyperbolic sine.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.asinh(0)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.asinh(1)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=0.0, b=0.881373587019543)
-    """
-    return Operation(_Op_code.asinh, x, type_=float)
+# def asinh(x: Union[float, var]) -> Operation:
+#     """Return the inverse hyperbolic sine of x
+# 
+#     Returns
+#     -------
+#     result: Operation
+#         Operation which will calculate the inverse hyperbolic sine.
+# 
+#     Examples
+#     --------
+# 
+#     >>> import zython as zn
+#     >>> class MyModel(zn.Model):
+#     ...     def __init__(self):
+#     ...         self.a = zn.asinh(0)
+#     ...         self.b = zn.var(float)
+#     ...         self.constraints = [self.b == zn.asinh(1)]
+#     >>> model = MyModel()
+#     >>> model.solve_satisfy()
+#     Solution(a=0.0, b=0.881373587019543)
+#     """
+#     return Operation(_Op_code.asinh, x, type_=float)
 
 def atan(x: Union[float, var]) -> Operation:
     """Return the arc tangent of x
@@ -645,28 +645,28 @@ def atan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.atan, x, type_=float)
 
-def atanh(x: Union[float, var]) -> Operation:
-    """Return the inverse hyperbolic tangent of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the inverse hyperbolic tangent.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.atanh(0)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.atanh(0.99)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=0.0, b=2.646652412362246)
-    """
-    return Operation(_Op_code.atanh, x, type_=float)
+#def atanh(x: Union[float, var]) -> Operation:
+#    """Return the inverse hyperbolic tangent of x
+#
+#    Returns
+#    -------
+#    result: Operation
+#        Operation which will calculate the inverse hyperbolic tangent.
+#
+#    Examples
+#    --------
+#
+#    >>> import zython as zn
+#    >>> class MyModel(zn.Model):
+#    ...     def __init__(self):
+#    ...         self.a = zn.atanh(0)
+#    ...         self.b = zn.var(float)
+#    ...         self.constraints = [self.b == zn.atanh(0.99)]
+#    >>> model = MyModel()
+#    >>> model.solve_satisfy()
+#    Solution(a=0.0, b=2.646652412362246)
+#    """
+#    return Operation(_Op_code.atanh, x, type_=float)
 
 def cos(x: Union[float, var]) -> Operation:
     """Return the cosine of x
@@ -691,28 +691,28 @@ def cos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.cos, x, type_=float)
 
-def cosh(x: Union[float, var]) -> Operation:
-    """Return the hyperbolic cosine of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the hyperbolic cosine.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.cosh(0)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.cosh(1)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=1.0, b=1.543080634815244)
-    """
-    return Operation(_Op_code.cosh, x, type_=float)
+# def cosh(x: Union[float, var]) -> Operation:
+#     """Return the hyperbolic cosine of x
+# 
+#     Returns
+#     -------
+#     result: Operation
+#         Operation which will calculate the hyperbolic cosine.
+# 
+#     Examples
+#     --------
+# 
+#     >>> import zython as zn
+#     >>> class MyModel(zn.Model):
+#     ...     def __init__(self):
+#     ...         self.a = zn.cosh(0)
+#     ...         self.b = zn.var(float)
+#     ...         self.constraints = [self.b == zn.cosh(1)]
+#     >>> model = MyModel()
+#     >>> model.solve_satisfy()
+#     Solution(a=1.0, b=1.543080634815244)
+#     """
+#     return Operation(_Op_code.cosh, x, type_=float)
 
 def sin(x: Union[float, var]) -> Operation:
     """Return the sine of x
@@ -737,28 +737,28 @@ def sin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.sin, x, type_=float)
 
-def sinh(x: Union[float, var]) -> Operation:
-    """Return the hyperbolic sine of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the hyperbolic sine.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.sinh(0)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.sinh(1)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=0.0, b=1.175201193643801)
-    """
-    return Operation(_Op_code.sinh, x, type_=float)
+# def sinh(x: Union[float, var]) -> Operation:
+#     """Return the hyperbolic sine of x
+# 
+#     Returns
+#     -------
+#     result: Operation
+#         Operation which will calculate the hyperbolic sine.
+# 
+#     Examples
+#     --------
+# 
+#     >>> import zython as zn
+#     >>> class MyModel(zn.Model):
+#     ...     def __init__(self):
+#     ...         self.a = zn.sinh(0)
+#     ...         self.b = zn.var(float)
+#     ...         self.constraints = [self.b == zn.sinh(1)]
+#     >>> model = MyModel()
+#     >>> model.solve_satisfy()
+#     Solution(a=0.0, b=1.175201193643801)
+#     """
+#     return Operation(_Op_code.sinh, x, type_=float)
 
 def tan(x: Union[float, var]) -> Operation:
     """Return the tangent of x
@@ -783,28 +783,28 @@ def tan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.tan, x, type_=float)
 
-def tanh(x: Union[float, var]) -> Operation:
-    """Return the hyperbolic tangent of x
-
-    Returns
-    -------
-    result: Operation
-        Operation which will calculate the hyperbolic tangent.
-
-    Examples
-    --------
-
-    >>> import zython as zn
-    >>> class MyModel(zn.Model):
-    ...     def __init__(self):
-    ...         self.a = zn.tanh(0)
-    ...         self.b = zn.var(float)
-    ...         self.constraints = [self.b == zn.tanh(1)]
-    >>> model = MyModel()
-    >>> model.solve_satisfy()
-    Solution(a=0.0, b=0.7615941559557649)
-    """
-    return Operation(_Op_code.tanh, x, type_=float)
+# def tanh(x: Union[float, var]) -> Operation:
+#     """Return the hyperbolic tangent of x
+# 
+#     Returns
+#     -------
+#     result: Operation
+#         Operation which will calculate the hyperbolic tangent.
+# 
+#     Examples
+#     --------
+# 
+#     >>> import zython as zn
+#     >>> class MyModel(zn.Model):
+#     ...     def __init__(self):
+#     ...         self.a = zn.tanh(0)
+#     ...         self.b = zn.var(float)
+#     ...         self.constraints = [self.b == zn.tanh(1)]
+#     >>> model = MyModel()
+#     >>> model.solve_satisfy()
+#     Solution(a=0.0, b=0.7615941559557649)
+#     """
+#     return Operation(_Op_code.tanh, x, type_=float)
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
     """Finds the smallest object in ``seq``, according to ``key``
