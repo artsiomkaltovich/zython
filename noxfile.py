@@ -32,7 +32,7 @@ def doctest(session):
         print("Skipping doctest for python 3.13, see https://github.com/twmr/pytest-sphinx/issues/67")
         return
     session.install("-r", "requirements.txt")
-    session.install("-r", "requirements_doc.txt")
+    session.install("-r", "requirements_dev.txt")
     session.run("pytest", "doc", "--doctest-glob=*.rst", "--doctest-modules")
 
 
@@ -56,3 +56,10 @@ def gendoc(session):
         "doc/source",
         "doc/build/html",
     )
+
+
+@nox.session(default=False)
+def testcov(session):
+    session.install("-r", "requirements.txt")
+    session.install("-r", "requirements_dev.txt")
+    session.run("pytest", "test", "zython", "doc", "--doctest-glob=*.rst", "--doctest-modules", "--cov=zython", "--cov-branch", "--cov-report=term-missing")

@@ -120,5 +120,5 @@ To check coverage for all tests (both doc and unit tests) you should
 run the following command:
 
 ```shell
-pytest test zython doc --doctest-glob="*.rst" --doctest-modules --cov=zython --cov-branch --cov-report=term-missing
+nox -rs testcov
 ```
