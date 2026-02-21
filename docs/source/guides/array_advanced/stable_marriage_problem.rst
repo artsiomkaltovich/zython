@@ -7,7 +7,7 @@ Problem Description
 -------------------
 Given *n* men and *n* women, each with their own preference rankings for the opposite group, the goal is to find a stable matching such that no man and woman would both prefer each other over their assigned partners.
 
-The model is based on the example from the `MiniZinc documentation <https://docs.minizinc.dev/en/stable/modelling2.html#array-access-constraints>`_.
+The model is based on the example from the `MiniZinc documentation <https://docs.minizinc.dev/en/2.9.0/modelling2.html#array-access-constraints>`_.
 
 
 Python Model

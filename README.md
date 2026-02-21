@@ -116,8 +116,7 @@ Good Luck and thank you for improvements. :)
 
 ### Coverage metric
 
-To check coverage for all tests (both doc and unit tests) you should
-run the following command:
+To check coverage for all tests (both doc and unit tests) you should run the following command:
 
 ```shell
 nox -rs testcov
