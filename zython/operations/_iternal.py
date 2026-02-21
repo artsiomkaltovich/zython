@@ -40,7 +40,7 @@ def _(seq: Union[list, tuple]):
 
 
 def _extract_func_var_and_op(
-        seq: ZnSequence | Collection[ZnSequence],
+        seq: Union[ZnSequence, Collection[ZnSequence]],
         func: Callable,
 ) -> Tuple[var | Collection[var] | None, Operation]:
     variable = None
