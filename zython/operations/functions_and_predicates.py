@@ -12,7 +12,7 @@ from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
 
-def exists(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
+def exists(*seq: ZnSequence) -> Constraint:
     """Specify constraint which should be true for `at least` one element in ``seq``.
 
     The method has the same signature as ``forall``.
@@ -36,11 +36,12 @@ def exists(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None
     >>> sorted((result["a"], result["b"], result["c"]))
     [0, 0, 1]
     """
+    seq, func = _get_seq_and_func(seq)
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     return constraint_module._exists(seq, iter_var, operation)
 
 
-def forall(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
+def forall(*seq: ZnSequence) -> Constraint:
     """
     Takes expression (that is, constraint) or function which return constraint
         and make them a single constraint which should be true for every element in the array.
@@ -70,6 +71,7 @@ def forall(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None
     >>> model.solve_satisfy()
     Solution(a=[1, 1, 1])
     """
+    seq, func = _get_seq_and_func(seq)
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     return constraint_module._forall(seq, iter_var, operation)
 
@@ -1110,3 +1112,10 @@ def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Co
         return Constraint(_Op_code.decreasing, seq)
     else:
         return Constraint(_Op_code.strictly_decreasing, seq)
+
+
+def _get_seq_and_func(seq):
+    assert len(seq) >= 2, "At least 2 arguments should be provided"
+    func = seq[-1]
+    seq = seq[:-1] if len(seq) > 2 else seq[0]
+    return seq, func

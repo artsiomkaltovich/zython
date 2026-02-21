@@ -1,7 +1,7 @@
 import enum
 import inspect
 from functools import singledispatch
-from typing import Union, Callable, Tuple, Optional
+from typing import Collection, Union, Callable, Tuple
 
 from zython import var
 from zython.operations.operation import Operation
@@ -40,13 +40,20 @@ def _(seq: Union[list, tuple]):
 
 
 def _extract_func_var_and_op(
-        seq: ZnSequence,
+        seq: ZnSequence | Collection[ZnSequence],
         func: Callable,
-) -> Tuple[Optional[var], Operation]:
+) -> Tuple[var | Collection[var] | None, Operation]:
     variable = None
     parameters = inspect.signature(func).parameters
     if len(parameters) > 1:
-        raise ValueError("only functions and lambdas with one arguments are supported")
+        if len(parameters) != len(seq):
+            raise ValueError(f"Function parameters ({len(parameters)}) don't match sequence length ({len(seq)})") 
+        variable = []
+        for p, s in zip(parameters.keys(), seq):
+            v = _get_variable(s)
+            v._name = p
+            variable.append(v)
+        func_op = func(*variable)
     elif len(parameters) == 1:
         variable = _get_variable(seq)
         variable._name, _ = dict(parameters).popitem()
