@@ -94,10 +94,6 @@ def _compile_slice(ndim, pos, view):
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
 
-def _pow(a, b, /, *, flags_):
-    return f"pow({to_str(a, flags_=flags_)}, {to_str(b, flags_=flags_)})"
-
-
 def _binary_op(sign, a, b, /, *, flags_):
     return f"({to_str(a, flags_=flags_)} {sign} {to_str(b, flags_=flags_)})"
 
@@ -195,7 +191,7 @@ class Op2StrType(UserDict):
         self[_Op_code.floordiv] = partial(_binary_op, "div")
         self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.in_] = partial(_binary_op, "in")
-        self[_Op_code.pow] = _pow  # todo: replace with _call_func 
+        self[_Op_code.pow] = partial(_call_func, "pow")
         self[_Op_code.sqrt] = partial(_call_func, "sqrt")
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")
