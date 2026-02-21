@@ -337,19 +337,20 @@ def table(
     x: ZnSequence,
     t: ZnSequence,
 ) -> Constraint:
-    """The table constraint is used to specify if one dimensional array
-        should be equal to any row of a two-dimensional array.
+    """The table constraint is used to specify if one dimensional array should be equal to any row of a two-dimensional array.
 
     Or, in more strict form:
     the table constraint enforces that a tuple of variables takes a value from a set of tuples.
     Since there are no tuples in MiniZinc this is encoded using arrays.
     The constraint enforces x in t, where we consider x and each row in t to be a tuple,
-        and t to be a set of tuples.
+    and t to be a set of tuples.
 
     Parameters
     ----------
     x: one-dimentional array
-    t: two-dimentional array, `x` should be one of the rows of `t`
+        The variable array to be matched.
+    t: two-dimentional array
+        `x` should be one of the rows of `t`.
 
     Examples
     --------
@@ -1153,6 +1154,7 @@ def implication(left: Operation, right: Operation) -> Constraint:
 
     Examples
     --------
+
     >>> import zython as zn
     >>> class MyModel(zn.Model):
     ...     def __init__(self, a):
