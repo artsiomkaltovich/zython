@@ -61,3 +61,4 @@ class _Op_code(enum.Enum):
     disjunctive = enum.auto()
     disjunctive_strict = enum.auto()
     table = enum.auto()
+    implication = enum.auto()

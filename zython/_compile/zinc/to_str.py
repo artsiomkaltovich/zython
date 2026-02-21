@@ -191,6 +191,7 @@ class Op2StrType(UserDict):
         self[_Op_code.floordiv] = partial(_binary_op, "div")
         self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.in_] = partial(_binary_op, "in")
+        self[_Op_code.implication] = partial(_binary_op, "->")
         self[_Op_code.pow] = partial(_call_func, "pow")
         self[_Op_code.sqrt] = partial(_call_func, "sqrt")
         self[_Op_code.invert] = partial(_unary_op, "not")

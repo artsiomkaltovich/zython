@@ -1114,6 +1114,40 @@ def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Co
         return Constraint(_Op_code.strictly_decreasing, seq)
 
 
+
+def implication(left: Operation, right: Operation) -> Constraint:
+    """
+    Represents a logical implication operation between two operands.
+
+    Parameters
+    ----------
+    left: Operation
+        The left operand of the implication.
+    right: Operation
+        The right operand of the implication.
+
+    Returns
+    -------
+    Constraint
+        A constraint that ensures if the left operand is true, the right operand must also be true.
+        If the left operand is false, the right operand can be either true or false.
+
+    Examples
+    --------
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self, a):
+    ...         self.a = zn.par(a)
+    ...         self.b = zn.var(range(5))
+    ...         self.constraints = [zn.implication(self.a > 1, self.b > 3)]
+    >>> model1 = MyModel(0)
+    >>> model2 = MyModel(2)
+    >>> model1.solve_minimize(model1.b), model2.solve_minimize(model2.b)
+    (Solution(objective=0, b=0), Solution(objective=4, b=4))
+    """
+    return Constraint(_Op_code.implication, left, right)
+
+
 def _get_seq_and_func(seq):
     assert len(seq) >= 2, "At least 2 arguments should be provided"
     func = seq[-1]
