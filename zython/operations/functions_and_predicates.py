@@ -87,7 +87,7 @@ def sum(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -
     seq: range, array of var, or sequence (list or tuple) of var
         sequence to sum up
     func: Operation or Callable, optional
-        Operation which will be executed with every element and later sum up. 
+        Operation which will be executed with every element and later sum up.
         Or function which returns such operation.
         If function or lambda it should be with 0 or 1 arguments only.
 
@@ -124,6 +124,7 @@ def sum(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     type_ = derive_operation_type(seq, operation)
     return Operation(_Op_code.sum_, seq, iter_var, operation, type_=type_)
+
 
 def product(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Operation:
     """Calculate the product of the ``seq`` according to ``func``
@@ -394,6 +395,7 @@ def abs(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.abs, x, type_=get_base_type(x))
 
+
 def exp(x: Union[float, var]) -> Operation:
     """Return the exponential of x
 
@@ -416,6 +418,7 @@ def exp(x: Union[float, var]) -> Operation:
     Solution(a=2.718281828459045, b=7.38905609893065)
     """
     return Operation(_Op_code.exp, x, type_=float)
+
 
 def ln(x: Union[float, var]) -> Operation:
     """Return the natural logarithm of x
@@ -440,6 +443,7 @@ def ln(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.ln, x, type_=float)
 
+
 def log(x: Union[float, var], base: float) -> Operation:
     """Return the logarithm of x to the given base
 
@@ -462,6 +466,7 @@ def log(x: Union[float, var], base: float) -> Operation:
     Solution(a=3.0, b=3.0)
     """
     return Operation(_Op_code.log, base, x, type_=float)
+
 
 def log10(x: Union[float, var]) -> Operation:
     """Return the base-10 logarithm of x
@@ -486,6 +491,7 @@ def log10(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.log10, x, type_=float)
 
+
 def log2(x: Union[float, var]) -> Operation:
     """Return the base-2 logarithm of x
 
@@ -508,6 +514,7 @@ def log2(x: Union[float, var]) -> Operation:
     Solution(a=3.0, b=4.0)
     """
     return Operation(_Op_code.log2, x, type_=float)
+
 
 def sqrt(x: Union[float, var]) -> Operation:
     """Return the square root of x
@@ -532,6 +539,7 @@ def sqrt(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.sqrt, x, type_=float)
 
+
 def acos(x: Union[float, var]) -> Operation:
     """Return the arc cosine of x
 
@@ -555,17 +563,18 @@ def acos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.acos, x, type_=float)
 
+
 # def acosh(x: Union[float, var]) -> Operation:
 #     """Return the inverse hyperbolic cosine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the inverse hyperbolic cosine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -577,6 +586,7 @@ def acos(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=1.316957896924817)
 #     """
 #     return Operation(_Op_code.acosh, x, type_=float)
+
 
 def asin(x: Union[float, var]) -> Operation:
     """Return the arc sine of x
@@ -601,17 +611,18 @@ def asin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.asin, x, type_=float)
 
+
 # def asinh(x: Union[float, var]) -> Operation:
 #     """Return the inverse hyperbolic sine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the inverse hyperbolic sine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -623,6 +634,7 @@ def asin(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=0.881373587019543)
 #     """
 #     return Operation(_Op_code.asinh, x, type_=float)
+
 
 def atan(x: Union[float, var]) -> Operation:
     """Return the arc tangent of x
@@ -647,7 +659,8 @@ def atan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.atan, x, type_=float)
 
-#def atanh(x: Union[float, var]) -> Operation:
+
+# def atanh(x: Union[float, var]) -> Operation:
 #    """Return the inverse hyperbolic tangent of x
 #
 #    Returns
@@ -669,6 +682,7 @@ def atan(x: Union[float, var]) -> Operation:
 #    Solution(a=0.0, b=2.646652412362246)
 #    """
 #    return Operation(_Op_code.atanh, x, type_=float)
+
 
 def cos(x: Union[float, var]) -> Operation:
     """Return the cosine of x
@@ -693,17 +707,18 @@ def cos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.cos, x, type_=float)
 
+
 # def cosh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic cosine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic cosine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -715,6 +730,7 @@ def cos(x: Union[float, var]) -> Operation:
 #     Solution(a=1.0, b=1.543080634815244)
 #     """
 #     return Operation(_Op_code.cosh, x, type_=float)
+
 
 def sin(x: Union[float, var]) -> Operation:
     """Return the sine of x
@@ -739,17 +755,18 @@ def sin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.sin, x, type_=float)
 
+
 # def sinh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic sine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic sine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -761,6 +778,7 @@ def sin(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=1.175201193643801)
 #     """
 #     return Operation(_Op_code.sinh, x, type_=float)
+
 
 def tan(x: Union[float, var]) -> Operation:
     """Return the tangent of x
@@ -785,17 +803,18 @@ def tan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.tan, x, type_=float)
 
+
 # def tanh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic tangent of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic tangent.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -807,6 +826,7 @@ def tan(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=0.7615941559557649)
 #     """
 #     return Operation(_Op_code.tanh, x, type_=float)
+
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
     """Finds the smallest object in ``seq``, according to ``key``
@@ -1112,7 +1132,6 @@ def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Co
         return Constraint(_Op_code.decreasing, seq)
     else:
         return Constraint(_Op_code.strictly_decreasing, seq)
-
 
 
 def implication(left: Operation, right: Operation) -> Constraint:

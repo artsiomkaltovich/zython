@@ -64,17 +64,13 @@ def test_3d_gen():
     ]
 
 
-@pytest.mark.parametrize(
-    "array", ([1, 0.0], ((1, 0.0), (1, 3)), [[1, 3], [1, "a"]], (((1, "a"),),))
-)
+@pytest.mark.parametrize("array", ([1, 0.0], ((1, 0.0), (1, 3)), [[1, 3], [1, "a"]], (((1, "a"),),)))
 def test_different_types(array):
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
 
-    with pytest.raises(
-        ValueError, match="All elements of the array should be the same type"
-    ):
+    with pytest.raises(ValueError, match="All elements of the array should be the same type"):
         MyModel(array)
 
 
@@ -83,26 +79,20 @@ def test_var_array_without_shape():
         zn.Array(zn.var(int))
 
 
-@pytest.mark.parametrize(
-    "array", (zn.Array([[1], [2]]), zn.Array(zn.var(int), shape=(1, 2)))
-)
+@pytest.mark.parametrize("array", (zn.Array([[1], [2]]), zn.Array(zn.var(int), shape=(1, 2))))
 @pytest.mark.parametrize("indexes", ((2, 0), (0, 2)))
 def test_array_index_error(array, indexes):
     with pytest.raises(IndexError):
         array[indexes]
 
 
-@pytest.mark.parametrize(
-    "array", (((1, 0, 1), (1, 3)), [[1, 3], [1, 1, 0]], (((1, 1), 1),))
-)
+@pytest.mark.parametrize("array", (((1, 0, 1), (1, 3)), [[1, 3], [1, 1, 0]], (((1, 1), 1),)))
 def test_different_length(array):
     class MyModel(zn.Model):
         def __init__(self, array):
             self.a = zn.Array(array)
 
-    with pytest.raises(
-        ValueError, match="Subarrays of different length are not supported"
-    ):
+    with pytest.raises(ValueError, match="Subarrays of different length are not supported"):
         MyModel(array)
 
 
@@ -114,9 +104,7 @@ class TestPos:
 
     def test_2d_index_on_1d_array(self):
         a = zn.Array([1, 2, 3])
-        with pytest.raises(
-            ValueError, match="The array has 1 dimensions, but 2 indexes were specified"
-        ):
+        with pytest.raises(ValueError, match="The array has 1 dimensions, but 2 indexes were specified"):
             _ = a[1, 0]
 
     @pytest.mark.parametrize(
@@ -140,25 +128,19 @@ class TestPos:
 
     def test_neg_int(self):
         a = zn.Array([1, 2, 3])
-        with pytest.raises(
-            ValueError, match="Negative indexes are not supported for now"
-        ):
+        with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
             _ = a[-1]
 
     def test_step(self):
         a = zn.Array([1, 2, 3])
-        with pytest.raises(
-            ValueError, match="step other then 1 isn't supported, but it is 2"
-        ):
+        with pytest.raises(ValueError, match="step other then 1 isn't supported, but it is 2"):
             _ = a[1:3:2]
 
     @pytest.mark.parametrize("pos", [slice(-1, 2), slice(1, -2), slice(-1, -2)])
     @pytest.mark.parametrize("before", (True, False))
     def test_neg_slice_2d(self, pos, before):
         a = zn.Array([[1], [2], [3]])
-        with pytest.raises(
-            ValueError, match="Negative indexes are not supported for now"
-        ):
+        with pytest.raises(ValueError, match="Negative indexes are not supported for now"):
             _ = a[:, pos] if before else a[pos, :]
 
     @pytest.mark.parametrize("start", (10, 15))
@@ -170,9 +152,7 @@ class TestPos:
         ):
             _ = array[1, start:10, :]
 
-    @pytest.mark.parametrize(
-        "pos, expected", [((0, 1), (0, 1)), ((0, slice(1, 3)), (0, slice(1, 3, 1)))]
-    )
+    @pytest.mark.parametrize("pos, expected", [((0, 1), (0, 1)), ((0, slice(1, 3)), (0, slice(1, 3, 1)))])
     def test_2d(self, pos, expected):
         a = zn.Array([[1, 2], [2, 3], [3, 4]])
         a = a[pos]

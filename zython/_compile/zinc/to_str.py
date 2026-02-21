@@ -120,7 +120,7 @@ def _call_func(func, *params, flatten_args=False, flags_):
 
 
 def _get_array_shape_decl(shape):
-    result = [f'0..{to_str(s - 1)}' for s in shape]
+    result = [f"0..{to_str(s - 1)}" for s in shape]
     return f"{', '.join(result)}"
 
 
@@ -152,7 +152,7 @@ def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
         return iter_var_str, to_str(func, flags_=flags_)
     return f"{iter_var.name} in {to_str(seq, flags_=flags_)}", to_str(func, flags_=flags_)
 
-    
+
 def _compile_array_comprehension(seq, iter_var, func, flags_):
     indexes, func_str = _get_indexes_and_cycle_body(seq, iter_var, func, flags_=flags_)
     return f"[{func_str} | {indexes}]"

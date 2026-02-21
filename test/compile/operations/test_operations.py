@@ -14,11 +14,22 @@ class TestBinary:
     variables = v, p
 
     @pytest.mark.parametrize("v", variables)
-    @pytest.mark.parametrize("op, sign", ([operator.add, "+"], [operator.sub, "-"],
-                                          [operator.floordiv, "div"], [operator.mul, "*"], [operator.mod, "mod"],
-                                          [operator.eq, "=="], [operator.ne, "!="],
-                                          [operator.gt, ">"], [operator.lt, "<"],
-                                          [operator.ge, ">="], [operator.le, "<="]))
+    @pytest.mark.parametrize(
+        "op, sign",
+        (
+            [operator.add, "+"],
+            [operator.sub, "-"],
+            [operator.floordiv, "div"],
+            [operator.mul, "*"],
+            [operator.mod, "mod"],
+            [operator.eq, "=="],
+            [operator.ne, "!="],
+            [operator.gt, ">"],
+            [operator.lt, "<"],
+            [operator.ge, ">="],
+            [operator.le, "<="],
+        ),
+    )
     def test_simple_ariph_binary_op(self, v, op: Callable, sign: str):
         result = op(v, 1)
         assert to_str(result) == f"({v.name} {sign} 1)"
@@ -30,7 +41,7 @@ class TestBinary:
         assert result.type is int
 
     def test_long_binary_op(self):
-        result = 1 + self.v * 2 - self.p + self.v ** self.p
+        result = 1 + self.v * 2 - self.p + self.v**self.p
         assert to_str(result) == f"(((1 + ({self.v.name} * 2)) - {self.p.name}) + pow({self.v.name}, {self.p.name}))"
         assert result.type is int
 

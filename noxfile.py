@@ -62,4 +62,14 @@ def gendoc(session):
 def testcov(session):
     session.install("-r", "requirements.txt")
     session.install("-r", "requirements_dev.txt")
-    session.run("pytest", "test", "zython", "doc", "--doctest-glob=*.rst", "--doctest-modules", "--cov=zython", "--cov-branch", "--cov-report=term-missing")
+    session.run(
+        "pytest",
+        "test",
+        "zython",
+        "doc",
+        "--doctest-glob=*.rst",
+        "--doctest-modules",
+        "--cov=zython",
+        "--cov-branch",
+        "--cov-report=term-missing",
+    )

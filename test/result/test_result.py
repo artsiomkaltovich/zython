@@ -43,7 +43,7 @@ class TestLen:
         class MyModel(zn.Model):
             def __init__(self):
                 self.b = zn.var(int)
-                self.constraints = [self.b ** 2 == -1]
+                self.constraints = [self.b**2 == -1]
 
         result = MyModel().solve_satisfy(all_solutions=all_solutions)
         assert len(result) == 0
@@ -52,7 +52,7 @@ class TestLen:
         class MyModel(zn.Model):
             def __init__(self):
                 self.a = zn.var(int)
-                self.constraints = [self.a ** 2 == 1]
+                self.constraints = [self.a**2 == 1]
 
         result = MyModel().solve_satisfy(all_solutions=True)
         assert len(result) == 2
@@ -61,7 +61,7 @@ class TestLen:
         class MyModel(zn.Model):
             def __init__(self):
                 self.a = zn.var(int)
-                self.constraints = [self.a ** 2 == 1]
+                self.constraints = [self.a**2 == 1]
 
         result = MyModel().solve_satisfy(all_solutions=False)
         assert len(result) == 1

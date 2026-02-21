@@ -13,6 +13,7 @@ class TestConstraint:
                 self.b = zn.var(range(3))
                 self.c = zn.var(range(3))
                 self.constraints = [constraint((self.a, self.b, self.c))]
+
         return Model()
 
     @pytest.mark.parametrize("constraint, expected", [(all_diff, {0, 1, 2}), (lambda x: zn.count(x, 1) == 3, {1})])
@@ -36,4 +37,3 @@ class TestConstraint:
         else:
             assert low <= result["n"] < high
             assert result["n"] == len(set(result["a"]))
-

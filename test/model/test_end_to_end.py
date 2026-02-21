@@ -8,12 +8,14 @@ from zython.var_par.par import par
 
 def test_minizinc_example():
     def minizinc_model():
-        src = "int: a;\n" \
-              "int: b;\n" \
-              "int: c;\n" \
-              "var -100..100: x;\n" \
-              "constraint ((((a * pow(x, 2)) + (b * x)) + c) = 0);\n" \
-              "solve satisfy"
+        src = (
+            "int: a;\n"
+            "int: b;\n"
+            "int: c;\n"
+            "var -100..100: x;\n"
+            "constraint ((((a * pow(x, 2)) + (b * x)) + c) = 0);\n"
+            "solve satisfy"
+        )
         model = minizinc.Model()
         model.add_string(src)
         gecode = minizinc.Solver.lookup("gecode")
@@ -32,7 +34,7 @@ def test_minizinc_example():
                 self.b = par(b)
                 self.c = par(c)
                 self.x = var(range(-100, 101))
-                self.constraints = [self.a * self.x ** 2 + self.b * self.x + self.c == 0]
+                self.constraints = [self.a * self.x**2 + self.b * self.x + self.c == 0]
 
         model = MyModel(1, 4, 0)
         result = model.solve_satisfy(all_solutions=True, result_as=zython.as_original)
@@ -48,12 +50,7 @@ def test_minizinc_example():
 
 def test_range_cmp():
     def minizinc_model():
-        src = "int: a;\n" \
-              "int: b;\n" \
-              "var -100..100: x;\n" \
-              "constraint a < x;\n" \
-              "constraint x < b;\n" \
-              "solve satisfy"
+        src = "int: a;\n" "int: b;\n" "var -100..100: x;\n" "constraint a < x;\n" "constraint x < b;\n" "solve satisfy"
         model = minizinc.Model()
         model.add_string(src)
         gecode = minizinc.Solver.lookup("gecode")
@@ -72,7 +69,10 @@ def test_range_cmp():
                 self.x = var(range(-100, 101))
                 self.constraints = [self.a < self.x, self.x < self.b]
 
-        model = MyModel(1, 4, )
+        model = MyModel(
+            1,
+            4,
+        )
         result = model.solve_satisfy(all_solutions=True, result_as=zython.as_original)
         return result
 
@@ -91,7 +91,7 @@ def test_extra_solve_args():
                 self.x = var(range(-100, 101))
                 self.constraints = [self.a < self.x, self.x < self.b]
 
-        model = MyModel(1, 4, )
+        model = MyModel(1, 4)
         result = model.solve_satisfy(
             optimisation_level=2,
             n_processes=3,

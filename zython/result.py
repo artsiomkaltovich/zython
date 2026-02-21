@@ -22,27 +22,17 @@ class Result:
             if isinstance(mzn_result.solution, list):
                 if mzn_result.solution:
                     # several solutions
-                    names, Solution = _generate_solution_class_and_field_names(
-                        mzn_result.solution[0]
-                    )
+                    names, Solution = _generate_solution_class_and_field_names(mzn_result.solution[0])
                     solutions = []
                     for i in range(len(mzn_result.solution)):
-                        solutions.append(
-                            Solution(
-                                *convert_result_value(
-                                    (mzn_result[i, name]) for name in names
-                                )
-                            )
-                        )
+                        solutions.append(Solution(*convert_result_value((mzn_result[i, name]) for name in names)))
                     self._solution = solutions
                 else:
                     # no solutions while all_solutions=True
                     self._solution = None
             else:
                 names, Solution = _generate_solution_class_and_field_names(mzn_result.solution)
-                self._solution = Solution(
-                    *(convert_result_value(mzn_result[name]) for name in names)
-                )
+                self._solution = Solution(*(convert_result_value(mzn_result[name]) for name in names))
         else:
             self._solution = None
 

@@ -6,10 +6,7 @@ import zython as zn
 
 def test_select_solver():
     def minizinc_model():
-        src = "float: a;\n" \
-              "var float: x;\n" \
-              "constraint x == a + 1;\n" \
-              "solve satisfy"
+        src = "float: a;\n" "var float: x;\n" "constraint x == a + 1;\n" "solve satisfy"
         model = minizinc.Model()
         model.add_string(src)
         solver = minizinc.Solver.lookup("cbc")

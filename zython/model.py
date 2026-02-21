@@ -13,22 +13,23 @@ from zython.var_par.var import var
 
 
 class Model(ABC):
-    """ Base class for user-defined models to solve """
+    """Base class for user-defined models to solve"""
+
     constraint: List[Constraint]
 
     def solve_satisfy(
-            self,
-            *,
-            all_solutions=False,
-            result_as=None,
-            verbose=False,
-            solver="gecode",
-            optimisation_level: Optional[int] = None,
-            n_processes: Optional[int] = None,
-            timeout: Optional[timedelta] = None,
-            random_seed: Optional[int] = None,
+        self,
+        *,
+        all_solutions=False,
+        result_as=None,
+        verbose=False,
+        solver="gecode",
+        optimisation_level: Optional[int] = None,
+        n_processes: Optional[int] = None,
+        timeout: Optional[timedelta] = None,
+        random_seed: Optional[int] = None,
     ):
-        """ Finds solution that satisfied constraints, or the error message if the model can't be solved
+        """Finds solution that satisfied constraints, or the error message if the model can't be solved
 
         Parameters
         ----------
@@ -76,17 +77,17 @@ class Model(ABC):
         )
 
     def solve_maximize(
-            self,
-            eq,
-            /,
-            *,
-            result_as=None,
-            verbose=False,
-            solver="gecode",
-            optimisation_level: Optional[int] = None,
-            n_processes: Optional[int] = None,
-            timeout: Optional[timedelta] = None,
-            random_seed: Optional[int] = None,
+        self,
+        eq,
+        /,
+        *,
+        result_as=None,
+        verbose=False,
+        solver="gecode",
+        optimisation_level: Optional[int] = None,
+        n_processes: Optional[int] = None,
+        timeout: Optional[timedelta] = None,
+        random_seed: Optional[int] = None,
     ):
         return self._solve(
             "maximize",
@@ -102,17 +103,17 @@ class Model(ABC):
         )
 
     def solve_minimize(
-            self,
-            eq,
-            /,
-            *,
-            result_as=None,
-            verbose=False,
-            solver="gecode",
-            optimisation_level: Optional[int] = None,
-            n_processes: Optional[int] = None,
-            timeout: Optional[timedelta] = None,
-            random_seed: Optional[int] = None,
+        self,
+        eq,
+        /,
+        *,
+        result_as=None,
+        verbose=False,
+        solver="gecode",
+        optimisation_level: Optional[int] = None,
+        n_processes: Optional[int] = None,
+        timeout: Optional[timedelta] = None,
+        random_seed: Optional[int] = None,
     ):
         return self._solve(
             "minimize",
@@ -128,16 +129,16 @@ class Model(ABC):
         )
 
     def _solve(
-            self,
-            *how_to_solve,
-            all_solutions,
-            result_as,
-            verbose,
-            solver,
-            optimisation_level,
-            n_processes,
-            timeout,
-            random_seed,
+        self,
+        *how_to_solve,
+        all_solutions,
+        result_as,
+        verbose,
+        solver,
+        optimisation_level,
+        n_processes,
+        timeout,
+        random_seed,
     ):
         solver = minizinc.Solver.lookup(solver)
         model = minizinc.Model()

@@ -41,6 +41,7 @@ def test_array_and_op():
 def test_no_arg_func():
     def fn():
         return -1
+
     iter_var, op = get_iter_var_and_op([1, 2, 3], fn)
     assert isinstance(op, int) and op == -1
 
