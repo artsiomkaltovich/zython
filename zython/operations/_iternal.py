@@ -42,7 +42,7 @@ def _(seq: Union[list, tuple]):
 def _extract_func_var_and_op(
         seq: Union[ZnSequence, Collection[ZnSequence]],
         func: Callable,
-) -> Tuple[var | Collection[var] | None, Operation]:
+) -> Tuple[Union[var, Collection[var], None], Operation]:
     variable = None
     parameters = inspect.signature(func).parameters
     if len(parameters) > 1:
