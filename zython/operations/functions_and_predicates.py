@@ -12,7 +12,7 @@ from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
 
-def exists(*seq: ZnSequence) -> Constraint:
+def exists(*seq: ZnSequence | "Constraint" | Callable) -> Constraint:
     """Specify constraint which should be true for `at least` one element in ``seq``.
 
     The method has the same signature as ``forall``.
@@ -35,24 +35,57 @@ def exists(*seq: ZnSequence) -> Constraint:
     >>> result = model.solve_satisfy()
     >>> sorted((result["a"], result["b"], result["c"]))
     [0, 0, 1]
+
+    >>> import zython as zn
+    >>> import itertools
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.x = zn.Array(zn.var(range(0, 5)), shape=3)
+    ...         self.y = zn.Array(zn.var(range(0, 5)), shape=3)
+    ...         self.constraints = [zn.exists(self.x, self.y, lambda a, b: a + b == 5)]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> any(x + y == 5 for x, y in itertools.product(result["x"], result["y"]))
+    True
     """
     seq, func = _get_seq_and_func(seq)
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     return constraint_module._exists(seq, iter_var, operation)
 
 
-def forall(*seq: ZnSequence) -> Constraint:
-    """
-    Takes expression (that is, constraint) or function which return constraint
-        and make them a single constraint which should be true for every element in the array.
+def forall(*seq: ZnSequence | "Constraint" | Callable) -> Constraint:
+    """Creates a universal quantifier constraint that must hold for all elements in one or more sequences.
 
-    Parameters
-    ----------
-    seq: range, array of var, or sequence (list or tuple) of var
-        sequence to apply ``func``
-    func: Constraint or Callable, optional
-        Constraint every element in seq should satisfy or function which returns such constraint.
-        If function or lambda it should be with 0 or 1 arguments only.
+    This function creates a constraint that applies to every element (or combination of elements
+    when multiple sequences are provided) in the given sequence(s). It's equivalent to the
+    mathematical universal quantifier (∀).
+
+    *seq : ZnSequence | Constraint | Callable
+        Variable-length argument list that can contain:
+        - One or more sequences (range, array of variables, list, or tuple of variables)
+        - A constraint to be applied to all elements
+        - A callable (function or lambda) that returns a constraint
+        
+        The last argument can be a Constraint or Callable that defines the condition.
+        If a callable is provided, it should accept 0 arguments (for simple constraints)
+        or N arguments where N is the number of sequences provided.
+
+    Constraint
+        A single constraint that enforces the given condition for all elements or
+        element combinations in the sequence(s).
+
+    Raises
+    ------
+    ValueError
+        If the arguments are not properly formatted or if the callable has an
+        incorrect number of parameters.
+
+    Notes
+    -----
+    - When multiple sequences are provided, the constraint is applied to the
+      Cartesian product of all sequences.
+    - The function automatically handles the iteration variables and applies
+      the constraint uniformly across all elements.
 
     Returns
     -------
