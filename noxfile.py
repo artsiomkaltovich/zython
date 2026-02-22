@@ -1,4 +1,3 @@
-import sys
 import nox
 
 nox.options.stop_on_first_error = True
@@ -28,9 +27,6 @@ def test(session):
 
 @nox.session
 def doctest(session):
-    if sys.version_info.major == 3 and sys.version_info.minor == 13:
-        print("Skipping doctest for python 3.13, see https://github.com/twmr/pytest-sphinx/issues/67")
-        return
     session.install("-r", "requirements.txt")
     session.install("-r", "requirements_dev.txt")
     session.run("pytest", "docs", "--doctest-glob=*.rst", "--doctest-modules")
