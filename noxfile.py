@@ -1,4 +1,3 @@
-import sys
 import nox
 
 nox.options.stop_on_first_error = True
