@@ -1,9 +1,11 @@
 version: 2
+sphinx:
+  configuration: docs/source/conf.py
 build:
-  os: "ubuntu-22.04"
+  os: "ubuntu-lts-latest"
   tools:
-    python: "3.8"
+    python: "3.10"
   jobs:
     pre_build:
-      - python3.8 setup.py install
+      - python3.10 setup.py install
       - sphinx-apidoc -f -o docs/source/api zython
