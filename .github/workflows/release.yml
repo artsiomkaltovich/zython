@@ -6,7 +6,8 @@ name: On release
 on:
   workflow_dispatch:
   push:
-    branches: [release]
+    tags:
+      - "*" # Run on any tag
 
 jobs:
   test:
