@@ -94,10 +94,6 @@ def _compile_slice(ndim, pos, view):
     return f"slice_{ndim}d({view.array.name}, {slices_str}, {new_index_set_str})", new_index_set
 
 
-def _pow(a, b, /, *, flags_):
-    return f"pow({to_str(a, flags_=flags_)}, {to_str(b, flags_=flags_)})"
-
-
 def _binary_op(sign, a, b, /, *, flags_):
     return f"({to_str(a, flags_=flags_)} {sign} {to_str(b, flags_=flags_)})"
 
@@ -124,7 +120,7 @@ def _call_func(func, *params, flatten_args=False, flags_):
 
 
 def _get_array_shape_decl(shape):
-    result = [f'0..{to_str(s - 1)}' for s in shape]
+    result = [f"0..{to_str(s - 1)}" for s in shape]
     return f"{', '.join(result)}"
 
 
@@ -151,6 +147,9 @@ def _array_comprehension_call(op, seq, iter_var, operation, *, flags_):
 
 
 def _get_indexes_and_cycle_body(seq, iter_var, func, flags_):
+    if isinstance(iter_var, (list, tuple)):
+        iter_var_str = ", ".join(f"{iv.name} in {to_str(s, flags_=flags_)}" for iv, s in zip(iter_var, seq))
+        return iter_var_str, to_str(func, flags_=flags_)
     return f"{iter_var.name} in {to_str(seq, flags_=flags_)}", to_str(func, flags_=flags_)
 
 
@@ -192,7 +191,8 @@ class Op2StrType(UserDict):
         self[_Op_code.floordiv] = partial(_binary_op, "div")
         self[_Op_code.mod] = partial(_binary_op, "mod")
         self[_Op_code.in_] = partial(_binary_op, "in")
-        self[_Op_code.pow] = _pow
+        self[_Op_code.implication] = partial(_binary_op, "->")
+        self[_Op_code.pow] = partial(_call_func, "pow")
         self[_Op_code.sqrt] = partial(_call_func, "sqrt")
         self[_Op_code.invert] = partial(_unary_op, "not")
         self[_Op_code.forall] = partial(_two_brackets_op, "forall")

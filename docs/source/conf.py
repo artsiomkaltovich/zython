@@ -14,17 +14,18 @@ import os
 import sys
 
 
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath("../.."))
 from read_version import read_version
 import zython  # for apidoc collection
+
 version = read_version()
-master_doc = 'index'
+master_doc = "index"
 
 # -- Project information -----------------------------------------------------
 
-project = 'zython'
-copyright = '2023, Artsiom Kaltovich'
-author = 'Artsiom Kaltovich'
+project = "zython"
+copyright = "2023, Artsiom Kaltovich"
+author = "Artsiom Kaltovich"
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,14 +34,14 @@ author = 'Artsiom Kaltovich'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",   # generate autodoc
+    "sphinx.ext.autodoc",  # generate autodoc
     "sphinx.ext.napoleon",  # extension for autodoc to understand numpy doc
     "sphinx.ext.doctest",
     "sphinx.ext.autosummary",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -53,9 +54,9 @@ exclude_patterns = []
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'nature'
+html_theme = "nature"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]

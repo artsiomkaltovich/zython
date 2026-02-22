@@ -40,6 +40,7 @@ from zython.operations.functions_and_predicates import (
     cumulative,
     disjunctive,
     table,
+    implication,
 )
 from zython.model import Model
 from zython.result import as_original

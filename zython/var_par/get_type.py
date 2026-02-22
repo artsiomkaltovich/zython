@@ -68,8 +68,10 @@ def get_wider_type(left, right):
     warnings.warn("_get_wider_type returns int as fallback")
     return int  # TODO: fix types, do not forget about int/int => float
 
-def derive_operation_type(seq, operation): 
+
+def derive_operation_type(seq, operation):
     from zython.var_par.collections.array import ArrayMixin
+
     if isinstance(seq, ArrayMixin) and operation is None:
         type_ = seq.type
     else:

@@ -13,11 +13,22 @@ class TestBothParams:
         zn.alldifferent([0, 2], except0=True)
 
     def test_ok_except_(self):
-        zn.alldifferent([0, 2], except_={1, })
+        zn.alldifferent(
+            [0, 2],
+            except_={
+                1,
+            },
+        )
 
     def test_both_not_ok(self):
         with pytest.raises(ValueError, match="Arguments `except0` and `except_` can't be set at the same time"):
-            zn.alldifferent([0, 2], except0=True, except_={1, })
+            zn.alldifferent(
+                [0, 2],
+                except0=True,
+                except_={
+                    1,
+                },
+            )
 
 
 class TestExceptTypes:
@@ -28,6 +39,7 @@ class TestExceptTypes:
                 self.a = zn.Array(zn.var(range(1, 4)), shape=4)
                 self.except_ = zn.Set([1, 2, 3])
                 self.constraints = [zn.alldifferent(self.a, except_=self.except_), zn.sum(self.a) == 7]
+
         model = MyModel()
         result = model.solve_satisfy()
         assert Counter(result["a"]) == {3: 1, 2: 1, 1: 2}

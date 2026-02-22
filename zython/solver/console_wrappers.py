@@ -4,7 +4,7 @@ import minizinc as mz
 
 
 def available_solver_tags(refresh: bool = False) -> Tuple[str, ...]:
-    """ Returns tags of available solvers
+    """Returns tags of available solvers
 
     Parameters
     ----------

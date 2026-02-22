@@ -12,7 +12,7 @@ from zython.var_par.types import ZnSequence
 from zython.var_par.var import var
 
 
-def exists(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
+def exists(*seq: ZnSequence | "Constraint" | Callable) -> Constraint:
     """Specify constraint which should be true for `at least` one element in ``seq``.
 
     The method has the same signature as ``forall``.
@@ -35,23 +35,57 @@ def exists(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None
     >>> result = model.solve_satisfy()
     >>> sorted((result["a"], result["b"], result["c"]))
     [0, 0, 1]
+
+    >>> import zython as zn
+    >>> import itertools
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self):
+    ...         self.x = zn.Array(zn.var(range(0, 5)), shape=3)
+    ...         self.y = zn.Array(zn.var(range(0, 5)), shape=3)
+    ...         self.constraints = [zn.exists(self.x, self.y, lambda a, b: a + b == 5)]
+    >>> model = MyModel()
+    >>> result = model.solve_satisfy()
+    >>> any(x + y == 5 for x, y in itertools.product(result["x"], result["y"]))
+    True
     """
+    seq, func = _get_seq_and_func(seq)
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     return constraint_module._exists(seq, iter_var, operation)
 
 
-def forall(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Constraint:
-    """
-    Takes expression (that is, constraint) or function which return constraint
-        and make them a single constraint which should be true for every element in the array.
+def forall(*seq: ZnSequence | "Constraint" | Callable) -> Constraint:
+    """Creates a universal quantifier constraint that must hold for all elements in one or more sequences.
 
-    Parameters
-    ----------
-    seq: range, array of var, or sequence (list or tuple) of var
-        sequence to apply ``func``
-    func: Constraint or Callable, optional
-        Constraint every element in seq should satisfy or function which returns such constraint.
-        If function or lambda it should be with 0 or 1 arguments only.
+    This function creates a constraint that applies to every element (or combination of elements
+    when multiple sequences are provided) in the given sequence(s). It's equivalent to the
+    mathematical universal quantifier (∀).
+
+    *seq : ZnSequence | Constraint | Callable
+        Variable-length argument list that can contain:
+        - One or more sequences (range, array of variables, list, or tuple of variables)
+        - A constraint to be applied to all elements
+        - A callable (function or lambda) that returns a constraint
+        
+        The last argument can be a Constraint or Callable that defines the condition.
+        If a callable is provided, it should accept 0 arguments (for simple constraints)
+        or N arguments where N is the number of sequences provided.
+
+    Constraint
+        A single constraint that enforces the given condition for all elements or
+        element combinations in the sequence(s).
+
+    Raises
+    ------
+    ValueError
+        If the arguments are not properly formatted or if the callable has an
+        incorrect number of parameters.
+
+    Notes
+    -----
+    - When multiple sequences are provided, the constraint is applied to the
+      Cartesian product of all sequences.
+    - The function automatically handles the iteration variables and applies
+      the constraint uniformly across all elements.
 
     Returns
     -------
@@ -70,6 +104,7 @@ def forall(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None
     >>> model.solve_satisfy()
     Solution(a=[1, 1, 1])
     """
+    seq, func = _get_seq_and_func(seq)
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     return constraint_module._forall(seq, iter_var, operation)
 
@@ -85,7 +120,7 @@ def sum(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -
     seq: range, array of var, or sequence (list or tuple) of var
         sequence to sum up
     func: Operation or Callable, optional
-        Operation which will be executed with every element and later sum up. 
+        Operation which will be executed with every element and later sum up.
         Or function which returns such operation.
         If function or lambda it should be with 0 or 1 arguments only.
 
@@ -122,6 +157,7 @@ def sum(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -
     iter_var, operation = _iternal.get_iter_var_and_op(seq, func)
     type_ = derive_operation_type(seq, operation)
     return Operation(_Op_code.sum_, seq, iter_var, operation, type_=type_)
+
 
 def product(seq: ZnSequence, func: Optional[Union["Constraint", Callable]] = None) -> Operation:
     """Calculate the product of the ``seq`` according to ``func``
@@ -334,19 +370,20 @@ def table(
     x: ZnSequence,
     t: ZnSequence,
 ) -> Constraint:
-    """The table constraint is used to specify if one dimensional array
-        should be equal to any row of a two-dimensional array.
+    """The table constraint is used to specify if one dimensional array should be equal to any row of a two-dimensional array.
 
     Or, in more strict form:
     the table constraint enforces that a tuple of variables takes a value from a set of tuples.
     Since there are no tuples in MiniZinc this is encoded using arrays.
     The constraint enforces x in t, where we consider x and each row in t to be a tuple,
-        and t to be a set of tuples.
+    and t to be a set of tuples.
 
     Parameters
     ----------
     x: one-dimentional array
-    t: two-dimentional array, `x` should be one of the rows of `t`
+        The variable array to be matched.
+    t: two-dimentional array
+        `x` should be one of the rows of `t`.
 
     Examples
     --------
@@ -392,6 +429,7 @@ def abs(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.abs, x, type_=get_base_type(x))
 
+
 def exp(x: Union[float, var]) -> Operation:
     """Return the exponential of x
 
@@ -414,6 +452,7 @@ def exp(x: Union[float, var]) -> Operation:
     Solution(a=2.718281828459045, b=7.38905609893065)
     """
     return Operation(_Op_code.exp, x, type_=float)
+
 
 def ln(x: Union[float, var]) -> Operation:
     """Return the natural logarithm of x
@@ -438,6 +477,7 @@ def ln(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.ln, x, type_=float)
 
+
 def log(x: Union[float, var], base: float) -> Operation:
     """Return the logarithm of x to the given base
 
@@ -460,6 +500,7 @@ def log(x: Union[float, var], base: float) -> Operation:
     Solution(a=3.0, b=3.0)
     """
     return Operation(_Op_code.log, base, x, type_=float)
+
 
 def log10(x: Union[float, var]) -> Operation:
     """Return the base-10 logarithm of x
@@ -484,6 +525,7 @@ def log10(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.log10, x, type_=float)
 
+
 def log2(x: Union[float, var]) -> Operation:
     """Return the base-2 logarithm of x
 
@@ -506,6 +548,7 @@ def log2(x: Union[float, var]) -> Operation:
     Solution(a=3.0, b=4.0)
     """
     return Operation(_Op_code.log2, x, type_=float)
+
 
 def sqrt(x: Union[float, var]) -> Operation:
     """Return the square root of x
@@ -530,6 +573,7 @@ def sqrt(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.sqrt, x, type_=float)
 
+
 def acos(x: Union[float, var]) -> Operation:
     """Return the arc cosine of x
 
@@ -553,17 +597,18 @@ def acos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.acos, x, type_=float)
 
+
 # def acosh(x: Union[float, var]) -> Operation:
 #     """Return the inverse hyperbolic cosine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the inverse hyperbolic cosine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -575,6 +620,7 @@ def acos(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=1.316957896924817)
 #     """
 #     return Operation(_Op_code.acosh, x, type_=float)
+
 
 def asin(x: Union[float, var]) -> Operation:
     """Return the arc sine of x
@@ -599,17 +645,18 @@ def asin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.asin, x, type_=float)
 
+
 # def asinh(x: Union[float, var]) -> Operation:
 #     """Return the inverse hyperbolic sine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the inverse hyperbolic sine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -621,6 +668,7 @@ def asin(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=0.881373587019543)
 #     """
 #     return Operation(_Op_code.asinh, x, type_=float)
+
 
 def atan(x: Union[float, var]) -> Operation:
     """Return the arc tangent of x
@@ -645,7 +693,8 @@ def atan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.atan, x, type_=float)
 
-#def atanh(x: Union[float, var]) -> Operation:
+
+# def atanh(x: Union[float, var]) -> Operation:
 #    """Return the inverse hyperbolic tangent of x
 #
 #    Returns
@@ -667,6 +716,7 @@ def atan(x: Union[float, var]) -> Operation:
 #    Solution(a=0.0, b=2.646652412362246)
 #    """
 #    return Operation(_Op_code.atanh, x, type_=float)
+
 
 def cos(x: Union[float, var]) -> Operation:
     """Return the cosine of x
@@ -691,17 +741,18 @@ def cos(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.cos, x, type_=float)
 
+
 # def cosh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic cosine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic cosine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -713,6 +764,7 @@ def cos(x: Union[float, var]) -> Operation:
 #     Solution(a=1.0, b=1.543080634815244)
 #     """
 #     return Operation(_Op_code.cosh, x, type_=float)
+
 
 def sin(x: Union[float, var]) -> Operation:
     """Return the sine of x
@@ -737,17 +789,18 @@ def sin(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.sin, x, type_=float)
 
+
 # def sinh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic sine of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic sine.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -759,6 +812,7 @@ def sin(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=1.175201193643801)
 #     """
 #     return Operation(_Op_code.sinh, x, type_=float)
+
 
 def tan(x: Union[float, var]) -> Operation:
     """Return the tangent of x
@@ -783,17 +837,18 @@ def tan(x: Union[float, var]) -> Operation:
     """
     return Operation(_Op_code.tan, x, type_=float)
 
+
 # def tanh(x: Union[float, var]) -> Operation:
 #     """Return the hyperbolic tangent of x
-# 
+#
 #     Returns
 #     -------
 #     result: Operation
 #         Operation which will calculate the hyperbolic tangent.
-# 
+#
 #     Examples
 #     --------
-# 
+#
 #     >>> import zython as zn
 #     >>> class MyModel(zn.Model):
 #     ...     def __init__(self):
@@ -805,6 +860,7 @@ def tan(x: Union[float, var]) -> Operation:
 #     Solution(a=0.0, b=0.7615941559557649)
 #     """
 #     return Operation(_Op_code.tanh, x, type_=float)
+
 
 def min(seq: ZnSequence, key: Union[Operation, Callable[[ZnSequence], Operation], None] = None) -> Operation:
     """Finds the smallest object in ``seq``, according to ``key``
@@ -1110,3 +1166,44 @@ def decreasing(seq: ZnSequence, *, allow_duplicate: Optional[bool] = True) -> Co
         return Constraint(_Op_code.decreasing, seq)
     else:
         return Constraint(_Op_code.strictly_decreasing, seq)
+
+
+def implication(left: Operation, right: Operation) -> Constraint:
+    """
+    Represents a logical implication operation between two operands.
+
+    Parameters
+    ----------
+    left: Operation
+        The left operand of the implication.
+    right: Operation
+        The right operand of the implication.
+
+    Returns
+    -------
+    Constraint
+        A constraint that ensures if the left operand is true, the right operand must also be true.
+        If the left operand is false, the right operand can be either true or false.
+
+    Examples
+    --------
+
+    >>> import zython as zn
+    >>> class MyModel(zn.Model):
+    ...     def __init__(self, a):
+    ...         self.a = zn.par(a)
+    ...         self.b = zn.var(range(5))
+    ...         self.constraints = [zn.implication(self.a > 1, self.b > 3)]
+    >>> model1 = MyModel(0)
+    >>> model2 = MyModel(2)
+    >>> model1.solve_minimize(model1.b), model2.solve_minimize(model2.b)
+    (Solution(objective=0, b=0), Solution(objective=4, b=4))
+    """
+    return Constraint(_Op_code.implication, left, right)
+
+
+def _get_seq_and_func(seq):
+    assert len(seq) >= 2, "At least 2 arguments should be provided"
+    func = seq[-1]
+    seq = seq[:-1] if len(seq) > 2 else seq[0]
+    return seq, func

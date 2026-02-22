@@ -39,7 +39,7 @@ class TestToStr:
 class TestModel:
     def test(self):
         class Model(zn.Model):
-            def __init__(self, ):
+            def __init__(self):
                 self.a = zn.Set(zn.var(zn.range(5)))
                 self.b = zn.Set(zn.range(10))
 

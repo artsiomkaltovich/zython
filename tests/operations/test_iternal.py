@@ -41,12 +41,13 @@ def test_array_and_op():
 def test_no_arg_func():
     def fn():
         return -1
+
     iter_var, op = get_iter_var_and_op([1, 2, 3], fn)
     assert isinstance(op, int) and op == -1
 
 
-def test_too_many_params():
-    with pytest.raises(ValueError, match="only functions and lambdas with one arguments are supported"):
+def test_params_and_arg_len_dont_match():
+    with pytest.raises(ValueError, match="don't match sequence length"):
         get_iter_var_and_op(range(5), lambda i, y: 1)
 
 

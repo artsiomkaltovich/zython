@@ -17,7 +17,7 @@ def test(session):
     session.run(
         "pytest",
         "-s",
-        "test",
+        "tests",
         "zython",
         "--cov=zython",
         "--cov-branch",
@@ -33,7 +33,7 @@ def doctest(session):
         return
     session.install("-r", "requirements.txt")
     session.install("-r", "requirements_dev.txt")
-    session.run("pytest", "doc", "--doctest-glob=*.rst", "--doctest-modules")
+    session.run("pytest", "docs", "--doctest-glob=*.rst", "--doctest-modules")
 
 
 @nox.session(default=False)
@@ -53,8 +53,8 @@ def gendoc(session):
         "docs/_build/doctrees",
         "-D",
         "language=en",
-        "doc/source",
-        "doc/build/html",
+        "docs/source",
+        "docs/build/html",
     )
 
 
@@ -62,4 +62,14 @@ def gendoc(session):
 def testcov(session):
     session.install("-r", "requirements.txt")
     session.install("-r", "requirements_dev.txt")
-    session.run("pytest", "test", "zython", "doc", "--doctest-glob=*.rst", "--doctest-modules", "--cov=zython", "--cov-branch", "--cov-report=term-missing")
+    session.run(
+        "pytest",
+        "tests",
+        "zython",
+        "docs",
+        "--doctest-glob=*.rst",
+        "--doctest-modules",
+        "--cov=zython",
+        "--cov-branch",
+        "--cov-report=term-missing",
+    )

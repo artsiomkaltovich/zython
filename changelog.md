@@ -1,3 +1,19 @@
+## 0.6.0
+
+#### Python interpreters support
+
+- Add 3.14 CPython.
+- Drop 3.8 and 3.9 CPython.
+
+#### Added
+
+- Add support for multiple collections in `forall` and `exists` constraints.
+- Add `implication` operation.
+
+#### CI changes
+
+- Use minizinc 2.9.5 as the latest version.
+
 ## 0.5.0
 
 #### Python interpreters support

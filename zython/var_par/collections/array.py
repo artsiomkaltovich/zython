@@ -21,7 +21,7 @@ class ArrayMixin(_AbstractCollection):
         return len(self._shape)
 
     def size(self, dim=0):
-        """ returns constraint, which is evaluated as the number of items in the specified dimension of the array.
+        """Returns constraint, which is evaluated as the number of items in the specified dimension of the array.
 
         Parameters
         ----------
@@ -47,9 +47,7 @@ class ArrayView(ArrayMixin):
         if not isinstance(pos, tuple):
             pos = (pos,)
         if len(pos) != self.array.ndims():
-            raise ValueError(
-                f"The array has {self.array.ndims()} dimensions, but {len(pos)} indexes were specified"
-            )
+            raise ValueError(f"The array has {self.array.ndims()} dimensions, but {len(pos)} indexes were specified")
         self._check_for_index_error(pos)
         pos = tuple(self._process_pos_item(dim, p) for dim, p in enumerate(pos))
         return pos
@@ -121,8 +119,10 @@ class ArrayPar(par, ArrayMixin):
             if len(shape) <= level:
                 shape.append(length)
             elif old_length != length:
-                raise ValueError("Subarrays of different length are not supported, length of all subarrays "
-                                 f"at level {level} should be {old_length}, but one has {length}")
+                raise ValueError(
+                    "Subarrays of different length are not supported, length of all subarrays "
+                    f"at level {level} should be {old_length}, but one has {length}"
+                )
             level = new_level
         if not isinstance(current_arg, int):
             raise ValueError("Only array with dtype int are supported")
@@ -134,8 +134,10 @@ class ArrayPar(par, ArrayMixin):
         flatten_values = [arg]
         for val, new_level in queue:
             if not isinstance(val, self._type):
-                raise ValueError(f"All elements of the array should be the same type, "
-                                 f"but {self._type} and {type(val)} were found")
+                raise ValueError(
+                    f"All elements of the array should be the same type, "
+                    f"but {self._type} and {type(val)} were found"
+                )
             if _can_create_array_from(val) or level != new_level:
                 raise ValueError("Subarrays of different length are not supported")
             flatten_values.append(val)
@@ -169,5 +171,6 @@ class Array:
             if _can_create_array_from(arg):
                 return ArrayPar(arg)
             else:
-                raise ValueError(f"Sequence of var is expected as parameter for array creation, "
-                                 f"but {type(arg)} was passed")
+                raise ValueError(
+                    f"Sequence of var is expected as parameter for array creation, " f"but {type(arg)} was passed"
+                )
